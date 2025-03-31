@@ -1,0 +1,19 @@
+{
+  "name": "resumeparser",
+  "version": "1.0.0",
+  "description": "Parse and search on resumes",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "postinstall": "cd resume_search && yarn install",
+    "dev": "cd resume_search && yarn dev",
+    "build": "cd resume_search && yarn build"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@tailwindcss/vite": "^4.0.17",
+    "tailwindcss": "^4.0.17"
+  }
+}
