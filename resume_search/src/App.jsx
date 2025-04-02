@@ -47,13 +47,13 @@ function App() {
               <TabsList className="bg-transparent border-b w-full justify-start rounded-none h-auto p-0">
                 <TabsTrigger 
                   value="search" 
-                  className="rounded-none border-b-2 border-transparent data-[state=active]:border-blue-600 data-[state=active]:bg-transparent px-4 py-2"
+                  className="rounded-none border-b-2 border-transparent data-[state=active]:border-blue-600 data-[state=active]:bg-white px-4 py-2"
                 >
                   Search candidates
                 </TabsTrigger>
                 <TabsTrigger 
                   value="saved" 
-                  className="rounded-none border-b-2 border-transparent data-[state=active]:border-blue-600 data-[state=active]:bg-transparent px-4 py-2"
+                  className="rounded-none border-b-2 border-transparent data-[state=active]:border-blue-600 data-[state=active]:bg-white px-4 py-2"
                 >
                   Saved Notes
                 </TabsTrigger>
@@ -74,25 +74,10 @@ function App() {
                 <EducationDetails />
                 <DiversityDetails />
                 
-                <div className="flex justify-between items-center mt-4 mb-8">
-                  <div className="flex items-center space-x-2">
-                    <span className="text-sm text-gray-600">Active in:</span>
-                    <Select defaultValue="6months">
-                      <SelectTrigger className="w-32">
-                        <SelectValue placeholder="Select period" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="6months">6 months</SelectItem>
-                        <SelectItem value="3months">3 months</SelectItem>
-                        <SelectItem value="1month">1 month</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-                  
-
-                  <button onClick={handleSearch} className="bg-blue-600 text-white text-m font-medium py-1 px-3 rounded-md flex items-center">
+                <div className="flex justify-end items-center mt-4 mb-8">
+                  <Button onClick={handleSearch} className="text-white bg-blue-800">
                     <span>Search candidates</span>
-                  </button>
+                  </Button>
 
                 </div>
               </TabsContent>

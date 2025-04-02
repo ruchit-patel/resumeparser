@@ -2,10 +2,9 @@ import React, { useState } from 'react';
 import { Card, CardHeader, CardContent } from '../ui/card';
 import { Label } from '../ui/label';
 import { Input } from '../ui/input';
-import { Button } from '../ui/button';
 import { Accordion, AccordionItem, AccordionTrigger, AccordionContent } from '../ui/accordion';
 import { ToggleGroup, ToggleGroupItem } from '../ui/toggle-group';
-import { Switch } from '../ui/switch';
+import { Badge } from '@/components/ui/badge';
 
 const EducationDetails = () => {
   const [ugQualification, setUgQualification] = useState('any');
@@ -22,7 +21,7 @@ const EducationDetails = () => {
           <AccordionContent>
             <CardContent className="space-y-4">
               {/* UG Qualification */}
-              <div className="space-y-2">
+              <div className="space-y-2 flex flex-col">
                 <Label className="block text-sm font-medium">UG Qualification</Label>
                 <ToggleGroup type="single" value={ugQualification} onValueChange={(value) => value && setUgQualification(value)}>
                   <ToggleGroupItem value="any" variant="pill" size="pill">Any UG qualification</ToggleGroupItem>
@@ -32,7 +31,7 @@ const EducationDetails = () => {
               </div>
               
               {/* Choose Course */}
-              <div className="space-y-2">
+              <div className="space-y-2 flex flex-col">
                 <Label htmlFor="ug-course">Choose Course</Label>
                 <Input 
                   id="ug-course"
@@ -41,7 +40,7 @@ const EducationDetails = () => {
               </div>
               
               {/* Institute */}
-              <div className="space-y-2">
+              <div className="space-y-2 flex flex-col">
                 <Label htmlFor="institute">Institute</Label>
                 <Input 
                   id="institute"
@@ -50,7 +49,7 @@ const EducationDetails = () => {
               </div>
               
               {/* Education Type */}
-              <div className="space-y-2">
+              <div className="space-y-2 flex flex-col">
                 <Label className="block text-sm font-medium">Education Type</Label>
                 <ToggleGroup type="single" value={educationType} onValueChange={(value) => value && setEducationType(value)}>
                   <ToggleGroupItem value="full-time" variant="pill" size="pill">Full Time</ToggleGroupItem>
@@ -60,7 +59,7 @@ const EducationDetails = () => {
               </div>
               
               {/* Year of degree completion */}
-              <div className="space-y-2">
+              <div className="space-y-2 flex flex-col">
                 <Label>Year of degree completion</Label>
                 <div className="flex items-center space-x-2">
                   <select className="w-1/3 px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
@@ -80,7 +79,7 @@ const EducationDetails = () => {
               </div>
               
               {/* PG Qualification */}
-              <div className="space-y-2">
+              <div className="space-y-2 flex flex-col">
                 <Label className="block text-sm font-medium">PG Qualification</Label>
                 <ToggleGroup type="single" value={pgQualification} onValueChange={(value) => value && setPgQualification(value)}>
                   <ToggleGroupItem value="any" variant="pill" size="pill">Any PG qualification</ToggleGroupItem>
@@ -91,9 +90,12 @@ const EducationDetails = () => {
               
               {/* Add PPG/Doctorate Qualification */}
               <div>
-                <Button variant="link" className="p-0 h-auto text-blue-600 text-sm font-medium flex items-center">
+                {/* <Button variant="link" className="p-0 h-auto text-blue-600 text-sm font-medium flex items-center">
                   <span className="mr-1">+</span> Add PPG/Doctorate Qualification
-                </Button>
+                </Button> */}
+                <Badge variant='outline' className='text-blue-800 cursor-pointer' onClick={() => alert(true)}>
+                  + Add PPG/Doctorate Qualification
+              </Badge>
               </div>
             </CardContent>
           </AccordionContent>

@@ -36,7 +36,7 @@ const DiversityDetails = () => {
                 <h3 className="text-sm font-medium text-gray-700">Diversity details</h3>
                 
                 {/* Gender */}
-                <div className="space-y-2">
+                <div className="space-y-2 flex flex-col">
                   <Label>Gender</Label>
                   <ToggleGroup type="single" value={gender} onValueChange={(value) => value && setGender(value)}>
                     <ToggleGroupItem value="all" variant="pill" size="pill">All candidates</ToggleGroupItem>
@@ -58,7 +58,7 @@ const DiversityDetails = () => {
                 </div>
                 
                 {/* Candidate Category */}
-                <div className="space-y-2">
+                <div className="space-y-2 flex flex-col">
                   <Label htmlFor="candidate-category">Candidate Category</Label>
                   <Input 
                     id="candidate-category"
@@ -67,7 +67,7 @@ const DiversityDetails = () => {
                 </div>
                 
                 {/* Candidate Age */}
-                <div className="space-y-2">
+                <div className="space-y-2 flex flex-col">
                   <Label>Candidate Age</Label>
                   <div className="flex items-center space-x-2">
                     <Input 
@@ -85,11 +85,11 @@ const DiversityDetails = () => {
               </div>
               
               {/* Work details */}
-              <div className="space-y-4">
+              <div className="space-y-4  flex flex-col">
                 <h3 className="text-sm font-medium text-gray-700">Work details</h3>
                 
                 {/* Show candidates seeking */}
-                <div className="space-y-2">
+                <div className="space-y-2 flex flex-col">
                   <Label>Show candidates seeking</Label>
                   <div className="flex space-x-2">
                     <Select>
@@ -115,7 +115,7 @@ const DiversityDetails = () => {
                 </div>
                 
                 {/* Work permit for */}
-                <div className="space-y-2">
+                <div className="space-y-2 flex flex-col">
                   <Label htmlFor="work-permit">Work permit for</Label>
                   <Input 
                     id="work-permit"
@@ -125,11 +125,11 @@ const DiversityDetails = () => {
               </div>
               
               {/* Display details */}
-              <div className="space-y-4">
+              <div className="space-y-4 flex flex-col">
                 <h3 className="text-sm font-medium text-gray-700">Display details</h3>
                 
                 {/* Show */}
-                <div className="space-y-2">
+                <div className="space-y-2 flex flex-col">
                   <Label>Show</Label>
                   <ToggleGroup type="single" value={showCandidates} onValueChange={(value) => value && setShowCandidates(value)}>
                     <ToggleGroupItem value="all" variant="pill" size="pill">All candidates</ToggleGroupItem>
@@ -139,7 +139,7 @@ const DiversityDetails = () => {
                 </div>
                 
                 {/* Show only candidates with */}
-                <div className="space-y-2">
+                <div className="space-y-2 flex flex-col">
                   <Label>Show only candidates with</Label>
                   <div className="flex flex-wrap gap-2">
                     <Toggle 
