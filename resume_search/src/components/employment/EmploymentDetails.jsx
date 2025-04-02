@@ -1,124 +1,135 @@
 import React, { useState } from 'react';
+import { Card, CardHeader, CardContent } from '../ui/card';
+import { Label } from '../ui/label';
+import { Input } from '../ui/input';
+import { Button } from '../ui/button';
+import { Accordion, AccordionItem, AccordionTrigger, AccordionContent } from '../ui/accordion';
+import { ToggleGroup, ToggleGroupItem } from '../ui/toggle-group';
+import { Switch } from '../ui/switch';
+import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from '../ui/select';
+import { Checkbox } from '../ui/checkbox';
 
 const EmploymentDetails = () => {
-  const [isExpanded, setIsExpanded] = useState(true);
+  const [noticePeriod, setNoticePeriod] = useState('any');
+  const [boostCompany, setBoostCompany] = useState(false);
+  const [boostDesignation, setBoostDesignation] = useState(false);
+  const [searchCurrentCompany, setSearchCurrentCompany] = useState(false);
+  const [searchCurrentDesignation, setSearchCurrentDesignation] = useState(false);
+  const [servingNoticePeriod, setServingNoticePeriod] = useState(false);
 
   return (
-    <div className="bg-white shadow rounded-lg p-6 mb-6">
-      <div className="flex justify-between items-center mb-4">
-        <h2 className="text-xl font-semibold">Employment Details</h2>
-        <button 
-          onClick={() => setIsExpanded(!isExpanded)}
-          className="text-gray-500 hover:text-gray-700"
-        >
-          {isExpanded ? (
-            <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 15l7-7 7 7" />
-            </svg>
-          ) : (
-            <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" />
-            </svg>
-          )}
-        </button>
-      </div>
-      
-      {isExpanded && (
-        <div className="space-y-4">
-          {/* Department and Role */}
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Department and Role</label>
-            <input 
-              type="text" 
-              placeholder="Add Department and Role" 
-              className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-            />
-          </div>
-          
-          {/* Industry */}
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Industry</label>
-            <input 
-              type="text" 
-              placeholder="Add Industry" 
-              className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-            />
-          </div>
-          
-          {/* Company */}
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Company</label>
-            <input 
-              type="text" 
-              placeholder="Add Company name" 
-              className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-            />
-            <div className="mt-2 flex items-center">
-              <span className="text-xs text-gray-500 mr-2">Boosted off</span>
-              <button className="relative inline-flex items-center h-5 rounded-full w-10 bg-gray-200">
-                <span className="absolute h-4 w-4 left-1 bg-white rounded-full"></span>
-              </button>
-            </div>
-            
-            <div className="mt-2">
-              <div className="flex items-center justify-between">
-                <span className="text-sm text-gray-700">Search in Current company</span>
-                <svg className="h-4 w-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" />
-                </svg>
+    <Card className="mb-6">
+      <Accordion type="single" collapsible>
+        <AccordionItem value="employment">
+          <AccordionTrigger className="px-6 py-4">
+            <h2 className="text-xl font-semibold">Employment Details</h2>
+          </AccordionTrigger>
+          <AccordionContent>
+            <CardContent className="space-y-4">
+              {/* Department and Role */}
+              <div className="space-y-2">
+                <Label htmlFor="department-role">Department and Role</Label>
+                <Input 
+                  id="department-role"
+                  placeholder="Add Department and Role" 
+                />
               </div>
-            </div>
-          </div>
-          
-          {/* Designation */}
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Designation</label>
-            <input 
-              type="text" 
-              placeholder="Add designation" 
-              className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-            />
-            <div className="mt-2 flex items-center">
-              <span className="text-xs text-gray-500 mr-2">Boosted off</span>
-              <button className="relative inline-flex items-center h-5 rounded-full w-10 bg-gray-200">
-                <span className="absolute h-4 w-4 left-1 bg-white rounded-full"></span>
-              </button>
-            </div>
-            
-            <div className="mt-2">
-              <div className="flex items-center justify-between">
-                <span className="text-sm text-gray-700">Search in Current designation</span>
-                <svg className="h-4 w-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" />
-                </svg>
+              
+              {/* Industry */}
+              <div className="space-y-2">
+                <Label htmlFor="industry">Industry</Label>
+                <Input 
+                  id="industry"
+                  placeholder="Add Industry" 
+                />
               </div>
-            </div>
-          </div>
-          
-          {/* Notice Period / Availability to join */}
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Notice Period / Availability to join</label>
-            <div className="flex flex-wrap gap-2">
-              <button className="bg-blue-50 text-blue-600 px-3 py-1 rounded-full text-sm">Any</button>
-              <button className="bg-gray-100 text-gray-700 px-3 py-1 rounded-full text-sm">0-15 days</button>
-              <button className="bg-gray-100 text-gray-700 px-3 py-1 rounded-full text-sm">1 month</button>
-              <button className="bg-gray-100 text-gray-700 px-3 py-1 rounded-full text-sm">2 months</button>
-              <button className="bg-gray-100 text-gray-700 px-3 py-1 rounded-full text-sm">3 months</button>
-              <button className="bg-gray-100 text-gray-700 px-3 py-1 rounded-full text-sm">More than 3 months</button>
-            </div>
-            
-            <div className="mt-3">
-              <div className="flex items-center">
-                <span className="text-sm text-gray-700 mr-2">Currently serving notice period</span>
-                <svg className="h-4 w-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" />
-                </svg>
+              
+              {/* Company */}
+              <div className="space-y-2">
+                <Label htmlFor="company">Company</Label>
+                <Input 
+                  id="company"
+                  placeholder="Add Company name" 
+                />
+                <div className="mt-2 flex items-center space-x-2">
+                  <span className="text-xs text-gray-500">Boosted off</span>
+                  <Switch 
+                    checked={boostCompany}
+                    onCheckedChange={setBoostCompany}
+                  />
+                </div>
+                
+                <div className="mt-2 flex items-center justify-between">
+                  <div className="flex items-center space-x-2">
+                    <Checkbox 
+                      id="search-current-company" 
+                      checked={searchCurrentCompany}
+                      onCheckedChange={setSearchCurrentCompany}
+                    />
+                    <Label htmlFor="search-current-company" className="font-normal">
+                      Search in Current company
+                    </Label>
+                  </div>
+                </div>
               </div>
-            </div>
-          </div>
-        </div>
-      )}
-    </div>
+              
+              {/* Designation */}
+              <div className="space-y-2">
+                <Label htmlFor="designation">Designation</Label>
+                <Input 
+                  id="designation"
+                  placeholder="Add designation" 
+                />
+                <div className="mt-2 flex items-center space-x-2">
+                  <span className="text-xs text-gray-500">Boosted off</span>
+                  <Switch 
+                    checked={boostDesignation}
+                    onCheckedChange={setBoostDesignation}
+                  />
+                </div>
+                
+                <div className="mt-2 flex items-center justify-between">
+                  <div className="flex items-center space-x-2">
+                    <Checkbox 
+                      id="search-current-designation" 
+                      checked={searchCurrentDesignation}
+                      onCheckedChange={setSearchCurrentDesignation}
+                    />
+                    <Label htmlFor="search-current-designation" className="font-normal">
+                      Search in Current designation
+                    </Label>
+                  </div>
+                </div>
+              </div>
+              
+              {/* Notice Period / Availability to join */}
+              <div className="space-y-2">
+                <Label>Notice Period / Availability to join</Label>
+                <ToggleGroup type="single" value={noticePeriod} onValueChange={(value) => value && setNoticePeriod(value)}>
+                  <ToggleGroupItem value="any" variant="pill" size="pill">Any</ToggleGroupItem>
+                  <ToggleGroupItem value="0-15" variant="pill" size="pill">0-15 days</ToggleGroupItem>
+                  <ToggleGroupItem value="1-month" variant="pill" size="pill">1 month</ToggleGroupItem>
+                  <ToggleGroupItem value="2-months" variant="pill" size="pill">2 months</ToggleGroupItem>
+                  <ToggleGroupItem value="3-months" variant="pill" size="pill">3 months</ToggleGroupItem>
+                  <ToggleGroupItem value="more-than-3" variant="pill" size="pill">More than 3 months</ToggleGroupItem>
+                </ToggleGroup>
+                
+                <div className="mt-3 flex items-center space-x-2">
+                  <Checkbox 
+                    id="serving-notice-period" 
+                    checked={servingNoticePeriod}
+                    onCheckedChange={setServingNoticePeriod}
+                  />
+                  <Label htmlFor="serving-notice-period" className="font-normal">
+                    Currently serving notice period
+                  </Label>
+                </div>
+              </div>
+            </CardContent>
+          </AccordionContent>
+        </AccordionItem>
+      </Accordion>
+    </Card>
   );
 };
 
