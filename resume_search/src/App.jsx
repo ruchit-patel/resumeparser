@@ -25,6 +25,17 @@ function App() {
   const [location, setLocation] = useState("");
   const [currency, setCurrency] = useState('INR');
   
+
+  // Employement Details
+  const [departmentes, setDepartmentes] = useState([]);
+  const [industry, setIndustry] = useState("");
+  const [company, setCompany] = useState("");
+  const [excludeCompanies, setExcludeCompanies] = useState([]);
+  const [designation, setDesignation] = useState("");
+  const [noticePeriod, setNoticePeriod] = useState('any');
+
+
+
   // State for active tab
   const [activeTab, setActiveTab] = useState('search');
   
@@ -32,6 +43,7 @@ function App() {
   const handleSearch = () => {
     alert("Field are searching ....")
     const JSONFormate = {
+      // Search
       searchKeywords:searchKeywords,
       searchIn:searchIn,
       skills:skills,
@@ -40,9 +52,19 @@ function App() {
       currency:currency,
       minSalary:minSalary,
       maxSalary:maxSalary,
-      location:location
+      location:location,
+
+      //  Employment
+
+      departmentes:departmentes,
+      industry:industry,
+      company:company,
+      excludeCompanies:excludeCompanies,
+      designation:designation,
+      noticePeriod:noticePeriod,
     }
     console.log(JSONFormate)
+    alert(JSONFormate)
     // In a real application, this would trigger an API call
   };
 
@@ -96,7 +118,23 @@ function App() {
                   currency={currency}
                   setCurrency={setCurrency}
                 />
-                <EmploymentDetails />
+
+                {/* Employment Details */}
+                <EmploymentDetails
+                  departmentes={departmentes}
+                  setDepartmentes={setDepartmentes}
+                  industry={industry}
+                  setIndustry={setIndustry}
+                  company={company}
+                  setCompany={setCompany}
+                  excludeCompanies={excludeCompanies}
+                  setExcludeCompanies={setExcludeCompanies}
+                  designation={designation}
+                  setDesignation={setDesignation}
+                  noticePeriod={noticePeriod}
+                  setNoticePeriod={setNoticePeriod}
+                />
+                
                 <EducationDetails />
                 <DiversityDetails />
                 

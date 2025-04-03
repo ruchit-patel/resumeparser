@@ -5,11 +5,17 @@ import { Input } from '../ui/input';
 import { Accordion, AccordionItem, AccordionTrigger, AccordionContent } from '../ui/accordion';
 import { ToggleGroup, ToggleGroupItem } from '../ui/toggle-group';
 import CustomSelectionAddInput from '../common/CustomSelectionAddInput';
+import DepartmentRoleSelector from './DepartmentSelection';
+import AutocompleteInput from '../common/AutoCompleteInputComponent';
 
-const EmploymentDetails = () => {
-  const [noticePeriod, setNoticePeriod] = useState('any');
-  const [excludeCompanies, setExcludeCompanies] = useState([]);
-
+const EmploymentDetails = ({
+  departmentes,setDepartmentes,
+  industry,setIndustry,
+  company,setCompany,
+  excludeCompanies,setExcludeCompanies,
+  designation,setDesignation,
+  noticePeriod,setNoticePeriod
+}) => {
   return (
     <Card className="mb-6">
       <Accordion type="single" collapsible>
@@ -22,44 +28,34 @@ const EmploymentDetails = () => {
               {/* Department and Role */}
               <div className="space-y-2 flex flex-col">
                 <Label htmlFor="department-role">Department and Role</Label>
-                <Input 
-                  id="department-role"
-                  placeholder="Add Department and Role" 
-                />
+                <DepartmentRoleSelector  selectedItems={departmentes} setSelectedItems={setDepartmentes}/>
               </div>
               
               {/* Industry */}
               <div className="space-y-2 flex flex-col">
                 <Label htmlFor="industry">Industry</Label>
-                <Input 
-                  id="industry"
-                  placeholder="Add Industry" 
-                />
+                <AutocompleteInput placeholder={"Add Industry"} inputValue={industry} setInputValue={setIndustry}/>
+               
               </div>
               
               {/* Company */}
               <div className="space-y-2 flex flex-col">
                 <Label htmlFor="company">Company</Label>
-                <Input 
-                  id="company"
-                  placeholder="Add Company name" 
-                />
+                <AutocompleteInput placeholder={"Add Company Name"} inputValue={company} setInputValue={setCompany}/>
+
                
                <CustomSelectionAddInput 
-               label='Exclude Companies' 
-               placeholder='Enter Exclude Companies' 
-               List={excludeCompanies} 
-               setList={setExcludeCompanies} />
-                
+                  label='Exclude Companies' 
+                  placeholder='Enter Exclude Companies' 
+                  List={excludeCompanies} 
+                  setList={setExcludeCompanies} />
               </div>
               
               {/* Designation */}
               <div className="space-y-2 flex flex-col">
                 <Label htmlFor="designation">Designation</Label>
-                <Input 
-                  id="designation"
-                  placeholder="Add designation" 
-                />
+                <AutocompleteInput placeholder={"Add Designation"} inputValue={designation} setInputValue={setDesignation}/>
+
                           
               </div>
               
