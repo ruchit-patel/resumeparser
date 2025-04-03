@@ -14,12 +14,40 @@ const MultiAutoSuggations = ({placeholder,keywords,setKeywords,setHideSection}) 
   const inputRef = useRef(null)
   const suggestionsRef = useRef(null)
 
+
+
+
+  const fetchSearchData = async () => {
+    try {
+      const myHeaders = new Headers();
+      myHeaders.append("Content-Type", "application/json");
+      myHeaders.append("Cookie", "connect.sid=s%3ARudFLEowBmEoJFYaY5ALLvqm3J67MSdH.2uDZBnIpaEuiWVkZfRYLExdJOszjPtNzEV2lwAJbZz8");
+  
+      const requestOptions = {
+        method: "GET",
+        headers: myHeaders,
+        redirect: "follow"
+      };
+  
+      const response = await fetch("https://api.freeapi.app/api/v1/public/randomproducts?page=1&limit=5&query=mens-watches", requestOptions);
+      const result = await response.json();
+      return result;
+    } catch (error) {
+      console.error(error);
+      return null;
+    }
+  }; 
+
+
   const allSuggestions = [
     "JavaScript", "TypeScript", "React", "Vue", "Angular", "Node.js", "Python", "Django", "Flask", "Ruby", "Rails", "PHP", "Laravel", "Java", "Spring", "C#", ".NET", "Go", "Rust", "Swift",
   ]
 
   useEffect(() => {
     if (inputValue.trim()) {
+      fetchSearchData().then((response) => {
+        console.log(response.data.data); // Use the returned JSON data here
+      });
       const filtered = allSuggestions.filter((item) => item.toLowerCase().includes(inputValue.toLowerCase()))
       setSuggestions(filtered)
       setShowSuggestions(filtered.length > 0)
