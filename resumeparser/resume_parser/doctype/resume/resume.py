@@ -14,16 +14,23 @@ from opensearchpy import OpenSearch
 class Resume(Document):
 
 	def validate(self):
-		client = genai.Client(api_key='AIzaSyDqcrnNO8isKSPEAQxfGvDKqPeGzEonB-4')
-		    # Check if the file is public or private
+		# Any validation logic if needed
+		pass
+
+	def before_insert(self):
+		"""Extract resume data using Gemini API before inserting the document"""
+		# Check if the file is public or private
 		if self.resume_file.startswith("/private/"):
-            # Handle private file (read directly from filesystem)
+			# Handle private file (read directly from filesystem)
 			file_path = frappe.get_site_path(self.resume_file.lstrip("/"))  # Full system path
 		elif self.resume_file.startswith("/files/"):
-            # Public file (can be accessed directly)
+			# Public file (can be accessed directly)
 			file_path = frappe.get_site_path("public", self.resume_file.lstrip("/public/"))
 		
 		filepath = pathlib.Path(file_path)
+
+		# Initialize Gemini client
+		client = genai.Client(api_key='AIzaSyDqcrnNO8isKSPEAQxfGvDKqPeGzEonB-4')
 
 		prompt = """
 			You are an AI assistant specializing in structured data extraction. Given a PDF resume, extract relevant information and return it as a structured JSON object. Follow the exact schema provided below. If certain details are missing, leave them as null or empty arrays but do not infer information. Ensure the extracted text retains proper formatting for addresses, descriptions, and long text fields.
@@ -128,7 +135,7 @@ class Resume(Document):
 
 		try:
 			data = json.loads(response_text)  # Convert to dictionary
-			self.extracted_json = data  # Store as JSON string
+			self.extracted_json = json.dumps(data, indent=4)  # Store as formatted JSON string
 		except json.JSONDecodeError:
 			frappe.throw("Invalid JSON response from Gemini API.")
 
@@ -137,7 +144,14 @@ class Resume(Document):
 
 	def after_insert(self):
 		"""Update the resume fields in OpenSearch"""
-		self.update_resume_fields(data=self.extracted_json, id=self.name)
+		# Parse the JSON string back to dictionary
+		data_dict = json.loads(self.extracted_json)
+		result = self.update_resume_fields(data=data_dict, id=self.name)
+		
+		# If a duplicate was found, store the info for the frontend
+		if result and result.get('status') == 'duplicate_found':
+			self.duplicate_info = json.dumps(result, indent=4)
+			self.save(ignore_permissions=True)
 
 	def update_resume_fields(self, data, id):
 		"""Update fields based on extracted LLM data after checking for duplicates"""
@@ -153,10 +167,17 @@ class Resume(Document):
 		# Check for potential duplicates
 		duplicate = self.check_duplicate_resume(client, data)
 		if duplicate:
-			frappe.throw(f"Potential duplicate resume found with ID: {duplicate}. Resume not indexed.")
+			# Instead of throwing error, return the duplicate info
+			return {
+				"status": "duplicate_found",
+				"duplicate_id": duplicate,
+				"data": data
+			}
 
+		# If no duplicate found, proceed with indexing
 		response = client.index(index=index_name, body=data, id=id)
 		frappe.logger().info(f"Stored in OpenSearch: {response}")
+		return {"status": "success"}
 
 	def normalize_mobile_number(self, number):
 		"""Normalize mobile number by handling international formats and removing country codes"""
@@ -285,10 +306,10 @@ class Resume(Document):
 			for doc_id, info in potential_duplicates.items():
 				if info["count"] >= 2:
 					matched_fields = ", ".join(info["fields"])
-					frappe.msgprint(
-						f"Duplicate detected! Matching fields: {matched_fields}",
-						indicator="red"
-					)
+					# frappe.msgprint(
+					# 	f"Duplicate detected! Matching fields: {matched_fields}",
+					# 	indicator="red"
+					# )
 					return doc_id
 
 			return None
@@ -311,3 +332,36 @@ class Resume(Document):
 			http_compress=True
 		)
 		return client
+
+@frappe.whitelist()
+def update_existing_resume(duplicate_id, new_data, name=None):
+	"""Update an existing resume with new data and remove the duplicate entry"""
+	try:
+		# Convert new_data to dict if it's a string
+		if isinstance(new_data, str):
+			new_data = json.loads(new_data)
+
+		# Get the existing resume
+		existing_resume = frappe.get_doc("Resume", duplicate_id)
+		
+		# Update the Frappe document
+		existing_resume.extracted_json = json.dumps(new_data, indent=4)
+		existing_resume.save()
+		
+		# Update OpenSearch index
+		client = existing_resume.get_opensearch_client()
+		index_name = "resumes"
+		
+		# Update the document in OpenSearch
+		response = client.index(index=index_name, body=new_data, id=duplicate_id)
+		frappe.logger().info(f"Updated existing resume in OpenSearch: {response}")
+		
+		# Delete the duplicate document using the provided name
+		if name:
+			frappe.delete_doc("Resume", name, force=1)
+		
+		return {"status": "success", "message": "Resume updated and duplicate removed"}
+		
+	except Exception as e:
+		frappe.log_error(f"Error updating existing resume: {str(e)}")
+		frappe.throw("Failed to update existing resume")

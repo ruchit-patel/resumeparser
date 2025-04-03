@@ -7,7 +7,8 @@
  "engine": "InnoDB",
  "field_order": [
   "resume_file",
-  "extracted_json"
+  "extracted_json",
+  "duplicate_info"
  ],
  "fields": [
   {
@@ -15,18 +16,27 @@
    "fieldtype": "Attach",
    "in_list_view": 1,
    "label": "Resume File",
-   "reqd": 1
+   "make_attachment_public": 1,
+   "reqd": 1,
+   "set_only_once": 1
   },
   {
    "fieldname": "extracted_json",
    "fieldtype": "JSON",
    "label": "File Content"
+  },
+  {
+   "description": "Information about duplicate resume if found",
+   "fieldname": "duplicate_info",
+   "fieldtype": "JSON",
+   "label": "Duplicate Info",
+   "read_only": 1
   }
  ],
  "grid_page_length": 50,
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2025-03-31 15:35:22.781421",
+ "modified": "2025-04-03 15:50:00.356317",
  "modified_by": "Administrator",
  "module": "Resume Parser",
  "name": "Resume",
