@@ -4,25 +4,22 @@ import { Label } from '../ui/label';
 import { Input } from '../ui/input';
 import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from '../ui/select';
 import { Checkbox } from '../ui/checkbox';
-import CutomInputSelection from '../common/customSelectionInput';
-import SearchBar from './autoSearch';
+import CustomSelectionAddInput from '../common/CustomSelectionAddInput';
+import MultiAutoSuggations from '../common/MultiAutoSuggationsComponent';
+import AutocompleteInput from '../common/AutoCompleteInputComponent';
 const SearchForm = ({ 
-  searchKeywords, 
-  setSearchKeywords, 
-  minExperience, 
-  setMinExperience, 
-  maxExperience, 
-  setMaxExperience,
-  location,
-  setLocation
+  searchKeywords,setSearchKeywords, 
+  searchIn,setSearchIn,
+  skills,setSkills,
+  minExperience,setMinExperience, 
+  maxExperience,setMaxExperience,
+  location,setLocation,
+  minSalary,setMinSalary,
+  maxSalary,setMaxSalary,
+  currency,setCurrency
 }) => {
   const [includeSalary, setIncludeSalary] = useState(false);
-  const [currency, setCurrency] = useState('INR');
-  const [minSalary, setMinSalary] = useState('');
-  const [maxSalary, setMaxSalary] = useState('');
-  const [searchIn, setSearchIn] = useState('Entire resume');
-
-  const [skills, setSkills] = useState([]);
+  const [isSearchText,setIsSearchText]= useState(false); // Optional when something do when inputfield is
 
   return (
     <Card className="mb-6">
@@ -34,12 +31,14 @@ const SearchForm = ({
         <div className="space-y-2 flex flex-col">
           
           <Label htmlFor="keywords">Keywords</Label>
-          <SearchBar/>
-          {/* <Input 
-            id="keywords"
-            placeholder="Enter keywords like skills, designation, and company" 
-            value={searchKeywords}
-            onChange={(e) => setSearchKeywords(e.target.value)}/> */}
+          <div className="border rounded-md px-2 py-1 focus-within:ring-1 focus-within:ring-ring focus-within:border-input flex gap-2">
+            <MultiAutoSuggations 
+            placeholder={"Enter keywords like skills, designation, and company"}
+            keywords={searchKeywords}
+            setKeywords={setSearchKeywords}
+            setHideSection={setIsSearchText}           
+            />
+          </div>
 
           {/* Find in Resume  */}
           <div className="mx-5 self-end flex gap-1">
@@ -64,7 +63,7 @@ const SearchForm = ({
 
         {/* Add IT Skills button */}
 
-        <CutomInputSelection label='IT Skill' placeholder='Enter skill' List={skills} setList={setSkills} />
+        <CustomSelectionAddInput label='IT Skill' placeholder='Enter skill' List={skills} setList={setSkills} />
 
         {/* Experience */}
         <div className="space-y-2 flex flex-col">
@@ -90,11 +89,7 @@ const SearchForm = ({
         {/* Current location */}
         <div className="space-y-2 flex flex-col">
           <Label>Current location of candidate</Label>
-          <Input 
-            placeholder="Add location" 
-            value={location}
-            onChange={(e) => setLocation(e.target.value)}
-          />
+          <AutocompleteInput placeholder={"Enter city Name"} inputValue={location} setInputValue={setLocation}/>
         </div>
         
         {/* Annual Salary */}
