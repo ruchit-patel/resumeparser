@@ -4,7 +4,7 @@ import { Label } from '../ui/label';
 import { Input } from '../ui/input';
 import { Accordion, AccordionItem, AccordionTrigger, AccordionContent } from '../ui/accordion';
 import { ToggleGroup, ToggleGroupItem } from '../ui/toggle-group';
-import CutomInputSelection from '../common/customSelectionInput';
+import CustomSelectionAddInput from '../common/CustomSelectionAddInput';
 
 const EmploymentDetails = () => {
   const [noticePeriod, setNoticePeriod] = useState('any');
@@ -45,7 +45,11 @@ const EmploymentDetails = () => {
                   placeholder="Add Company name" 
                 />
                
-               <CutomInputSelection label='Exclude Companies' placeholder='Enter Exclude Companies' List={excludeCompanies} setList={setExcludeCompanies} />
+               <CustomSelectionAddInput 
+               label='Exclude Companies' 
+               placeholder='Enter Exclude Companies' 
+               List={excludeCompanies} 
+               setList={setExcludeCompanies} />
                 
               </div>
               

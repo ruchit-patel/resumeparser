@@ -14,22 +14,35 @@ import { FrappeProvider } from 'frappe-react-sdk'
 import './App.css';
 
 function App() {
-  // State for search form
-  const [searchKeywords, setSearchKeywords] = useState('');
+  // Search Form
+  const [searchKeywords, setSearchKeywords] = useState([]);
+  const [searchIn, setSearchIn] = useState('Entire resume');
+  const [skills, setSkills] = useState([]);
   const [minExperience, setMinExperience] = useState('');
   const [maxExperience, setMaxExperience] = useState('');
-  const [location, setLocation] = useState('');
+  const [minSalary, setMinSalary] = useState('');
+  const [maxSalary, setMaxSalary] = useState('');
+  const [location, setLocation] = useState("");
+  const [currency, setCurrency] = useState('INR');
   
   // State for active tab
   const [activeTab, setActiveTab] = useState('search');
   
   // Handle search submission
   const handleSearch = () => {
-    console.log('Searching with parameters:', {
-      keywords: searchKeywords,
-      experience: `${minExperience}-${maxExperience} years`,
-      location
-    });
+    alert("Field are searching ....")
+    const JSONFormate = {
+      searchKeywords:searchKeywords,
+      searchIn:searchIn,
+      skills:skills,
+      minExperience:minExperience,
+      maxExperience:maxExperience,
+      currency:currency,
+      minSalary:minSalary,
+      maxSalary:maxSalary,
+      location:location
+    }
+    console.log(JSONFormate)
     // In a real application, this would trigger an API call
   };
 
@@ -60,15 +73,28 @@ function App() {
               </TabsList>
               
               <TabsContent value="search" className="mt-6 space-y-6">
+
+
+                {/*  Search Form */}
                 <SearchForm 
                   searchKeywords={searchKeywords}
                   setSearchKeywords={setSearchKeywords}
+                  searchIn={searchIn}
+                  setSearchIn={setSearchIn}
+                  skills={skills}
+                  setSkills={setSkills}
                   minExperience={minExperience}
                   setMinExperience={setMinExperience}
                   maxExperience={maxExperience}
+                  minSalary={minSalary}
+                  setMinSalary={setMinSalary}
+                  maxSalary={maxSalary}
+                  setMaxSalary={setMaxSalary}
                   setMaxExperience={setMaxExperience}
                   location={location}
                   setLocation={setLocation}
+                  currency={currency}
+                  setCurrency={setCurrency}
                 />
                 <EmploymentDetails />
                 <EducationDetails />
