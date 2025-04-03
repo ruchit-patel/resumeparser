@@ -1,7 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Input } from '../ui/input';
 import { Badge } from '@/components/ui/badge';
-import { X } from 'lucide-react';
 import MultiAutoSuggations from './MultiAutoSuggationsComponent';
 
 const CustomSelectionAddInput = ({ label, placeholder, List, setList }) => {

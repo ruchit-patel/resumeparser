@@ -8,12 +8,18 @@ import { ToggleGroup, ToggleGroupItem } from '../ui/toggle-group';
 import { Toggle } from '../ui/toggle';
 import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from '../ui/select';
 import { Checkbox } from '../ui/checkbox';
-
-const DiversityDetails = () => {
-  const [gender, setGender] = useState('all');
-  const [showCandidates, setShowCandidates] = useState('all');
-  const [verifiedFilters, setVerifiedFilters] = useState([]);
-  const [showDiversityOptions, setShowDiversityOptions] = useState(false);
+import AutocompleteInput from '../common/AutoCompleteInputComponent';
+const DiversityDetails = ({ gender, setGender,
+        disabilitiesOnly, setDisabilitiesOnly,
+        category , setCategory,
+        candidateMinAge , setCandidateMinAge,
+        candidateMaxAge , setCandidateMaxAge,
+        jobType, setJobType,
+        employmentType, setEmploymentType,
+        workPermit, setWorkPermit,
+        showCandidates, setShowCandidates,
+        verifiedFilters, setVerifiedFilters,
+      }) => {
 
   const handleVerifiedFilterChange = (value) => {
     setVerifiedFilters(prev => 
@@ -49,21 +55,18 @@ const DiversityDetails = () => {
                 <div className="flex items-center space-x-2">
                   <Checkbox 
                     id="diversity-checkbox" 
-                    checked={showDiversityOptions}
-                    onCheckedChange={setShowDiversityOptions}
+                    checked={disabilitiesOnly}
+                    onCheckedChange={setDisabilitiesOnly}
                   />
                   <Label htmlFor="diversity-checkbox" className="font-normal">
-                    Show only candidates who
+                  Person with Disabilities only
                   </Label>
                 </div>
                 
                 {/* Candidate Category */}
                 <div className="space-y-2 flex flex-col">
                   <Label htmlFor="candidate-category">Candidate Category</Label>
-                  <Input 
-                    id="candidate-category"
-                    placeholder="Add candidate category" 
-                  />
+                  <AutocompleteInput placeholder={"Add candidate category"} setInputValue={setCategory} inputValue={category}/>
                 </div>
                 
                 {/* Candidate Age */}
@@ -73,11 +76,15 @@ const DiversityDetails = () => {
                     <Input 
                       placeholder="Min age" 
                       className="w-1/3"
+                      value={candidateMinAge}
+                      onChange={(e)=>setCandidateMinAge(e.target.value)}
                     />
                     <span className="text-gray-500">to</span>
                     <Input 
                       placeholder="Max age" 
                       className="w-1/3"
+                      value={candidateMaxAge}
+                      onChange={(e)=>setCandidateMaxAge(e.target.value)}
                     />
                     <span className="text-gray-500">Years</span>
                   </div>
@@ -88,31 +95,31 @@ const DiversityDetails = () => {
               <div className="space-y-4  flex flex-col">
                 <h3 className="text-sm font-medium text-gray-700">Work details</h3>
                 
-                {/* Show candidates seeking */}
-                <div className="space-y-2 flex flex-col">
-                  <Label>Show candidates seeking</Label>
-                  <div className="flex space-x-2">
-                    <Select>
-                      <SelectTrigger className="w-1/3">
-                        <SelectValue placeholder="Job type" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="full-time">Full Time</SelectItem>
-                        <SelectItem value="part-time">Part Time</SelectItem>
-                        <SelectItem value="contract">Contract</SelectItem>
-                      </SelectContent>
-                    </Select>
-                    <Select>
-                      <SelectTrigger className="w-1/3">
-                        <SelectValue placeholder="Employment type" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="permanent">Permanent</SelectItem>
-                        <SelectItem value="temporary">Temporary</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
+               {/* Show candidates seeking */}
+              <div className="space-y-2 flex flex-col">
+                <Label>Show candidates seeking</Label>
+                <div className="flex space-x-2">
+                  <Select onValueChange={setJobType}>
+                    <SelectTrigger className="w-1/3">
+                      <SelectValue placeholder="Job type" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="full-time">Full Time</SelectItem>
+                      <SelectItem value="part-time">Part Time</SelectItem>
+                      <SelectItem value="contract">Contract</SelectItem>
+                    </SelectContent>
+                  </Select>
+                  <Select onValueChange={setEmploymentType}>
+                    <SelectTrigger className="w-1/3">
+                      <SelectValue placeholder="Employment type" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="permanent">Permanent</SelectItem>
+                      <SelectItem value="temporary">Temporary</SelectItem>
+                    </SelectContent>
+                  </Select>
                 </div>
+              </div>
                 
                 {/* Work permit for */}
                 <div className="space-y-2 flex flex-col">
@@ -120,6 +127,8 @@ const DiversityDetails = () => {
                   <Input 
                     id="work-permit"
                     placeholder="Choose category" 
+                    value={workPermit}
+                    onChange={(e)=>setWorkPermit(e.target.value)}
                   />
                 </div>
               </div>

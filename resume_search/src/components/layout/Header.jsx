@@ -15,7 +15,7 @@ const Header = () => {
                 </svg> */}
 
               <img src="/resume.svg" className='h-10 w-10 mx-5' alt="Icon" />
-                Resume Parser
+                Resume Finder
               </div>
             </div>
             

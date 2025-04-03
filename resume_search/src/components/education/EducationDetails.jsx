@@ -1,19 +1,31 @@
-import React, { useState } from 'react';
-import { Card, CardHeader, CardContent } from '../ui/card';
+import React, { useEffect, useState } from 'react';
+import { Card, CardContent } from '../ui/card';
 import { Label } from '../ui/label';
 import { Input } from '../ui/input';
 import { Accordion, AccordionItem, AccordionTrigger, AccordionContent } from '../ui/accordion';
 import { ToggleGroup, ToggleGroupItem } from '../ui/toggle-group';
 import { Badge } from '@/components/ui/badge';
+import { AlertCircle } from 'lucide-react';
+import AutocompleteInput from '../common/AutoCompleteInputComponent';
+import CourceSelector from './CourceSelection';
+import CustomSelectionAddInput from '../common/CustomSelectionAddInput';
+const EducationDetails = (
+  {
+    ugQualification, setUgQualification,
+    course, setCourse,
+    institute, setInstitute,
+    educationType, setEducationType,
+    fromYear, setFromYear,
+    toYear, setToYear,
+    pgQualification, setPgQualification,
+    doctorateQualification, setdoctorateQualification,
+  }
+) => {
 
-const EducationDetails = () => {
-  const [ugQualification, setUgQualification] = useState('any');
-  const [educationType, setEducationType] = useState('full-time');
-  const [pgQualification, setPgQualification] = useState('any');
 
   return (
     <Card className="mb-6">
-      <Accordion type="single" collapsible >
+      <Accordion type="single" collapsible>
         <AccordionItem value="education">
           <AccordionTrigger className="px-6 py-4">
             <h2 className="text-xl font-semibold">Education Details</h2>
@@ -29,25 +41,40 @@ const EducationDetails = () => {
                   <ToggleGroupItem value="none" variant="pill" size="pill">No UG qualification</ToggleGroupItem>
                 </ToggleGroup>
               </div>
-              
-              {/* Choose Course */}
-              <div className="space-y-2 flex flex-col">
-                <Label htmlFor="ug-course">Choose Course</Label>
-                <Input 
-                  id="ug-course"
-                  placeholder="Type or select UG course from list" 
-                />
-              </div>
-              
-              {/* Institute */}
-              <div className="space-y-2 flex flex-col">
-                <Label htmlFor="institute">Institute</Label>
-                <Input 
-                  id="institute"
-                  placeholder="Select institute" 
-                />
-              </div>
-              
+
+              {ugQualification === 'specific' && (
+                <>
+                  <div id="chooseCourse" className="space-y-2 flex flex-col">
+                    <Label htmlFor="ug-course">Choose Course</Label>
+                    {/* <AutocompleteInput
+                     placeholder={"Type or select UG course from list"}
+                     setInputValue={setCourse}
+                     inputValue={course}
+                     /> */}
+
+                     <CourceSelector placeholder='Type or Select UG cource from list' setSelectedItems={setCourse} selectedItems={course}/>
+
+                  </div>
+                  <div id="institute" className="space-y-2 flex flex-col">
+                    <Label htmlFor="institute">Institute</Label>
+                    <AutocompleteInput
+                     placeholder={"Select institute"}
+                     setInputValue={setInstitute}
+                     inputValue={institute}
+                     />
+    
+                  </div>
+                </>
+              )}
+
+              {ugQualification === 'none' && (
+                <div className="flex items-center text-red-600">
+                  <AlertCircle className="mr-2" />
+                  No UG qualification required.
+                </div>
+              )}
+
+                            
               {/* Education Type */}
               <div className="space-y-2 flex flex-col">
                 <Label className="block text-sm font-medium">Education Type</Label>
@@ -62,14 +89,14 @@ const EducationDetails = () => {
               <div className="space-y-2 flex flex-col">
                 <Label>Year of degree completion</Label>
                 <div className="flex items-center space-x-2">
-                  <select className="w-1/3 px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
+                  <select value={fromYear} onChange={(e) => setFromYear(e.target.value)} className="w-1/3 px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none">
                     <option>From</option>
                     {[...Array(30)].map((_, i) => (
                       <option key={i} value={2025 - i}>{2025 - i}</option>
                     ))}
                   </select>
                   <span className="text-gray-500">To</span>
-                  <select className="w-1/3 px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
+                  <select value={toYear} onChange={(e) => setToYear(e.target.value)} className="w-1/3 px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none">
                     <option>To</option>
                     {[...Array(30)].map((_, i) => (
                       <option key={i} value={2025 - i}>{2025 - i}</option>
@@ -90,13 +117,9 @@ const EducationDetails = () => {
               
               {/* Add PPG/Doctorate Qualification */}
               <div>
-                {/* <Button variant="link" className="p-0 h-auto text-blue-600 text-sm font-medium flex items-center">
-                  <span className="mr-1">+</span> Add PPG/Doctorate Qualification
-                </Button> */}
-                <Badge variant='outline' className='text-blue-800 cursor-pointer' onClick={() => alert(true)}>
-                  + Add PPG/Doctorate Qualification
-              </Badge>
+                <CustomSelectionAddInput label={"PPG Doctorate Qualification"} placeholder={"Enter Qualification"} setList={setdoctorateQualification} List={doctorateQualification}/>
               </div>
+              
             </CardContent>
           </AccordionContent>
         </AccordionItem>

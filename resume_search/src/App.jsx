@@ -34,6 +34,28 @@ function App() {
   const [designation, setDesignation] = useState("");
   const [noticePeriod, setNoticePeriod] = useState('any');
 
+  // education Details
+
+    const [ugQualification, setUgQualification] = useState('any');
+    const [course, setCourse] = useState([]);
+    const [institute, setInstitute] = useState('');
+    const [educationType, setEducationType] = useState('full-time');
+    const [fromYear, setFromYear] = useState('');
+    const [toYear, setToYear] = useState('');
+    const [pgQualification, setPgQualification] = useState('any');
+    const [doctorateQualification, setdoctorateQualification] = useState([]);
+
+    //  Diversity and Additional Details 
+    const [gender, setGender] = useState('all');
+    const [disabilitiesOnly, setDisabilitiesOnly] = useState(false);
+    const [category , setCategory] = useState("");
+    const [candidateMinAge , setCandidateMinAge] = useState("");
+    const [candidateMaxAge , setCandidateMaxAge] = useState("");
+    const [jobType, setJobType] = useState('');
+    const [employmentType, setEmploymentType] = useState('');
+    const [workPermit, setWorkPermit] = useState('');
+    const [showCandidates, setShowCandidates] = useState('all');
+    const [verifiedFilters, setVerifiedFilters] = useState([]);
 
 
   // State for active tab
@@ -55,16 +77,37 @@ function App() {
       location:location,
 
       //  Employment
-
       departmentes:departmentes,
       industry:industry,
       company:company,
       excludeCompanies:excludeCompanies,
       designation:designation,
       noticePeriod:noticePeriod,
+
+
+      // Education Details
+      course:course,
+      institute:institute,
+      educationType:educationType,
+      fromYear:fromYear,
+      toYear:toYear,
+      doctorateQualification:doctorateQualification,
+
+      //  Diversity and Additional Details 
+      gender:gender,
+      disabilitiesOnly:disabilitiesOnly, 
+      category:category , 
+      candidateMinAge:candidateMinAge , 
+      candidateMaxAge:candidateMaxAge ,
+      jobType:jobType,
+      employmentType:employmentType,
+      workPermit:workPermit, 
+      showCandidates:showCandidates,
+      verifiedFilters:verifiedFilters,
     }
+    
     console.log(JSONFormate)
-    alert(JSONFormate)
+    // alert(JSON.stringify(JSONFormate))
     // In a real application, this would trigger an API call
   };
 
@@ -134,9 +177,51 @@ function App() {
                   noticePeriod={noticePeriod}
                   setNoticePeriod={setNoticePeriod}
                 />
-                
-                <EducationDetails />
-                <DiversityDetails />
+
+
+                {/* Education Dwatils */}
+                <EducationDetails 
+                  ugQualification={ugQualification}
+                  setUgQualification={setUgQualification}
+                  course={course}
+                  setCourse={setCourse}
+                  institute={institute}
+                  setInstitute={setInstitute}
+                  educationType={educationType}
+                  setEducationType={setEducationType}
+                  fromYear={fromYear}
+                  setFromYear={setFromYear}
+                  toYear={toYear}
+                  setToYear={setToYear}
+                  pgQualification={pgQualification}
+                  setPgQualification={setPgQualification}
+                  doctorateQualification={doctorateQualification}
+                  setdoctorateQualification={setdoctorateQualification}
+                />
+
+                {/* Diversity and Additional Details */}
+                <DiversityDetails
+                gender={gender}
+                setGender={setGender}
+                disabilitiesOnly={disabilitiesOnly}
+                setDisabilitiesOnly={setDisabilitiesOnly}
+                category={category}
+                setCategory={setCategory}
+                candidateMinAge={candidateMinAge}
+                setCandidateMinAge={setCandidateMinAge}
+                candidateMaxAge={candidateMaxAge}
+                setCandidateMaxAge={setCandidateMaxAge}
+                jobType={jobType}
+                setJobType={setJobType}
+                employmentType={employmentType}
+                setEmploymentType={setEmploymentType}
+                workPermit={workPermit}
+                setWorkPermit={setWorkPermit}
+                showCandidates={showCandidates}
+                setShowCandidates={setShowCandidates}
+                verifiedFilters={verifiedFilters}
+                setVerifiedFilters={setVerifiedFilters}        
+                />
                 
                 <div className="flex justify-end items-center mt-4 mb-8">
                   <Button onClick={handleSearch} className="text-white bg-blue-800">
