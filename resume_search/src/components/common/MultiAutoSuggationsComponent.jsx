@@ -34,6 +34,7 @@ const MultiAutoSuggations = ({placeholder,keywords,setKeywords,setHideSection,ap
     if (inputValue.trim()) {
       fetchSearchData(inputValue).then((response) => {
         const filtered = response.message
+        console.log(filtered,"---------------------->")
         setSuggestions(filtered)
         setShowSuggestions(filtered.length > 0)
       });
@@ -59,9 +60,9 @@ const MultiAutoSuggations = ({placeholder,keywords,setKeywords,setHideSection,ap
     return () => document.removeEventListener("mousedown", handleClickOutside)
   }, [])
 
-  const addKeyword = (text) => {
+  const addKeyword = (text,cat) => {
     if (text.trim() && !keywords.some((k) => k.text.toLowerCase() === text.toLowerCase())) {
-      setKeywords([...keywords, { text, isNecessary: false }])
+      setKeywords([...keywords, { text,cat, isNecessary: false }])
       setInputValue("")
       setShowSuggestions(false)
       setSelectedSuggestionIndex(-1)
@@ -139,8 +140,8 @@ const MultiAutoSuggations = ({placeholder,keywords,setKeywords,setHideSection,ap
             <div ref={suggestionsRef} className="absolute z-10 w-full mt-1 bg-white border rounded-md shadow-lg max-h-60 overflow-auto">
               <ul className="py-1">
                 {suggestions.map((suggestion, index) => (
-                  <li key={index} className={cn("px-3 py-1.5 cursor-pointer text-sm", index === selectedSuggestionIndex ? "bg-blue-50" : "hover:bg-gray-50")} onClick={() => addKeyword(suggestion)}>
-                    {suggestion}
+                  <li key={index} className={cn("px-3 py-1.5 cursor-pointer text-sm", index === selectedSuggestionIndex ? "bg-blue-50" : "hover:bg-gray-50")} onClick={() => addKeyword(suggestion[0],suggestion[1])}>
+                    {suggestion[0]}
                   </li>
                 ))}
               </ul>
