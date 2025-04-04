@@ -36,14 +36,20 @@ function App() {
 
   // education Details
 
-    const [ugQualification, setUgQualification] = useState('any');
-    const [course, setCourse] = useState([]);
-    const [institute, setInstitute] = useState('');
-    const [educationType, setEducationType] = useState('full-time');
-    const [fromYear, setFromYear] = useState('');
-    const [toYear, setToYear] = useState('');
-    const [pgQualification, setPgQualification] = useState('any');
+    const [ugQualification, setUgQualification] = useState('');
+    const [pgQualification, setPgQualification] = useState('');
     const [doctorateQualification, setdoctorateQualification] = useState([]);
+    const [ugcourse, ugsetCourse] = useState([]);
+    const [uginstitute, ugsetInstitute] = useState('');
+    const [ugeducationType, ugsetEducationType] = useState('full-time');
+    const [ugfromYear, ugsetFromYear] = useState('');
+    const [ugtoYear, ugsetToYear] = useState('');
+
+    const [pgcourse, pgsetCourse] = useState([]);
+    const [pginstitute, pgsetInstitute] = useState('');
+    const [pgeducationType, pgsetEducationType] = useState('full-time');
+    const [pgfromYear, pgsetFromYear] = useState('');
+    const [pgtoYear, pgsetToYear] = useState('');
 
     //  Diversity and Additional Details 
     const [gender, setGender] = useState('all');
@@ -86,11 +92,16 @@ function App() {
 
 
       // Education Details
-      course:course,
-      institute:institute,
-      educationType:educationType,
-      fromYear:fromYear,
-      toYear:toYear,
+      ugcourse:ugcourse,
+      uginstitute:uginstitute,
+      ugeducationType:ugeducationType,
+      ugfromYear:ugfromYear,
+      ugtoYear:ugtoYear,
+      pgcourse:pgcourse,
+      pginstitute:pginstitute,
+      pgeducationType:pgeducationType,
+      pgfromYear:pgfromYear,
+      pgtoYear:pgtoYear,
       doctorateQualification:doctorateQualification,
 
       //  Diversity and Additional Details 
@@ -183,16 +194,26 @@ function App() {
                 <EducationDetails 
                   ugQualification={ugQualification}
                   setUgQualification={setUgQualification}
-                  course={course}
-                  setCourse={setCourse}
-                  institute={institute}
-                  setInstitute={setInstitute}
-                  educationType={educationType}
-                  setEducationType={setEducationType}
-                  fromYear={fromYear}
-                  setFromYear={setFromYear}
-                  toYear={toYear}
-                  setToYear={setToYear}
+                  ugcourse={ugcourse}
+                  ugsetCourse={ugsetCourse}
+                  uginstitute={uginstitute}
+                  ugsetInstitute={ugsetInstitute}
+                  ugeducationType={ugeducationType}
+                  ugsetEducationType={ugsetEducationType}
+                  ugfromYear={ugfromYear}
+                  ugsetFromYear={ugsetFromYear}
+                  ugtoYear={ugtoYear}
+                  ugsetToYear={ugsetToYear}
+                  pgcourse={pgcourse}
+                  pgsetCourse={pgsetCourse}
+                  pginstitute={pginstitute}
+                  pgsetInstitute={pgsetInstitute}
+                  pgeducationType={pgeducationType}
+                  pgsetEducationType={pgsetEducationType}
+                  pgfromYear={pgfromYear}
+                  pgsetFromYear={pgsetFromYear}
+                  pgtoYear={pgtoYear}
+                  pgsetToYear={pgsetToYear}
                   pgQualification={pgQualification}
                   setPgQualification={setPgQualification}
                   doctorateQualification={doctorateQualification}

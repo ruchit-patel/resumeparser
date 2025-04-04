@@ -269,13 +269,6 @@ export default function CourceSelector({
                     className="pl-2 py-1 cursor-pointer hover:bg-gray-100 rounded flex items-center"
                     onClick={() => toggleSelectAllRoles(dept.name)}
                   >
-                    <input 
-                      type="checkbox" 
-                      className="mr-2"
-                      checked={isDepartmentSelected(dept.name)}
-                      readOnly
-                    />
-                    <span className="text-gray-800">Any Roles</span>
                   </div>
                   
                   {dept.roles.map((role, roleIndex) => (

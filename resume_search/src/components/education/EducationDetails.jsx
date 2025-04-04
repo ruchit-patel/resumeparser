@@ -13,12 +13,21 @@ import EducationQualification from './UGPGQualification';
 const EducationDetails = (
   {
     ugQualification, setUgQualification,
-    course, setCourse,
-    institute, setInstitute,
-    educationType, setEducationType,
-    fromYear, setFromYear,
-    toYear, setToYear,
     pgQualification, setPgQualification,
+    
+    ugcourse, ugsetCourse,
+    uginstitute, ugsetInstitute,
+    ugeducationType, ugsetEducationType,
+    ugfromYear, ugsetFromYear,
+    ugtoYear, ugsetToYear,
+
+    pgcourse, pgsetCourse,
+    pginstitute, pgsetInstitute,
+    pgeducationType, pgsetEducationType,
+    pgfromYear, pgsetFromYear,
+    pgtoYear, pgsetToYear,
+
+
     doctorateQualification, setdoctorateQualification,
   }
 ) => {
@@ -43,7 +52,19 @@ const EducationDetails = (
                 </ToggleGroup>
               </div>
 
-              <EducationQualification ugQualification={ugQualification}/>
+              <EducationQualification ugQualification={ugQualification}
+                  course={ugcourse}
+                  setCourse={ugsetCourse}
+                  institute={uginstitute}
+                  setInstitute={ugsetInstitute}
+                  educationType={ugeducationType}
+                  setEducationType={ugsetEducationType}
+                  fromYear={ugfromYear}
+                  setFromYear={ugsetFromYear}
+                  toYear={ugtoYear}
+                  setToYear={ugsetToYear}
+              
+              />
               
               {/* PG Qualification */}
               <div className="space-y-2 flex flex-col">
@@ -55,7 +76,20 @@ const EducationDetails = (
                 </ToggleGroup>
               </div>
               
+              <EducationQualification ugQualification={pgQualification}
+                  course={pgcourse}
+                  setCourse={pgsetCourse}
+                  institute={pginstitute}
+                  setInstitute={pgsetInstitute}
+                  educationType={pgeducationType}
+                  setEducationType={pgsetEducationType}
+                  fromYear={pgfromYear}
+                  setFromYear={pgsetFromYear}
+                  toYear={pgtoYear}
+                  setToYear={pgsetToYear}/>
+
               {/* Add PPG/Doctorate Qualification */}
+              
               <div>
                 <CustomSelectionAddInput 
                 label={"PPG Doctorate Qualification"} 
