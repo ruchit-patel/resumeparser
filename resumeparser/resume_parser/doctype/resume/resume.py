@@ -17,6 +17,19 @@ class Resume(Document):
 		# Any validation logic if needed
 		pass
 
+	def get_opensearch_credentials(self):
+		"""Get OpenSearch credentials from site config or environment variables"""
+		return {
+			'host': frappe.conf.get('opensearch_host') or os.environ.get('OPENSEARCH_HOST'),
+			'port': frappe.conf.get('opensearch_port') or os.environ.get('OPENSEARCH_PORT') or 443,
+			'username': frappe.conf.get('opensearch_username') or os.environ.get('OPENSEARCH_USERNAME'),
+			'password': frappe.conf.get('opensearch_password') or os.environ.get('OPENSEARCH_PASSWORD')
+		}
+
+	def get_gemini_api_key(self):
+		"""Get Gemini API key from site config or environment variables"""
+		return frappe.conf.get('gemini_api_key') or os.environ.get('GEMINI_API_KEY')
+
 	def before_insert(self):
 		"""Extract resume data using Gemini API before inserting the document"""
 		# Check if the file is public or private
@@ -29,8 +42,11 @@ class Resume(Document):
 		
 		filepath = pathlib.Path(file_path)
 
-		# Initialize Gemini client
-		client = genai.Client(api_key='AIzaSyDqcrnNO8isKSPEAQxfGvDKqPeGzEonB-4')
+		# Initialize Gemini client with API key from config
+		api_key = self.get_gemini_api_key()
+		if not api_key:
+			frappe.throw('Gemini API key not configured. Please set it in site_config.json or environment variables.')
+		client = genai.Client(api_key=api_key)
 
 		prompt = """
 			You are an AI assistant specializing in structured data extraction. Given a PDF resume, extract relevant information and return it as a structured JSON object. Follow the exact schema provided below. If certain details are missing, leave them as null or empty arrays but do not infer information. Ensure the extracted text retains proper formatting for addresses, descriptions, and long text fields.
@@ -319,14 +335,12 @@ class Resume(Document):
 			return None
 	
 	def get_opensearch_client(self):
-		host = "search-sayajicluster-pnjcmwlww5nb327dwfbmebdtze.ap-south-1.es.amazonaws.com"  # or Docker container IP
-		port = 443
-		username = "admin"  # Replace with your username
-		password = "Lolpass@123"  # Replace with your password
+		# Get credentials from config or environment
+		creds = self.get_opensearch_credentials()
 
 		client = OpenSearch(
-			hosts=[{"host": host, "port": port}],
-			http_auth=(username, password),  # Auth credentials
+			hosts=[{"host": creds['host'], "port": creds['port']}],
+			http_auth=(creds['username'], creds['password']),  # Auth credentials
 			use_ssl=True,  # Set to True if using HTTPS
 			verify_certs=True,  # Set to False if using self-signed certs
 			http_compress=True
@@ -365,3 +379,130 @@ def update_existing_resume(duplicate_id, new_data, name=None):
 	except Exception as e:
 		frappe.log_error(f"Error updating existing resume: {str(e)}")
 		frappe.throw("Failed to update existing resume")
+
+@frappe.whitelist()
+def suggest_keywords(search_text):
+    """Suggest keywords based on user input by searching through resumes.
+    Returns suggestions for skills, designations, and companies."""
+    try:
+        # Initialize OpenSearch client
+        resume = frappe.new_doc("Resume")
+        client = resume.get_opensearch_client()
+        index_name = "resumes"
+
+        # First, let's check what's in the index
+        debug_query = {
+            "size": 1,
+            "query": {
+                "match_all": {}
+            }
+        }
+        debug_response = client.search(index=index_name, body=debug_query)
+        frappe.logger().debug(f"Sample document from index: {debug_response}")
+
+        # Build the search query
+        query = {
+            "size": 0,
+            "query": {
+                "bool": {
+                    "should": [
+                        {
+                            "match_phrase_prefix": {
+                                "skills.skill_name": {
+                                    "query": search_text,
+                                    "boost": 3
+                                }
+                            }
+                        },
+                        {
+                            "match": {
+                                "skills.skill_name": {
+                                    "query": search_text,
+                                    "fuzziness": "AUTO",
+                                    "boost": 2
+                                }
+                            }
+                        },
+                        {
+                            "nested": {
+                                "path": "experience",
+                                "query": {
+                                    "match_phrase_prefix": {
+                                        "experience.role_position": {
+                                            "query": search_text,
+                                            "boost": 2
+                                        }
+                                    }
+                                }
+                            }
+                        },
+                        {
+                            "nested": {
+                                "path": "experience",
+                                "query": {
+                                    "match_phrase_prefix": {
+                                        "experience.company_name": {
+                                            "query": search_text,
+                                            "boost": 2
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    ]
+                }
+            },
+            "aggs": {
+                "skills": {
+                    "terms": {
+                        "field": "skills.skill_name.keyword",
+                        "size": 5,
+                        "min_doc_count": 1
+                    }
+                },
+                "designations": {
+                    "nested": {
+                        "path": "experience"
+                    },
+                    "aggs": {
+                        "position_names": {
+                            "terms": {
+                                "field": "experience.role_position.keyword",
+                                "size": 5,
+                                "min_doc_count": 1
+                            }
+                        }
+                    }
+                },
+                "companies": {
+                    "nested": {
+                        "path": "experience"
+                    },
+                    "aggs": {
+                        "company_names": {
+                            "terms": {
+                                "field": "experience.company_name.keyword",
+                                "size": 5,
+                                "min_doc_count": 1
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        # Execute the search
+        response = client.search(index=index_name, body=query)
+
+        # Extract suggestions from aggregations
+        suggestions = {
+            "skills": [bucket["key"] for bucket in response["aggregations"]["skills"]["buckets"]],
+            "designations": [bucket["key"] for bucket in response["aggregations"]["designations"]["position_names"]["buckets"]],
+            "companies": [bucket["key"] for bucket in response["aggregations"]["companies"]["company_names"]["buckets"]]
+        }
+
+        return {"status": "success", "suggestions": suggestions}
+
+    except Exception as e:
+        frappe.log_error(f"Error suggesting keywords: {str(e)}")
+        return {"status": "error", "message": str(e)}

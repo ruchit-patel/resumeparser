@@ -3,32 +3,169 @@ import frappe
 
 
 @frappe.whitelist(allow_guest=True)
-def seach_keywords(q:str):
-    job_keywords = [
-            "Software Developer", "Software Engineer", "Full Stack Developer", 
-            "Frontend Developer", "Backend Developer", "Web Developer", 
-            "Mobile Developer", "Data Scientist", "Data Analyst", "Machine Learning Engineer", 
-            "DevOps Engineer", "Cloud Engineer", "System Administrator", 
-            "Network Engineer", "Database Administrator", "QA Engineer", 
-            "Test Engineer", "Automation Tester", "Business Analyst", 
-            "Project Manager", "Product Manager", "Technical Lead", 
-            "Engineering Manager", "IT Support", "IT Consultant", 
-            "UI/UX Designer", "Graphic Designer", "Frontend Engineer", 
-            "Backend Engineer", "Cybersecurity Analyst", "Penetration Tester", 
-            "Data Engineer", "Big Data Engineer", "Solutions Architect", 
-            "Technical Writer", "Game Developer", "Embedded Systems Engineer", 
-            "Blockchain Developer", "AI Engineer", "NLP Engineer", 
-            "Security Analyst", "IT Administrator", "Site Reliability Engineer (SRE)", 
-            "API Developer", "CRM Developer", "ERP Consultant", 
-            "Network Administrator", "Cloud Architect", "Mobile App Developer", 
-            "Android Developer", "iOS Developer", "Quality Assurance Specialist", 
-            "Release Manager", "Build Engineer", "Software Tester", 
-            "Help Desk Support", "IT Technician", "Infrastructure Engineer", 
-            "IT Operations Manager", "Tech Support Executive", 
-            "Technical Recruiter", "Technical Support Engineer"
-        ]
-    filter_data = list(filter(lambda a: q in a, job_keywords))
-    return filter_data
+def seach_keywords(q: str):
+    try:
+        # Get OpenSearch client
+        client = frappe.new_doc("Resume").get_opensearch_client()
+        index_name = "resumes"
+
+        # OpenSearch query for skills, designations, and companies with prefix matching
+        query = {
+            "size": 0,
+            "_source": False,
+            "query": {
+                "bool": {
+                    "should": [
+                        {
+                            "nested": {
+                                "path": "skills",
+                                "query": {
+                                    "match_phrase_prefix": {
+                                        "skills.skill_name": {
+                                            "query": q,
+                                            "max_expansions": 50
+                                        }
+                                    }
+                                }
+                            }
+                        },
+                        {
+                            "nested": {
+                                "path": "experience",
+                                "query": {
+                                    "match_phrase_prefix": {
+                                        "experience.role_position": {
+                                            "query": q,
+                                            "max_expansions": 50
+                                        }
+                                    }
+                                }
+                            }
+                        },
+                        {
+                            "nested": {
+                                "path": "experience",
+                                "query": {
+                                    "match_phrase_prefix": {
+                                        "experience.company_name": {
+                                            "query": q,
+                                            "max_expansions": 50
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    ],
+                    "minimum_should_match": 1
+                }
+            },
+            "aggs": {
+                "skill_suggestions": {
+                    "nested": {
+                        "path": "skills"
+                    },
+                    "aggs": {
+                        "matching_skills": {
+                            "filter": {
+                                "match_phrase_prefix": {
+                                    "skills.skill_name": {
+                                        "query": q,
+                                        "max_expansions": 50
+                                    }
+                                }
+                            },
+                            "aggs": {
+                                "skills": {
+                                    "terms": {
+                                        "field": "skills.skill_name.keyword",
+                                        "size": 5
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "designation_suggestions": {
+                    "nested": {
+                        "path": "experience"
+                    },
+                    "aggs": {
+                        "matching_designations": {
+                            "filter": {
+                                "match_phrase_prefix": {
+                                    "experience.role_position": {
+                                        "query": q,
+                                        "max_expansions": 50
+                                    }
+                                }
+                            },
+                            "aggs": {
+                                "designations": {
+                                    "terms": {
+                                        "field": "experience.role_position.keyword",
+                                        "size": 5
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "company_suggestions": {
+                    "nested": {
+                        "path": "experience"
+                    },
+                    "aggs": {
+                        "matching_companies": {
+                            "filter": {
+                                "match_phrase_prefix": {
+                                    "experience.company_name": {
+                                        "query": q,
+                                        "max_expansions": 50
+                                    }
+                                }
+                            },
+                            "aggs": {
+                                "companies": {
+                                    "terms": {
+                                        "field": "experience.company_name.keyword",
+                                        "size": 5
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        # Execute the query against OpenSearch
+        response = client.search(index=index_name, body=query)
+        
+        # Extract suggestions from all three categories
+        suggestions = {
+            "skills": [],
+            "designations": [],
+            "companies": []
+        }
+        
+        if 'aggregations' in response:
+            # Extract skills
+            skill_buckets = response['aggregations']['skill_suggestions']['matching_skills']['skills']['buckets']
+            suggestions['skills'] = [bucket['key'] for bucket in skill_buckets]
+            
+            # Extract designations
+            designation_buckets = response['aggregations']['designation_suggestions']['matching_designations']['designations']['buckets']
+            suggestions['designations'] = [bucket['key'] for bucket in designation_buckets]
+            
+            # Extract companies
+            company_buckets = response['aggregations']['company_suggestions']['matching_companies']['companies']['buckets']
+            suggestions['companies'] = [bucket['key'] for bucket in company_buckets]
+        
+        return suggestions
+
+    except Exception as e:
+        frappe.log_error(f"Error in seach_keywords: {str(e)}")
+        return {"skills": [], "designations": [], "companies": []}
 
 @frappe.whitelist(allow_guest=True)
 def seach_skills(q:str):
