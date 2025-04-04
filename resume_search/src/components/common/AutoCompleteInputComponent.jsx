@@ -2,7 +2,7 @@ import { useState, useRef, useEffect } from "react"
 import { Input } from "@/components/ui/input"
 import { cn } from "@/lib/utils"
 
-const AutocompleteInput = ({placeholder,inputValue,setInputValue}) => {
+const AutocompleteInput = ({placeholder,inputValue,setInputValue,apiEndPoint}) => {
   // const [inputValue, setInputValue] = useState("")
   const [suggestions, setSuggestions] = useState([])
   const [showSuggestions, setShowSuggestions] = useState(false)
@@ -10,27 +10,31 @@ const AutocompleteInput = ({placeholder,inputValue,setInputValue}) => {
   const inputRef = useRef(null)
   const suggestionsRef = useRef(null)
 
-  // Sample data - you can replace this with your own data
-  const allOptions = [
-    "Gujarat",
-    "Gujranwala",
-    "Gujrat",
-    "Gujjar Khan",
-    "Gujiao",
-    "Gujba",
-    "Gujranwala Division",
-    "Gujrat District",
-    "Gujranwala District",
-    "Gujba District",
-  ]
+  const fetchSearchData = async (query) => {
+    try {
+
+      console.log("Search Query : ",query)
+      const myHeaders = new Headers();
+      myHeaders.append("Cookie", "full_name=Guest; sid=Guest; system_user=no; user_id=Guest; user_lang=en");
+  
+      const response = await fetch(`http://localhost:8000/${apiEndPoint}?q=${query}`);
+      const result = await response.json();
+      return result;
+    } catch (error) {
+      console.error(error);
+      return null;
+    }
+  }; 
 
   // Filter suggestions based on input
   useEffect(() => {
     if (inputValue.trim()) {
-      const filtered = allOptions.filter((option) => option.toLowerCase().includes(inputValue.toLowerCase()))
-      setSuggestions(filtered)
-      setShowSuggestions(filtered.length > 0)
-      setSelectedIndex(-1)
+      fetchSearchData(inputValue).then((response) => {
+        const filtered = response.message
+        setSuggestions(filtered)
+        setShowSuggestions(filtered.length > 0)
+        setSelectedIndex(-1)
+      });
     } else {
       setSuggestions([])
       setShowSuggestions(false)
@@ -77,7 +81,7 @@ const AutocompleteInput = ({placeholder,inputValue,setInputValue}) => {
   }
 
   return (
-    <div className="relative w-full">
+    <div className="w-full">
       <Input
         ref={inputRef}
         type="text"
@@ -89,10 +93,10 @@ const AutocompleteInput = ({placeholder,inputValue,setInputValue}) => {
         className="w-full"
       />
 
-      {showSuggestions && (
+      {(showSuggestions && inputValue.length > 0) && (
         <div
           ref={suggestionsRef}
-          className="absolute z-10 w-full mt-1 bg-white border rounded-md shadow-lg max-h-60 overflow-auto"
+          className="z-10 w-full mt-1 bg-white border rounded-md shadow-lg max-h-60 overflow-auto"
         >
           <ul className="py-1">
             {suggestions.map((suggestion, index) => (

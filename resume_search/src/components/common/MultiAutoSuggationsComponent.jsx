@@ -5,7 +5,7 @@ import { X, Star } from "lucide-react"
 import { Input } from "@/components/ui/input"
 import { cn } from "@/lib/utils"
 
-const MultiAutoSuggations = ({placeholder,keywords,setKeywords,setHideSection}) => {
+const MultiAutoSuggations = ({placeholder,keywords,setKeywords,setHideSection,apiEndPoint}) => {
   // const [keywords, setKeywords] = useState([])
   const [inputValue, setInputValue] = useState("")
   const [suggestions, setSuggestions] = useState([])
@@ -14,22 +14,14 @@ const MultiAutoSuggations = ({placeholder,keywords,setKeywords,setHideSection}) 
   const inputRef = useRef(null)
   const suggestionsRef = useRef(null)
 
-
-
-
-  const fetchSearchData = async () => {
+  const fetchSearchData = async (query) => {
     try {
+
+      console.log("Search Query : ",query)
       const myHeaders = new Headers();
-      myHeaders.append("Content-Type", "application/json");
-      myHeaders.append("Cookie", "connect.sid=s%3ARudFLEowBmEoJFYaY5ALLvqm3J67MSdH.2uDZBnIpaEuiWVkZfRYLExdJOszjPtNzEV2lwAJbZz8");
+      myHeaders.append("Cookie", "full_name=Guest; sid=Guest; system_user=no; user_id=Guest; user_lang=en");
   
-      const requestOptions = {
-        method: "GET",
-        headers: myHeaders,
-        redirect: "follow"
-      };
-  
-      const response = await fetch("https://api.freeapi.app/api/v1/public/randomproducts?page=1&limit=5&query=mens-watches", requestOptions);
+      const response = await fetch(`http://localhost:8000/${apiEndPoint}?q=${query}`);
       const result = await response.json();
       return result;
     } catch (error) {
@@ -38,19 +30,14 @@ const MultiAutoSuggations = ({placeholder,keywords,setKeywords,setHideSection}) 
     }
   }; 
 
-
-  const allSuggestions = [
-    "JavaScript", "TypeScript", "React", "Vue", "Angular", "Node.js", "Python", "Django", "Flask", "Ruby", "Rails", "PHP", "Laravel", "Java", "Spring", "C#", ".NET", "Go", "Rust", "Swift",
-  ]
-
   useEffect(() => {
     if (inputValue.trim()) {
-      fetchSearchData().then((response) => {
-        console.log(response.data.data); // Use the returned JSON data here
+      fetchSearchData(inputValue).then((response) => {
+        const filtered = response.message
+        setSuggestions(filtered)
+        setShowSuggestions(filtered.length > 0)
       });
-      const filtered = allSuggestions.filter((item) => item.toLowerCase().includes(inputValue.toLowerCase()))
-      setSuggestions(filtered)
-      setShowSuggestions(filtered.length > 0)
+
     } else {
       setSuggestions([])
       setShowSuggestions(false)
@@ -118,19 +105,22 @@ const MultiAutoSuggations = ({placeholder,keywords,setKeywords,setHideSection}) 
   return (
     <div className="w-full flex flex-col gap-1">
         {/* List of Skills */}
-        <div className="relative flex flex-wrap gap-2 mb-1">
-          {keywords.map((keyword, index) => (
-            <div key={index} className="flex items-center gap-1 bg-blue-50 text-blue-700 rounded-full px-2 py-1 text-sm">
-              <button onClick={() => toggleNecessary(index)} className="focus:outline-none">
-                <Star className={cn("h-4 w-4", keyword.isNecessary ? "fill-blue-500 text-blue-500" : "text-blue-300")} />
-              </button>
-              <span>{keyword.text}</span>
-              <button onClick={() => removeKeyword(index)} className="focus:outline-none hover:bg-blue-100 rounded-full">
-                <X className="h-4 w-4 text-blue-500" />
-              </button>
-            </div>
-          ))}
-        </div>
+        { keywords.length > 0 && (
+           <div className="flex flex-wrap">
+           {keywords.map((keyword, index) => (
+             <div key={index} className="flex items-center gap-1 bg-blue-50 text-blue-700 rounded-full px-2 py-1 text-sm">
+               <button onClick={() => toggleNecessary(index)} className="focus:outline-none">
+                 <Star className={cn("h-4 w-4", keyword.isNecessary ? "fill-blue-500 text-blue-500" : "text-blue-300")} />
+               </button>
+               <span>{keyword.text}</span>
+               <button onClick={() => removeKeyword(index)} className="focus:outline-none hover:bg-blue-100 rounded-full">
+                 <X className="h-4 w-4 text-blue-500" />
+               </button>
+             </div>
+           ))}
+         </div>
+        )}
+       
 
         {/* Enter new Skill */}
         <div className="relative w-auto">

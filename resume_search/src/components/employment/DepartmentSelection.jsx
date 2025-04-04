@@ -175,7 +175,7 @@ export default function DepartmentRoleSelector({
   return (
     <div className="w-full scroll-auto" ref={dropdownRef}>   
       <div className="border rounded-md p-2 bg-white min-h-10">
-        <div className="flex flex-wrap gap-2 mb-2" onClick={() => setIsOpen(!isOpen)}>
+        <div className="flex flex-wrap gap-2 " onClick={() => setIsOpen(!isOpen)}>
           {selectedItems.map((item, index) => (
             <span 
               key={index} 

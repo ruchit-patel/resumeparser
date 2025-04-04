@@ -21,6 +21,8 @@ export default defineConfig({
 		outDir: '../resumeparser/public/resume_search',
 		emptyOutDir: true,
 		target: 'es2015',
+
 	},
+	base:'/resume_search/'
 
 });

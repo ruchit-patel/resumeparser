@@ -66,7 +66,12 @@ const DiversityDetails = ({ gender, setGender,
                 {/* Candidate Category */}
                 <div className="space-y-2 flex flex-col">
                   <Label htmlFor="candidate-category">Candidate Category</Label>
-                  <AutocompleteInput placeholder={"Add candidate category"} setInputValue={setCategory} inputValue={category}/>
+                  <AutocompleteInput 
+                  placeholder={"Add candidate category"} 
+                  setInputValue={setCategory} 
+                  inputValue={category}
+                  apiEndPoint = {"api/method/resumeparser.apis.search_apis.seach_candidate_category"}
+                  />
                 </div>
                 
                 {/* Candidate Age */}
@@ -124,12 +129,12 @@ const DiversityDetails = ({ gender, setGender,
                 {/* Work permit for */}
                 <div className="space-y-2 flex flex-col">
                   <Label htmlFor="work-permit">Work permit for</Label>
-                  <Input 
-                    id="work-permit"
-                    placeholder="Choose category" 
-                    value={workPermit}
-                    onChange={(e)=>setWorkPermit(e.target.value)}
-                  />
+                  <AutocompleteInput 
+                  placeholder={"Choose category"} 
+                  setInputValue={setWorkPermit} 
+                  inputValue={workPermit}
+                  apiEndPoint = {"api/method/resumeparser.apis.search_apis.seach_candidate_category"}/>
+                  
                 </div>
               </div>
               

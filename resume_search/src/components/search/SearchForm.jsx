@@ -33,6 +33,7 @@ const SearchForm = ({
           <Label htmlFor="keywords">Keywords</Label>
           <div className="border rounded-md px-2 py-1 focus-within:ring-1 focus-within:ring-ring focus-within:border-input flex gap-2">
             <MultiAutoSuggations 
+            apiEndPoint = {"api/method/resumeparser.apis.search_apis.seach_keywords"}
             placeholder={"Enter keywords like skills, designation, and company"}
             keywords={searchKeywords}
             setKeywords={setSearchKeywords}
@@ -63,7 +64,13 @@ const SearchForm = ({
 
         {/* Add IT Skills button */}
 
-        <CustomSelectionAddInput label='IT Skill' placeholder='Enter skill' List={skills} setList={setSkills} />
+        <CustomSelectionAddInput 
+        label='IT Skill' 
+        placeholder='Enter skill' 
+        List={skills} 
+        setList={setSkills} 
+        apiEndPoint = {"api/method/resumeparser.apis.search_apis.seach_skills"}
+        />
 
         {/* Experience */}
         <div className="space-y-2 flex flex-col">
@@ -89,7 +96,10 @@ const SearchForm = ({
         {/* Current location */}
         <div className="space-y-2 flex flex-col">
           <Label>Current location of candidate</Label>
-          <AutocompleteInput placeholder={"Enter city Name"} inputValue={location} setInputValue={setLocation}/>
+          <AutocompleteInput placeholder={"Enter city Name"} 
+          inputValue={location} 
+          setInputValue={setLocation} 
+          apiEndPoint = {"api/method/resumeparser.apis.search_apis.seach_candidate_location"}/>
         </div>
         
         {/* Annual Salary */}
@@ -131,7 +141,7 @@ const SearchForm = ({
                 onCheckedChange={setIncludeSalary}
               />
               <Label htmlFor="include-salary" className="text-sm font-normal">
-                Include candidates who did not mention their current salary
+                Include candidates where salary is not provided.
               </Label>
             </div>
           </div>

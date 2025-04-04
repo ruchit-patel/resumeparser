@@ -34,27 +34,44 @@ const EmploymentDetails = ({
               {/* Industry */}
               <div className="space-y-2 flex flex-col">
                 <Label htmlFor="industry">Industry</Label>
-                <AutocompleteInput placeholder={"Add Industry"} inputValue={industry} setInputValue={setIndustry}/>
+                <AutocompleteInput 
+                placeholder={"Add Industry"} 
+                inputValue={industry} 
+                setInputValue={setIndustry}
+                apiEndPoint = {"api/method/resumeparser.apis.search_apis.seach_candidate_industry"}
+                />
                
               </div>
               
               {/* Company */}
               <div className="space-y-2 flex flex-col">
                 <Label htmlFor="company">Company</Label>
-                <AutocompleteInput placeholder={"Add Company Name"} inputValue={company} setInputValue={setCompany}/>
+                <AutocompleteInput 
+                placeholder={"Add Company Name"} 
+                inputValue={company} 
+                setInputValue={setCompany}
+                apiEndPoint = {"api/method/resumeparser.apis.search_apis.seach_candidate_company"}
+                />
 
                
                <CustomSelectionAddInput 
                   label='Exclude Companies' 
                   placeholder='Enter Exclude Companies' 
                   List={excludeCompanies} 
-                  setList={setExcludeCompanies} />
+                  setList={setExcludeCompanies}
+                  apiEndPoint = {"api/method/resumeparser.apis.search_apis.seach_candidate_company"}
+                   />
               </div>
               
               {/* Designation */}
               <div className="space-y-2 flex flex-col">
                 <Label htmlFor="designation">Designation</Label>
-                <AutocompleteInput placeholder={"Add Designation"} inputValue={designation} setInputValue={setDesignation}/>
+                <AutocompleteInput 
+                placeholder={"Add Designation"} 
+                inputValue={designation} 
+                setInputValue={setDesignation}
+                apiEndPoint = {"api/method/resumeparser.apis.search_apis.seach_candidate_designation"}
+                />
 
                           
               </div>
