@@ -4,6 +4,7 @@ import { useState, useRef, useEffect } from "react"
 import { X, Star } from "lucide-react"
 import { Input } from "@/components/ui/input"
 import { cn } from "@/lib/utils"
+import { config } from "@/config"
 
 const MultiAutoSuggations = ({placeholder,keywords,setKeywords,setHideSection,apiEndPoint}) => {
   // const [keywords, setKeywords] = useState([])
@@ -16,12 +17,11 @@ const MultiAutoSuggations = ({placeholder,keywords,setKeywords,setHideSection,ap
 
   const fetchSearchData = async (query) => {
     try {
-
       console.log("Search Query : ",query)
       const myHeaders = new Headers();
       myHeaders.append("Cookie", "full_name=Guest; sid=Guest; system_user=no; user_id=Guest; user_lang=en");
   
-      const response = await fetch(`http://localhost:8000/${apiEndPoint}?q=${query}`);
+      const response = await fetch(`${config.backendUrl}/${apiEndPoint}?q=${query}`);
       const result = await response.json();
       return result;
     } catch (error) {
