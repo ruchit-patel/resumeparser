@@ -103,10 +103,10 @@ const MultiAutoSuggations = ({placeholder,keywords,setKeywords,setHideSection,ap
   }
 
   return (
-    <div className="w-full flex flex-col gap-1">
+    <div className="w-full flex flex-col gap-2">
         {/* List of Skills */}
         { keywords.length > 0 && (
-           <div className="flex flex-wrap">
+           <div className="flex flex-wrap gap-1">
            {keywords.map((keyword, index) => (
              <div key={index} className="flex items-center gap-1 bg-blue-50 text-blue-700 rounded-full px-2 py-1 text-sm">
                <button onClick={() => toggleNecessary(index)} className="focus:outline-none">
