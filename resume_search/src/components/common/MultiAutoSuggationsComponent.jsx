@@ -6,44 +6,76 @@ import { Input } from "@/components/ui/input"
 import { cn } from "@/lib/utils"
 import { config } from "@/config"
 
-const MultiAutoSuggations = ({placeholder,keywords,setKeywords,setHideSection,apiEndPoint}) => {
+const MultiAutoSuggations = ({placeholder, keywords, setKeywords, setHideSection, apiEndPoint}) => {
   // const [keywords, setKeywords] = useState([])
   const [inputValue, setInputValue] = useState("")
   const [suggestions, setSuggestions] = useState([])
   const [showSuggestions, setShowSuggestions] = useState(false)
   const [selectedSuggestionIndex, setSelectedSuggestionIndex] = useState(-1)
+  const [isLoading, setIsLoading] = useState(false)
   const inputRef = useRef(null)
   const suggestionsRef = useRef(null)
+  const debounceTimeoutRef = useRef(null)
 
   const fetchSearchData = async (query) => {
     try {
-      console.log("Search Query : ",query)
+      console.log("Search Query : ", query)
       const myHeaders = new Headers();
       myHeaders.append("Cookie", "full_name=Guest; sid=Guest; system_user=no; user_id=Guest; user_lang=en");
   
+      setIsLoading(true)
       const response = await fetch(`${config.backendUrl}/${apiEndPoint}?q=${query}`);
       const result = await response.json();
+      setIsLoading(false)
       return result;
     } catch (error) {
       console.error(error);
+      setIsLoading(false)
       return null;
     }
   }; 
 
-  useEffect(() => {
-    if (inputValue.trim()) {
-      fetchSearchData(inputValue).then((response) => {
-        const filtered = response.message
-        console.log(filtered,"---------------------->")
-        setSuggestions(filtered)
-        setShowSuggestions(filtered.length > 0)
-      });
-
-    } else {
-      setSuggestions([])
-      setShowSuggestions(false)
+  // Debounced input handler
+  const handleInputChange = (e) => {
+    const value = e.target.value;
+    setInputValue(value);
+    
+    // Clear any existing timeout
+    if (debounceTimeoutRef.current) {
+      clearTimeout(debounceTimeoutRef.current);
     }
-  }, [inputValue])
+    
+    // If input is empty, clear suggestions immediately
+    if (!value.trim()) {
+      setSuggestions([]);
+      setShowSuggestions(false);
+      return;
+    }
+    
+    // Set a new timeout - only call API when user pauses typing (500ms)
+    debounceTimeoutRef.current = setTimeout(() => {
+      fetchSearchData(value).then((response) => {
+        if (response && response.message) {
+          const filtered = response.message;
+          console.log(filtered, "---------------------->");
+          setSuggestions(filtered);
+          setShowSuggestions(filtered.length > 0);
+        }
+      });
+    }, 500); // 500ms debounce time - adjust as needed
+  };
+
+  // Clean up timeout on unmount
+  useEffect(() => {
+    return () => {
+      if (debounceTimeoutRef.current) {
+        clearTimeout(debounceTimeoutRef.current);
+      }
+    };
+  }, []);
+
+  // Remove the direct effect that watches inputValue changes
+  // We now handle this in the debounced input handler
 
   useEffect(() => {
     const handleClickOutside = (e) => {
@@ -60,9 +92,9 @@ const MultiAutoSuggations = ({placeholder,keywords,setKeywords,setHideSection,ap
     return () => document.removeEventListener("mousedown", handleClickOutside)
   }, [])
 
-  const addKeyword = (text,cat) => {
+  const addKeyword = (text, cat) => {
     if (text.trim() && !keywords.some((k) => k.text.toLowerCase() === text.toLowerCase())) {
-      setKeywords([...keywords, { text,cat, isNecessary: false }])
+      setKeywords([...keywords, { text, cat, isNecessary: false }])
       setInputValue("")
       setShowSuggestions(false)
       setSelectedSuggestionIndex(-1)
@@ -76,8 +108,6 @@ const MultiAutoSuggations = ({placeholder,keywords,setKeywords,setHideSection,ap
     if (newKeywords.length === 0) {
       setHideSection(false);
     }
-
-    
   }
 
   const toggleNecessary = (index) => {
@@ -90,7 +120,7 @@ const MultiAutoSuggations = ({placeholder,keywords,setKeywords,setHideSection,ap
     if (e.key === "Enter" && inputValue.trim()) {
       e.preventDefault()
       if (selectedSuggestionIndex >= 0 && selectedSuggestionIndex < suggestions.length) {
-        addKeyword(suggestions[selectedSuggestionIndex])
+        addKeyword(suggestions[selectedSuggestionIndex][0], suggestions[selectedSuggestionIndex][1])
       } else {
         addKeyword(inputValue)
       }
@@ -122,25 +152,31 @@ const MultiAutoSuggations = ({placeholder,keywords,setKeywords,setHideSection,ap
          </div>
         )}
        
-
         {/* Enter new Skill */}
         <div className="relative w-auto">
           <Input
             ref={inputRef}
             type="text"
             value={inputValue}
-            onChange={(e) => setInputValue(e.target.value)}
+            onChange={handleInputChange}
             onKeyDown={handleKeyDown}
             placeholder={placeholder}
             className="border-0 shadow-none focus-visible:ring-0 p-0 h-8"
           />
+          
+          {/* Loading indicator */}
+          {isLoading && (
+            <div className="absolute right-2 top-1">
+              <div className="h-4 w-4 border-2 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
+            </div>
+          )}
 
         {/* Suggestions List */}
           {showSuggestions && (
             <div ref={suggestionsRef} className="absolute z-10 w-full mt-1 bg-white border rounded-md shadow-lg max-h-60 overflow-auto">
               <ul className="py-1">
                 {suggestions.map((suggestion, index) => (
-                  <li key={index} className={cn("px-3 py-1.5 cursor-pointer text-sm", index === selectedSuggestionIndex ? "bg-blue-50" : "hover:bg-gray-50")} onClick={() => addKeyword(suggestion[0],suggestion[1])}>
+                  <li key={index} className={cn("px-3 py-1.5 cursor-pointer text-sm", index === selectedSuggestionIndex ? "bg-blue-50" : "hover:bg-gray-50")} onClick={() => addKeyword(suggestion[0], suggestion[1])}>
                     {suggestion[0]}
                   </li>
                 ))}
@@ -148,7 +184,6 @@ const MultiAutoSuggations = ({placeholder,keywords,setKeywords,setHideSection,ap
             </div>
           )}
         </div>
-
     </div>
   )
 }

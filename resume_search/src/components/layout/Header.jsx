@@ -20,17 +20,16 @@ const Header = () => {
             </div>
             
             {/* Navigation */}
-            {/* <nav className="ml-10 flex space-x-8">
-              <a href="#" className="border-b-2 border-blue-500 text-gray-900 px-1 pt-1 text-sm font-medium">
-                Jobs & Responses
+            <nav className="ml-10 flex space-x-8">
+              <a href="/resume_search/search" className="border-b-2 border-blue-500 text-gray-900 px-1 pt-1 text-sm font-medium">
+                  Search Job & Respose
               </a>
-              <a href="#" className="border-b-2 border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 px-1 pt-1 text-sm font-medium">
-                Recruiter
+
+              <a href="/resume_search/results" className="border-b-2 border-blue-500 text-gray-900 px-1 pt-1 text-sm font-medium">
+                ResDesk
               </a>
-              <a href="#" className="border-b-2 border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 px-1 pt-1 text-sm font-medium">
-                Analytics
-              </a>
-            </nav> */}
+              
+            </nav>
           </div>
           
           {/* Right side icons */}
