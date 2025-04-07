@@ -44,12 +44,12 @@ const CandidateCard = ({ candidate, onSelect, selected = false }) => {
               <div className="flex flex-wrap items-center gap-4 text-sm text-gray-500 mb-4">
                 <div className="flex items-center gap-1">
                   <Badge variant="outline" className="bg-gray-100 text-gray-500 font-normal rounded-md px-1.5 py-0.5">
-                    <BriefcaseBusiness/> {candidate.experience}
+                    <BriefcaseBusiness/> {candidate.experience} years
                   </Badge>
                 </div>
                 <div className="flex items-center gap-1">
                   <Badge variant="outline" className="bg-gray-100 text-gray-500 font-normal rounded-md px-1.5 py-0.5">
-                    <Wallet/> {candidate.salary}
+                    <Wallet/> ₹{candidate.currentSalary} - {candidate.expectedSalary} LPA
                   </Badge>
                 </div>
                 <div className="flex items-center gap-1">
@@ -64,14 +64,16 @@ const CandidateCard = ({ candidate, onSelect, selected = false }) => {
                 <div className="flex items-start">
                   <div className="w-32 text-sm font-medium text-gray-500 shrink-0">Current</div>
                   <div className="text-sm text-gray-800">
-                    <span className="text-green-700 font-medium">{candidate.currentJob}</span> at {candidate.company}
+                    <span className="text-green-700 font-medium">{candidate.role}</span> at {candidate.company} ({candidate.duration})
                   </div>
                 </div>
 
                 {/* Row */}
                 <div className="flex items-start">
                   <div className="w-32 text-sm font-medium text-gray-500 shrink-0">Education</div>
-                  <div className="text-sm text-gray-800">{candidate.education}</div>
+                  <div className="text-sm text-gray-800">
+                    {candidate.education.degree} in {candidate.education.specialization} from {candidate.education.university} ({candidate.education.year})
+                  </div>
                 </div>
 
                 {/* Row */}
@@ -118,7 +120,7 @@ const CandidateCard = ({ candidate, onSelect, selected = false }) => {
               {/* Similar profiles link */}
               <div className="mt-4">
                 <Button variant="link" size="sm" className="text-blue-600 p-0 h-auto">
-                  {candidate.similarProfiles} similar profiles
+                  {candidate.profileStats.similarProfiles} similar profiles
                 </Button>
               </div>
             </div>
@@ -150,7 +152,7 @@ const CandidateCard = ({ candidate, onSelect, selected = false }) => {
 
               {/* Profile Summary */}
               <p className="text-sm text-gray-700 mt-3 line-clamp-2 max-w-[200px]">
-                Seasoned professional with {candidate.profileSummary} years of experience. Expert in {candidate.keySkills[0]}...
+                Professional with {candidate.workExperience.total} of experience. Expert in {candidate.keySkills.slice(0, 2).join(', ')}...
               </p>
 
               {/* Actions */}
@@ -180,6 +182,8 @@ const CandidateCard = ({ candidate, onSelect, selected = false }) => {
                 <span className="cursor-pointer hover:underline">Save</span>
                 <span className="text-gray-300">|</span>
                 <span className="cursor-pointer hover:underline">Share</span>
+                <span className="text-gray-300">|</span>
+                <span className="cursor-pointer hover:underline text-gray-500">Last active: {candidate.profileStats.lastActivity}</span>
               </div>
             </div>
 

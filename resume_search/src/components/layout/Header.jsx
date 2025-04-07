@@ -28,6 +28,10 @@ const Header = () => {
               <a href="/resume_search/results" className="border-b-2 border-blue-500 text-gray-900 px-1 pt-1 text-sm font-medium">
                 ResDesk
               </a>
+
+              <a href="/resume_search/detail" className="border-b-2 border-blue-500 text-gray-900 px-1 pt-1 text-sm font-medium">
+                Candidate Resume Details
+              </a>
               
             </nav>
           </div>
