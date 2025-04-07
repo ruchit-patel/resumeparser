@@ -29,9 +29,9 @@ const Header = () => {
                 ResDesk
               </a>
 
-              <a href="/resume_search/detail" className="border-b-2 border-blue-500 text-gray-900 px-1 pt-1 text-sm font-medium">
+              {/* <a href="/resume_search/detail/testbyjay" className="border-b-2 border-blue-500 text-gray-900 px-1 pt-1 text-sm font-medium">
                 Candidate Resume Details
-              </a>
+              </a> */}
               
             </nav>
           </div>

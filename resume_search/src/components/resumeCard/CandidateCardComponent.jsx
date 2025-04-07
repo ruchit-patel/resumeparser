@@ -10,9 +10,11 @@ import { Eye, Download, FileText, Clock, MessageSquare,
   Bookmark, Phone, AlertCircle ,MapPin,Wallet,BriefcaseBusiness} from "lucide-react"
 
 import { cn } from "@/lib/utils"
-
+import { useNavigate } from 'react-router-dom';
 
 const CandidateCard = ({ candidate, onSelect, selected = false }) => {
+
+        const navigate = useNavigate();
   const [saved, setSaved] = useState(false)
 
   const handleCheckboxChange = (checked) => {
@@ -22,7 +24,7 @@ const CandidateCard = ({ candidate, onSelect, selected = false }) => {
   }
 
   return (
-<Card className="w-full overflow-hidden border-gray-200">
+<Card className="w-full overflow-hidden border-gray-200" onClick={()=> navigate(`/resume_search/detail/${candidate.id}`)}>
       <CardContent className="p-0">
         <div className="p-4 pb-3">
           <div className="flex items-start justify-between gap-4">
@@ -44,12 +46,12 @@ const CandidateCard = ({ candidate, onSelect, selected = false }) => {
               <div className="flex flex-wrap items-center gap-4 text-sm text-gray-500 mb-4">
                 <div className="flex items-center gap-1">
                   <Badge variant="outline" className="bg-gray-100 text-gray-500 font-normal rounded-md px-1.5 py-0.5">
-                    <BriefcaseBusiness/> {candidate.experience} years
+                    <BriefcaseBusiness/> {candidate.experience}
                   </Badge>
                 </div>
                 <div className="flex items-center gap-1">
                   <Badge variant="outline" className="bg-gray-100 text-gray-500 font-normal rounded-md px-1.5 py-0.5">
-                    <Wallet/> ₹{candidate.currentSalary} - {candidate.expectedSalary} LPA
+                    <Wallet/> {candidate.salary}
                   </Badge>
                 </div>
                 <div className="flex items-center gap-1">
@@ -64,16 +66,14 @@ const CandidateCard = ({ candidate, onSelect, selected = false }) => {
                 <div className="flex items-start">
                   <div className="w-32 text-sm font-medium text-gray-500 shrink-0">Current</div>
                   <div className="text-sm text-gray-800">
-                    <span className="text-green-700 font-medium">{candidate.role}</span> at {candidate.company} ({candidate.duration})
+                    <span className="text-green-700 font-medium">{candidate.currentJob}</span> at {candidate.company}
                   </div>
                 </div>
 
                 {/* Row */}
                 <div className="flex items-start">
                   <div className="w-32 text-sm font-medium text-gray-500 shrink-0">Education</div>
-                  <div className="text-sm text-gray-800">
-                    {candidate.education.degree} in {candidate.education.specialization} from {candidate.education.university} ({candidate.education.year})
-                  </div>
+                  <div className="text-sm text-gray-800">{candidate.education}</div>
                 </div>
 
                 {/* Row */}
@@ -120,7 +120,7 @@ const CandidateCard = ({ candidate, onSelect, selected = false }) => {
               {/* Similar profiles link */}
               <div className="mt-4">
                 <Button variant="link" size="sm" className="text-blue-600 p-0 h-auto">
-                  {candidate.profileStats.similarProfiles} similar profiles
+                  {candidate.similarProfiles} similar profiles
                 </Button>
               </div>
             </div>
@@ -152,7 +152,7 @@ const CandidateCard = ({ candidate, onSelect, selected = false }) => {
 
               {/* Profile Summary */}
               <p className="text-sm text-gray-700 mt-3 line-clamp-2 max-w-[200px]">
-                Professional with {candidate.workExperience.total} of experience. Expert in {candidate.keySkills.slice(0, 2).join(', ')}...
+                Seasoned professional with {candidate.profileSummary} years of experience. Expert in {candidate.keySkills[0]}...
               </p>
 
               {/* Actions */}
@@ -182,8 +182,6 @@ const CandidateCard = ({ candidate, onSelect, selected = false }) => {
                 <span className="cursor-pointer hover:underline">Save</span>
                 <span className="text-gray-300">|</span>
                 <span className="cursor-pointer hover:underline">Share</span>
-                <span className="text-gray-300">|</span>
-                <span className="cursor-pointer hover:underline text-gray-500">Last active: {candidate.profileStats.lastActivity}</span>
               </div>
             </div>
 
