@@ -5,11 +5,12 @@ import ResumeDetailPage from './pages/resume_detail';
 import Header from './components/layout/Header';
 import Footer from './components/layout/Footer';
 import { FrappeProvider } from 'frappe-react-sdk';
-
+import AuthMiddleware from './components/middelwares/authMiddleware';
 function App() {
   return (
     <div className="min-h-screen bg-gray-50">
-      <FrappeProvider>
+      <FrappeProvider >
+      <AuthMiddleware>
         <Header />
         
         <Routes>
@@ -19,9 +20,11 @@ function App() {
         </Routes>
         
         <Footer />
+        </AuthMiddleware>
       </FrappeProvider>
     </div>
   );
 }
+
 
 export default App;

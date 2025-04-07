@@ -306,7 +306,7 @@ def seach_candidate_category(q:str):
     return filter_data
 
 
-@frappe.whitelist(allow_guest=True)
+@frappe.whitelist()
 def seach_results():
     return [{'id': 1,
   'name': 'Anay Raja',
