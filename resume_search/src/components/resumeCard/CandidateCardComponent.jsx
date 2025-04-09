@@ -13,9 +13,8 @@ import { cn } from "@/lib/utils"
 import { useNavigate } from 'react-router-dom';
 
 const CandidateCard = ({ candidate, onSelect, selected = false }) => {
-
-        const navigate = useNavigate();
-  const [saved, setSaved] = useState(false)
+  const navigate = useNavigate();
+  const [saved, setSaved] = useState(false);
 
   const handleCheckboxChange = (checked) => {
     if (onSelect) {
@@ -38,7 +37,7 @@ const CandidateCard = ({ candidate, onSelect, selected = false }) => {
                   className="h-4 w-4"
                 />
                 <label htmlFor={`candidate-${candidate.id}`} className="text-base font-medium cursor-pointer">
-                  {candidate.basicInfo.name}
+                  {candidate.basicInfo.candidate_name}
                 </label>
               </div>
 
@@ -46,17 +45,17 @@ const CandidateCard = ({ candidate, onSelect, selected = false }) => {
               <div className="flex flex-wrap items-center gap-4 text-sm text-gray-500 mb-4">
                 <div className="flex items-center gap-1">
                   <Badge variant="outline" className="bg-gray-100 text-gray-500 font-normal rounded-md px-1.5 py-0.5">
-                    <BriefcaseBusiness/> {candidate.basicInfo.experience}
+                    <BriefcaseBusiness/> {candidate?.experience?.[0]?.role_position || '-'}
                   </Badge>
                 </div>
                 <div className="flex items-center gap-1">
                   <Badge variant="outline" className="bg-gray-100 text-gray-500 font-normal rounded-md px-1.5 py-0.5">
-                    <Wallet/> {candidate.basicInfo.salary}
+                    <Wallet/> {candidate?.experience?.[0]?.company_name || '-'}
                   </Badge>
                 </div>
                 <div className="flex items-center gap-1">
                   <Badge variant="outline" className="bg-gray-100 text-gray-500 font-normal rounded-md px-1.5 py-0.5">
-                  <MapPin/> {candidate.basicInfo.location}
+                    <MapPin/> {candidate?.experience?.[0]?.location || '-'}
                   </Badge>
                 </div>
               </div>
@@ -66,51 +65,43 @@ const CandidateCard = ({ candidate, onSelect, selected = false }) => {
                 <div className="flex items-start">
                   <div className="w-32 text-sm font-medium text-gray-500 shrink-0">Current</div>
                   <div className="text-sm text-gray-800">
-                    <span className="text-green-700 font-medium">{candidate.workSummary.role}</span> at {candidate.workSummary.currentCompany}
+                    <span className="text-green-700 font-medium">{candidate?.experience?.[0]?.role_position || '-'}</span> at {candidate?.experience?.[0]?.company_name || '-'}
                   </div>
                 </div>
 
                 {/* Row */}
                 <div className="flex items-start">
-                  <div className="w-32 text-sm font-medium text-gray-500 shrink-0">Education</div>
-                  <div className="text-sm text-gray-800">{candidate.education.degree}</div>
+                  <div className="w-32 text-sm font-medium text-gray-500 shrink-0">Location</div>
+                  <div className="text-sm text-gray-800">{candidate?.experience?.[0]?.location || '-'}</div>
                 </div>
 
                 {/* Row */}
                 <div className="flex items-start">
-                  <div className="w-32 text-sm font-medium text-gray-500 shrink-0">Pref. locations</div>
-                  <div className="text-sm text-gray-800">
-                    {candidate.workSummary.preferredLocations.join(", ")}
-                  </div>
-                </div>
-
-                {/* Row */}
-                <div className="flex items-start">
-                  <div className="w-32 text-sm font-medium text-gray-500 shrink-0">Key skills</div>
+                  <div className="w-32 text-sm font-medium text-gray-500 shrink-0">Technical skills</div>
                   <div className="flex flex-wrap gap-1 text-sm text-gray-800">
-                    {candidate.skills.keySkills.map((skill, index) => (
+                    {candidate?.skills?.TechnicalSkill?.map((skill, index) => (
                       <Badge
                         key={index}
                         className="bg-white border border-gray-200 text-gray-800 hover:bg-gray-50 font-normal"
                       >
                         {skill}
                       </Badge>
-                    ))}
+                    )) || '-'}
                   </div>
                 </div>
 
                 {/* Row */}
                 <div className="flex items-start">
-                  <div className="w-32 text-sm font-medium text-gray-500 shrink-0">May also know</div>
+                  <div className="w-32 text-sm font-medium text-gray-500 shrink-0">Soft skills</div>
                   <div className="flex flex-wrap gap-1 text-sm text-gray-800">
-                    {candidate.skills.additionalSkills.map((skill, index) => (
+                    {candidate?.skills?.Soft?.map((skill, index) => (
                       <Badge
                         key={index}
                         className="bg-white border border-gray-200 text-gray-800 hover:bg-gray-50 font-normal"
                       >
                         {skill}
                       </Badge>
-                    ))}
+                    )) || '-'}
                   </div>
                 </div>
               </div>
@@ -118,11 +109,11 @@ const CandidateCard = ({ candidate, onSelect, selected = false }) => {
 
 
               {/* Similar profiles link */}
-              <div className="mt-4">
+              {/* <div className="mt-4">
                 <Button variant="link" size="sm" className="text-blue-600 p-0 h-auto">
                   {candidate.workSummary.similarProfiles} similar profiles
                 </Button>
-              </div>
+              </div> */}
             </div>
 
             {/* Right side with photo and actions */}
@@ -132,7 +123,7 @@ const CandidateCard = ({ candidate, onSelect, selected = false }) => {
                 <Avatar className="h-20 w-20 rounded-full border">
                   <AvatarImage src={candidate.basicInfo.photo} alt={candidate.basicInfo.name} />
                   <AvatarFallback className="bg-gray-100 text-gray-400">
-                    {candidate.basicInfo.name.charAt(0)}
+                    {candidate.basicInfo.candidate_name.charAt(0)}
                   </AvatarFallback>
                 </Avatar>
                 <Button
@@ -152,7 +143,7 @@ const CandidateCard = ({ candidate, onSelect, selected = false }) => {
 
               {/* Profile Summary */}
               <p className="text-sm text-gray-700 mt-3 line-clamp-2 max-w-[200px]">
-                Seasoned professional with {candidate.workSummary.experience} years of experience. Expert in {candidate.skills.keySkills[0]}...
+                {candidate.experience[0].job_description}
               </p>
 
               {/* Actions */}
@@ -162,7 +153,7 @@ const CandidateCard = ({ candidate, onSelect, selected = false }) => {
                   size="sm"
                   className="text-blue-600 border-blue-600 hover:bg-blue-50 h-9"
                 >
-                  View phone number
+                  {candidate.basicInfo.mobile_number}
                 </Button>
                 <Button
                   variant="outline"
@@ -170,9 +161,9 @@ const CandidateCard = ({ candidate, onSelect, selected = false }) => {
                   className="text-gray-700 border-gray-300 h-9 flex items-center justify-center"
                 >
                   <Phone className="h-4 w-4 mr-2" />
-                  Call candidate
+                  {candidate.basicInfo.email}
                 </Button>
-                <div className="text-xs text-gray-500 mt-1">Verified phone & email</div>
+                <div className="text-xs text-gray-500 mt-1">{candidate.basicInfo.city}</div>
               </div>
 
               {/* Bottom options */}

@@ -24,14 +24,14 @@ const ResumeProfileDetailComponent = ({candidate}) => {
           <div className="flex mt-6 mb-8">
             <div className="w-1 bg-blue-600 mr-4 flex-shrink-0"></div>
             <p className="text-sm text-gray-700">
-              Seasoned professional with {candidate.summary.years} years of experience. {candidate.summary.description}
+              Seasoned professional with {candidate.experience[0].experience} years of experience. {candidate.experience[0].job_description}
             </p>
           </div>
 
           <div className="mb-8">
             <h3 className="font-medium text-lg mb-3">Key skills</h3>
             <div className="flex flex-wrap gap-2 mb-4">
-                {candidate.skills.keySkills.map((skill) => (
+                {candidate.skills.TechnicalSkill.map((skill) => (
                     <Badge
                         key={skill}
                         variant="outline"
@@ -43,9 +43,9 @@ const ResumeProfileDetailComponent = ({candidate}) => {
           </div>
 
           <div className="mb-8">
-            <h3 className="font-medium text-lg mb-3">May also know</h3>
+            <h3 className="font-medium text-lg mb-3">Soft skills</h3>
             <div className="flex flex-wrap gap-2">
-            {candidate.skills.additionalSkills.map((skill) => (
+            {candidate.skills.Soft.map((skill) => (
                     <Badge
                         key={skill}
                         variant="outline"
@@ -71,56 +71,68 @@ const ResumeProfileDetailComponent = ({candidate}) => {
           <div className="mb-8">
             <h3 className="font-medium text-lg mb-3">Work experience</h3>
 
-            <div className="flex items-start gap-3 mb-2">
-              <div className="w-10 h-10 bg-blue-100 rounded-md flex items-center justify-center overflow-hidden">
-                <span className="text-blue-600 font-semibold">M</span>
-              </div>
-              <div>
-                <h4 className="font-semibold">{candidate.workSummary.role} at {candidate.workSummary.currentCompany}</h4>
-                <p className="text-sm text-gray-500">Feb '23 till date (2y 1m)</p>
-              </div>
-            </div>
+            {candidate.experience.map((exp, index) => (
+              <div key={index} className="mb-6">
+                <div className="flex items-start gap-3 mb-2">
+                  <div className="w-10 h-10 bg-blue-100 rounded-md flex items-center justify-center overflow-hidden">
+                    <span className="text-blue-600 font-semibold">{exp.company_name?.[0] || 'C'}</span>
+                  </div>
+                  <div>
+                    <h4 className="font-semibold">{exp.role_position} at {exp.company_name}</h4>
+                    <p className="text-sm text-gray-500">{exp.from} {exp.to ? `to ${exp.to}` : '(Current)'}</p>
+                  </div>
+                </div>
 
-            <p className="text-sm mt-2">
-              Software Developer with 1.8 years of experience in <span className="bg-yellow-100 px-1">.NET</span>,{" "}
-              <span className="bg-yellow-100 px-1">.NET Core</span> and significant experience in{" "}
-              <span className="bg-yellow-100 px-1">Frappe Framework</span>
-            </p>
+                <p className="text-sm mt-2">
+                  {exp.job_description}
+                </p>
+              </div>
+            ))}
           </div>
 
           {/* Education Section */}
           <div className="mb-8">
             <h3 className="font-medium text-lg mb-3">Education</h3>
-            <div className="flex items-start gap-3">
-              <div className="w-10 h-10 bg-amber-50 rounded-md flex items-center justify-center">
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  width="24"
-                  height="24"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  className="text-amber-400"
-                >
-                  <path d="M22 10v6M2 10l10-5 10 5-10 5z" />
-                  <path d="M6 12v5c0 2 2 3 6 3s6-1 6-3v-5" />
-                </svg>
-              </div>
-              <div>
-                <div className="flex items-center gap-2">
-                  <h4 className="font-semibold text-blue-600">{candidate.education.degree}</h4>
-                  <Badge
-                    variant="outline"
-                    className="bg-amber-50 hover:bg-amber-50 text-amber-600 rounded-sm text-xs font-normal py-0 px-1 h-5"
-                  >
-                    {candidate.education.type}
-                  </Badge>
+            <div className="space-y-4">
+              {candidate.education.map((edu, index) => (
+                <div key={index} className="flex items-start gap-3">
+                  <div className="w-10 h-10 bg-amber-50 rounded-md flex items-center justify-center">
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      width="24"
+                      height="24"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      className="text-amber-400"
+                    >
+                      <path d="M22 10v6M2 10l10-5 10 5-10 5z" />
+                      <path d="M6 12v5c0 2 2 3 6 3s6-1 6-3v-5" />
+                    </svg>
+                  </div>
+                  <div>
+                    <div className="flex items-center gap-2">
+                      <h4 className="font-semibold text-blue-600">{edu.course_name}</h4>
+                      {edu.specialization && (
+                        <Badge
+                          variant="outline"
+                          className="bg-amber-50 hover:bg-amber-50 text-amber-600 rounded-sm text-xs font-normal py-0 px-1 h-5"
+                        >
+                          {edu.specialization}
+                        </Badge>
+                      )}
+                    </div>
+                    <p className="text-sm text-gray-700">
+                      {edu.school_college_name}
+                      {edu.school_college_city && `, ${edu.school_college_city}`}
+                    </p>
+                    <p className="text-xs text-gray-500">{edu.from} - {edu.to}</p>
+                  </div>
                 </div>
-                <p className="text-sm text-gray-700">{candidate.education.university}, {candidate.education.location}</p>
-              </div>
+              ))}
             </div>
           </div>
 
@@ -146,14 +158,14 @@ const ResumeProfileDetailComponent = ({candidate}) => {
                 </svg>
               </div>
               <div>
-                <h4 className="font-semibold">{candidate.certification.name}</h4>
-                <p className="text-sm text-gray-700">{candidate.certification.provider}</p>
+                <h4 className="font-semibold">{candidate.certification?.name}</h4>
+                <p className="text-sm text-gray-700">{candidate.certification?.provider}</p>
               </div>
             </div>
           </div>
 
           {/* Other details Section */}
-          <div className="mb-8">
+          {/* <div className="mb-8">
             <h3 className="font-medium text-lg mb-3">Other details</h3>
 
             <div className="mb-6">
@@ -167,7 +179,7 @@ const ResumeProfileDetailComponent = ({candidate}) => {
                 ))}
               </div>
             </div>
-          </div>
+          </div> */}
 
           {/* Personal details Section */}
           <div className="mb-8">
@@ -175,25 +187,25 @@ const ResumeProfileDetailComponent = ({candidate}) => {
             <div className="grid grid-cols-5 gap-4 text-sm">
               <div>
                 <div className="text-gray-500 mb-1">Date of Birth</div>
-                <div>{candidate.personalDetails.dateOfBirth}</div>
+                <div>{candidate.basicInfo.date_of_birth}</div>
               </div>
               <div>
                 <div className="text-gray-500 mb-1">Gender</div>
-                <div>{candidate.personalDetails.gender}</div>
+                <div>{candidate.basicInfo.gende}</div>
               </div>
               <div>
                 <div className="text-gray-500 mb-1">Marital status</div>
-                <div>{candidate.personalDetails.maritalStatus}</div>
+                <div>{candidate.basicInfo.maritalStatus}</div>
               </div>
               <div>
                 <div className="text-gray-500 mb-1">Category</div>
-                <div>{candidate.personalDetails.castCategory}</div>
+                <div>{candidate.basicInfo.castCategory}</div>
               </div>
               <div>
                 <div className="text-gray-500 mb-1">Physically Challenged</div>
-                <div>{candidate.personalDetails.physicallyChallenged}</div>
+                <div>{candidate.basicInfo.physicallyChallenged}</div>
               </div>
-            </div>
+            </div>  
           </div>
 
           {/* Desired job detail Section */}
@@ -217,22 +229,6 @@ const ResumeProfileDetailComponent = ({candidate}) => {
               <h3 className="font-medium text-lg">Attached CV</h3>
               <div className="flex items-center gap-1">
                 <span className="text-sm text-gray-500">Last updated on {candidate.resume.lastUpdate}</span>
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  width="20"
-                  height="20"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  className="text-gray-500"
-                >
-                  <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
-                  <polyline points="7 10 12 15 17 10" />
-                  <line x1="12" y1="15" x2="12" y2="3" />
-                </svg>
               </div>
             </div>
             <div className="border rounded-md p-8 flex items-center justify-center">
@@ -242,9 +238,14 @@ const ResumeProfileDetailComponent = ({candidate}) => {
         </TabsContent>
 
         <TabsContent value="cv">
-        <div className="border rounded-md p-8 flex items-center justify-center">
-             <embed src={candidate.resume.link} width="100%" height="900px" type="application/pdf" />
-            </div>
+          <div className="border rounded-md p-8 flex items-center justify-center">
+            <embed
+              src={candidate.resume.link}
+              width="100%"
+              height="900px"
+              type="application/pdf"
+            />
+          </div>
         </TabsContent>
       </Tabs>
     </div>
