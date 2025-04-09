@@ -38,7 +38,7 @@ const CandidateCard = ({ candidate, onSelect, selected = false }) => {
                   className="h-4 w-4"
                 />
                 <label htmlFor={`candidate-${candidate.id}`} className="text-base font-medium cursor-pointer">
-                  {candidate.name}
+                  {candidate.basicInfo.name}
                 </label>
               </div>
 
@@ -46,17 +46,17 @@ const CandidateCard = ({ candidate, onSelect, selected = false }) => {
               <div className="flex flex-wrap items-center gap-4 text-sm text-gray-500 mb-4">
                 <div className="flex items-center gap-1">
                   <Badge variant="outline" className="bg-gray-100 text-gray-500 font-normal rounded-md px-1.5 py-0.5">
-                    <BriefcaseBusiness/> {candidate.experience}
+                    <BriefcaseBusiness/> {candidate.basicInfo.experience}
                   </Badge>
                 </div>
                 <div className="flex items-center gap-1">
                   <Badge variant="outline" className="bg-gray-100 text-gray-500 font-normal rounded-md px-1.5 py-0.5">
-                    <Wallet/> {candidate.salary}
+                    <Wallet/> {candidate.basicInfo.salary}
                   </Badge>
                 </div>
                 <div className="flex items-center gap-1">
                   <Badge variant="outline" className="bg-gray-100 text-gray-500 font-normal rounded-md px-1.5 py-0.5">
-                  <MapPin/> {candidate.location}
+                  <MapPin/> {candidate.basicInfo.location}
                   </Badge>
                 </div>
               </div>
@@ -66,21 +66,21 @@ const CandidateCard = ({ candidate, onSelect, selected = false }) => {
                 <div className="flex items-start">
                   <div className="w-32 text-sm font-medium text-gray-500 shrink-0">Current</div>
                   <div className="text-sm text-gray-800">
-                    <span className="text-green-700 font-medium">{candidate.currentJob}</span> at {candidate.company}
+                    <span className="text-green-700 font-medium">{candidate.workSummary.role}</span> at {candidate.workSummary.currentCompany}
                   </div>
                 </div>
 
                 {/* Row */}
                 <div className="flex items-start">
                   <div className="w-32 text-sm font-medium text-gray-500 shrink-0">Education</div>
-                  <div className="text-sm text-gray-800">{candidate.education}</div>
+                  <div className="text-sm text-gray-800">{candidate.education.degree}</div>
                 </div>
 
                 {/* Row */}
                 <div className="flex items-start">
                   <div className="w-32 text-sm font-medium text-gray-500 shrink-0">Pref. locations</div>
                   <div className="text-sm text-gray-800">
-                    {candidate.preferredLocations.join(", ")}
+                    {candidate.workSummary.preferredLocations.join(", ")}
                   </div>
                 </div>
 
@@ -88,7 +88,7 @@ const CandidateCard = ({ candidate, onSelect, selected = false }) => {
                 <div className="flex items-start">
                   <div className="w-32 text-sm font-medium text-gray-500 shrink-0">Key skills</div>
                   <div className="flex flex-wrap gap-1 text-sm text-gray-800">
-                    {candidate.keySkills.map((skill, index) => (
+                    {candidate.skills.keySkills.map((skill, index) => (
                       <Badge
                         key={index}
                         className="bg-white border border-gray-200 text-gray-800 hover:bg-gray-50 font-normal"
@@ -103,7 +103,7 @@ const CandidateCard = ({ candidate, onSelect, selected = false }) => {
                 <div className="flex items-start">
                   <div className="w-32 text-sm font-medium text-gray-500 shrink-0">May also know</div>
                   <div className="flex flex-wrap gap-1 text-sm text-gray-800">
-                    {candidate.additionalSkills.map((skill, index) => (
+                    {candidate.skills.additionalSkills.map((skill, index) => (
                       <Badge
                         key={index}
                         className="bg-white border border-gray-200 text-gray-800 hover:bg-gray-50 font-normal"
@@ -120,7 +120,7 @@ const CandidateCard = ({ candidate, onSelect, selected = false }) => {
               {/* Similar profiles link */}
               <div className="mt-4">
                 <Button variant="link" size="sm" className="text-blue-600 p-0 h-auto">
-                  {candidate.similarProfiles} similar profiles
+                  {candidate.workSummary.similarProfiles} similar profiles
                 </Button>
               </div>
             </div>
@@ -130,9 +130,9 @@ const CandidateCard = ({ candidate, onSelect, selected = false }) => {
               {/* Avatar + Bookmark */}
               <div className="relative">
                 <Avatar className="h-20 w-20 rounded-full border">
-                  <AvatarImage src={candidate.photo} alt={candidate.name} />
+                  <AvatarImage src={candidate.basicInfo.photo} alt={candidate.basicInfo.name} />
                   <AvatarFallback className="bg-gray-100 text-gray-400">
-                    {candidate.name.charAt(0)}
+                    {candidate.basicInfo.name.charAt(0)}
                   </AvatarFallback>
                 </Avatar>
                 <Button
@@ -152,7 +152,7 @@ const CandidateCard = ({ candidate, onSelect, selected = false }) => {
 
               {/* Profile Summary */}
               <p className="text-sm text-gray-700 mt-3 line-clamp-2 max-w-[200px]">
-                Seasoned professional with {candidate.profileSummary} years of experience. Expert in {candidate.keySkills[0]}...
+                Seasoned professional with {candidate.workSummary.experience} years of experience. Expert in {candidate.skills.keySkills[0]}...
               </p>
 
               {/* Actions */}

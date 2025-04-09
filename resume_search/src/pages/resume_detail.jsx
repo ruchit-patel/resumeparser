@@ -1,44 +1,68 @@
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import ResumeProfileDetailComponent from '../components/resumeCard/ResumeProfileDetailComponent'
 import CandidateCard from '../components/resumeCard/CandidateCardComponent'
-const ResumeDetailPage = () => {
+import { config } from "@/config"
+import { useParams } from 'react-router-dom'; 
 
-  const candidate = {
-    id: 1,
-  name: "John Doe",
-  experience: "5 years",
-  salary: "5-7 LPA",
-  location: "New York, NY",
-  currentJob: "Software Engineer",
-  company: "Tech Corp",
-  education: "B.Tech in Computer Science",
-  preferredLocations: ["New York, NY", "San Francisco, CA"],
-  keySkills: ["React", "Node.js", "Python"],
-  additionalSkills: ["SQL", "Git", "Agile"],
-      similarProfiles: 12,
-  photo: "https://example.com/photo.jpg", // Replace with actual photo URL
-  profileSummary: 5,
-  department: "Engineering",
-  industry: "IT",
-      isNewProfile: true,
-      isPremiumInstitute: true,
-  hasVerifiedSkills: true,
-  lastModified: "2 days ago"
+const ResumeDetailPage = () => {
+  const [candidateData, setCandidateData] = useState(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const { id } = useParams();
+
+  const fetchCandidateDetail = async () => {
+    try {
+      setIsLoading(true);
+      const response = await fetch(`${config.backendUrl}/api/method/resumeparser.apis.search_apis.candidate_detail/${id}`);
+      const result = await response.json();
+      return result;
+    } catch (error) {
+      console.error('Error fetching candidate details:', error);
+      return null;
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    if (id) {
+      fetchCandidateDetail().then((response) => {
+        if (response?.message) {
+          setCandidateData(response.message);
+          console.log('Candidate data loaded:', response.message);
+        }
+      });
+    }
+  }, [id]); // Add id as dependency
+
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center h-screen">
+        <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-blue-500"></div>
+      </div>
+    );
+  }
+
+  if (!candidateData) {
+    return (
+      <div className="text-center py-10 text-gray-600">
+        No candidate data found
+      </div>
+    );
   }
 
   const handleSelectCandidate = (id, selected) => {
     console.log(id, selected)
-    }
+  }
 
   return (
     <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 flex flex-col gap-5">
       <CandidateCard
-                key={candidate.id}
-                candidate={candidate}
+                key={candidateData.id}
+                candidate={candidateData}
                 onSelect={handleSelectCandidate}
                 selected={false}
               />
-      <ResumeProfileDetailComponent candidate={candidate}/>
+      <ResumeProfileDetailComponent candidate={candidateData}/>
     </main>
   )
 }
