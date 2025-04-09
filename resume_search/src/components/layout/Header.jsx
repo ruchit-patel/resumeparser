@@ -1,6 +1,8 @@
 import React from 'react';
 import Cookies from 'js-cookie';
+import { useNavigate } from 'react-router-dom';
 const Header = () => {
+  const navigate = useNavigate();
   return (
     <header className="bg-white shadow-sm">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -16,35 +18,39 @@ const Header = () => {
 
               <img src="/assets/resumeparser/resume_search/resume.svg" className='h-10 w-10 mx-5' alt="Icon" />
                 Resume Finder
-                sid :  {Cookies.get('sid')} 
               </div>
             </div>
             
             {/* Navigation */}
             <nav className="ml-10 flex space-x-8">
-              <a href="/resume_search/search" className="border-b-2 border-blue-500 text-gray-900 px-1 pt-1 text-sm font-medium">
-                  Search Job & Respose
-              </a>
+              <button
+                onClick={() => navigate('/resume_search/search')}
+                className="border-b-2 border-blue-500 text-gray-900 px-1 pt-1 text-sm font-medium">
+                Search Job & Respose
+              </button>
 
-              <a href="/resume_search/results" className="border-b-2 border-blue-500 text-gray-900 px-1 pt-1 text-sm font-medium">
+              <button
+                onClick={() => navigate('/resume_search/results')}
+                className="border-b-2 border-blue-500 text-gray-900 px-1 pt-1 text-sm font-medium">
                 ResDesk
-              </a>
-
-              {/* <a href="/resume_search/detail/testbyjay" className="border-b-2 border-blue-500 text-gray-900 px-1 pt-1 text-sm font-medium">
-                Candidate Resume Details
-              </a> */}
+              </button>
               
             </nav>
           </div>
           
           {/* Right side icons */}
           <div className="flex items-center space-x-4">
-            <button className="bg-blue-600 text-white text-sm font-medium py-1 px-3 rounded-md flex items-center">
-              <span className="ml-1 text-xs">Hello {Cookies.get('full_name')} </span>
+            <button className="bg-blue-600 hover:bg-blue-700 transition-colors duration-200 text-white text-sm font-medium py-1.5 px-4 rounded-md flex items-center hover:shadow-md">
+              <span className="ml-1 text-xs font-semibold">Hello {Cookies.get('full_name')} </span>
             </button>
 
-            <button onClick={(e) => { e.preventDefault(); fetch('/api/method/logout').then(() => window.location.href = '/login'); }} className="bg-red-600 text-white text-sm font-medium py-1 px-3 rounded-md flex items-center">
-              <span className="ml-1 text-xs">Logout</span>
+            <button 
+              onClick={async () => {
+                await fetch('/api/method/logout');
+                window.location.href = `/login?redirect-to=${window.location.pathname}`;
+              }} 
+              className="bg-red-600 hover:bg-red-700 transition-colors duration-200 text-white text-sm font-medium py-1.5 px-4 rounded-md flex items-center hover:shadow-md">
+              <span className="ml-1 text-xs font-semibold">Logout</span>
             </button>
 
           </div>

@@ -9,7 +9,7 @@ import AuthMiddleware from './components/middelwares/authMiddleware';
 function App() {
   return (
     <div className="min-h-screen bg-gray-50">
-      <FrappeProvider >
+      <FrappeProvider url="http://localhost:8000">
       <AuthMiddleware>
         <Header />
         
@@ -20,7 +20,7 @@ function App() {
         </Routes>
         
         <Footer />
-        </AuthMiddleware>
+      </AuthMiddleware>
       </FrappeProvider>
     </div>
   );
