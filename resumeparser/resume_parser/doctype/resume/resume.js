@@ -39,5 +39,11 @@ frappe.ui.form.on("Resume", {
                 true // Sets dialog as minimizable
             )
 		}
-	}
+	},
+
+	refresh(frm) {
+        frm.add_custom_button('View Resume', () => {
+			window.location.replace(`/resume_search/detail/${frm.doc.name}`);
+        }).addClass('btn-primary');
+    }
 });

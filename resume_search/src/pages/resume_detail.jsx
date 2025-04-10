@@ -67,7 +67,7 @@ const ResumeDetailPage = () => {
           <ResumeProfileDetailComponent candidate={candidateData}/>
         </>
       ) : (
-        <div className="text-center py-10 text-gray-600">
+        <div className="text-center py-10 text-gray-800">
           No candidate data found
         </div>
       )}

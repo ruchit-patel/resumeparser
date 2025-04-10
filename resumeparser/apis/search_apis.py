@@ -1,5 +1,16 @@
 import frappe
 
+from datetime import datetime, date
+def human_readable_date_diff(target_date_str):
+    delta = (target_date_str.date() - date.today()).days
+
+    # Human-readable output
+    if delta == 0:
+        return "Today"
+    elif delta > 0:
+        return f"{delta} day{'s' if delta > 1 else ''} to go"
+    else:
+        return f"{abs(delta)} day{'s' if abs(delta) > 1 else ''} ago"
 
 
 @frappe.whitelist(allow_guest=True)
@@ -224,8 +235,6 @@ def seach_candidate_location(q:str):
     return filter_data
 
 
-
-
 @frappe.whitelist(allow_guest=True)
 def seach_candidate_industry(q:str):
     industries = [
@@ -236,9 +245,6 @@ def seach_candidate_industry(q:str):
     ]
     filter_data = list(filter(lambda a: q in a, industries))
     return filter_data
-
-
-
 
 
 @frappe.whitelist(allow_guest=True)
@@ -276,7 +282,6 @@ def seach_candidate_designation(q:str):
     return filter_data
 
 
-
 @frappe.whitelist(allow_guest=True)
 def seach_candidate_edu_institute(q:str):
     education_institutions = [
@@ -307,14 +312,50 @@ def seach_candidate_category(q:str):
     filter_data = list(filter(lambda a: q in a, candidate_categories))
     return filter_data
 
-
+import json
 @frappe.whitelist(allow_guest=True)
 def seach_results():
-    return []
-
-@frappe.whitelist(allow_guest=True)
-def resume_link_find():
-    return frappe.get_doc("Resume", 1).get("resume_file")
+    try:            
+        data = []
+        for source_row in frappe.get_all("Resume",fields=["*"]):
+            source =  json.loads(source_row.get("extracted_json"))
+            skills = source.get("skills", [])
+            technical_skills = [s.get("skill_name", "") for s in skills if s.get("skill_type") == "Technical"]
+            soft_skills = [s.get("skill_name", "") for s in skills if s.get("skill_type") == "Soft"]
+            data.append({
+                "id": str(source_row.get("name")),
+                "basicInfo": {
+                "candidate_name": source.get("candidate_name"),
+                "date_of_birth": None,
+                "address": None,
+                "gender": None,
+                "mobile_number": source.get("mobile_number"),
+                "email": source.get("email"),
+                "city": source.get("city"),
+                "maritalStatus": "-",
+                "castCategory": "-",
+                "physicallyChallenged": "-"
+            },
+            "workSummary": {
+                "industry": None,
+                "department": None,
+                "role": None
+            },
+            "education": source.get("education", []),
+            "experience": source.get("experience", []),
+            "projects": source.get("projects", []),
+            "certificates": source.get("certificates", []),
+            "accomplishments": [],
+            "skills": {
+                "TechnicalSkill": technical_skills,
+                "Soft": soft_skills,
+                "AdditionalSkills": []
+            }
+        })
+        return data
+    except Exception as e:
+        frappe.log_error(f"Error in seach_results: {str(e)}")
+        return []
 
 @frappe.whitelist()
 def candidate_detail():
@@ -375,7 +416,7 @@ def candidate_detail():
                 },
                 "resume": {
                     "link": frappe.get_doc("Resume", candidate_id).get("resume_file"),
-                    "lastUpdate": "2 days ago"
+                    "lastUpdate": human_readable_date_diff(frappe.get_doc("Resume", candidate_id).get("modified"))
                 }
             }
         except Exception as e:
@@ -384,4 +425,15 @@ def candidate_detail():
     except Exception as e:
         frappe.log_error(f"Error fetching candidate details: {str(e)}")
         return {"status": "error", "message": str(e)}
-        
+    
+
+@frappe.whitelist(allow_guest=True)
+def test():
+    return "test"
+
+
+
+
+
+
+

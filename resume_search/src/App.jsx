@@ -9,7 +9,7 @@ import AuthMiddleware from './components/middelwares/authMiddleware';
 function App() {
   return (
     <div className="min-h-screen bg-gray-50">
-      <FrappeProvider url="http://localhost:8000">
+      <FrappeProvider>
       <AuthMiddleware>
         <Header />
         
