@@ -152,6 +152,7 @@ class Resume(Document):
 		try:
 			data = json.loads(response_text)  # Convert to dictionary
 			self.extracted_json = json.dumps(data, indent=4)  # Store as formatted JSON string
+			self.candidate_name = data.get("candidate_name")
 		except json.JSONDecodeError:
 			frappe.throw("Invalid JSON response from Gemini API.")
 
