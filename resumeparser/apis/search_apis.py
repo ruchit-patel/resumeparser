@@ -357,7 +357,7 @@ def seach_results():
         frappe.log_error(f"Error in seach_results: {str(e)}")
         return []
 
-@frappe.whitelist()
+@frappe.whitelist(allow_guest=True)
 def candidate_detail():
     try:    
         path = frappe.request.path

@@ -42,8 +42,10 @@ frappe.ui.form.on("Resume", {
 	},
 
 	refresh(frm) {
-        frm.add_custom_button('View Resume', () => {
-			window.location.replace(`/resume_search/detail/${frm.doc.name}`);
-        }).addClass('btn-primary');
+		if(!frm.is_new()) {
+			frm.add_custom_button('View Resume', () => {
+				window.open(`/resume_search/detail/${frm.doc.name}`, '_blank');
+			}).addClass('btn-primary');
+		}
     }
 });
