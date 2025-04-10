@@ -1,0 +1,38 @@
+{
+ "app": "frappe",
+ "charts": [],
+ "content": "[{\"id\":\"GqKjOQSym9\",\"type\":\"quick_list\",\"data\":{\"quick_list_name\":\"Resume\",\"col\":12}}]",
+ "creation": "2025-04-10 16:04:35.073500",
+ "custom_blocks": [],
+ "docstatus": 0,
+ "doctype": "Workspace",
+ "for_user": "",
+ "hide_custom": 0,
+ "icon": "number-card",
+ "idx": 0,
+ "indicator_color": "green",
+ "is_hidden": 0,
+ "label": "Resume List",
+ "link_type": "DocType",
+ "links": [],
+ "modified": "2025-04-10 16:05:31.255320",
+ "modified_by": "jaypatelsayaji@gmail.com",
+ "module": "Resume Parser",
+ "name": "Resume List",
+ "number_cards": [],
+ "owner": "jaypatelsayaji@gmail.com",
+ "parent_page": "",
+ "public": 1,
+ "quick_lists": [
+  {
+   "document_type": "Resume",
+   "label": "Resume",
+   "quick_list_filter": "[]"
+  }
+ ],
+ "roles": [],
+ "sequence_id": 23.0,
+ "shortcuts": [],
+ "title": "Resume List",
+ "type": "Workspace"
+}

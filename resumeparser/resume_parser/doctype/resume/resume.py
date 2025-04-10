@@ -156,8 +156,6 @@ class Resume(Document):
 		except json.JSONDecodeError:
 			frappe.throw("Invalid JSON response from Gemini API.")
 
-		#self.update_resume_fields(data)
-		#self.save()
 
 	def after_insert(self):
 		"""Update the resume fields in OpenSearch"""
