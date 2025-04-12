@@ -2,42 +2,20 @@ import React, { useState, useRef, useEffect } from 'react';
 import { Input } from '@/components/ui/input';
 import { X, ChevronRight, Check, Search } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import {config} from '@/config';
 
-// Sample departments and roles data
-const departments = [
-  { 
-    name: 'Customer Success, Service & Operations', 
-    roles: ['Customer Support', 'Service Manager', 'Operations Lead', 'Account Manager'] 
-  },
-  { 
-    name: 'Data Science & Analytics', 
-    roles: ['Data Scientist', 'Data Analyst', 'ML Engineer', 'BI Developer'] 
-  },
-  { 
-    name: 'Engineering - Hardware & Networks', 
-    roles: ['Hardware Engineer', 'Network Administrator', 'ASIC / RTL / Logic Design Engineer', 'Design Team Lead', 'Design Verification Engineer', 'EDA Tools Engineer', 'Embedded Hardware Engineer'] 
-  },
-  { 
-    name: 'Engineering - Software & QA', 
-    roles: ['Software Developer', 'QA Engineer', 'DevOps Engineer', 'UI/UX Developer'] 
-  },
-  { 
-    name: 'Finance & Accounting', 
-    roles: ['Accountant', 'Financial Analyst', 'Tax Specialist', 'Auditor'] 
-  },
-  { 
-    name: 'Human Resources', 
-    roles: ['HR Manager', 'Recruiter', 'Training Coordinator', 'Compensation Specialist'] 
-  },
-  { 
-    name: 'IT & Information Security', 
-    roles: ['IT Support', 'Security Analyst', 'System Administrator', 'IT Project Manager'] 
-  },
-  { 
-    name: 'BFSI, Investments & Trading', 
-    roles: ['Investment Analyst', 'Trading Specialist', 'Risk Manager', 'Compliance Officer'] 
+const fetchSearchData = async () => {
+  try {
+    const apiEndPoint = "api/method/resumeparser.apis.search_apis.candidate_departments"
+    const response = await fetch(`${config.backendUrl}/${apiEndPoint}`);
+    const result = await response.json();
+    return result.message || [];
+  } catch (error) {
+    console.error('Error fetching departments:', error);
+    return [];
   }
-];
+};
+
 export default function DepartmentRoleSelector({ 
   placeholder = "Add Department/Role", 
   selectedItems,
@@ -47,9 +25,20 @@ export default function DepartmentRoleSelector({
   const [isOpen, setIsOpen] = useState(false);
   const [expandedDept, setExpandedDept] = useState(null);
   const [searchQuery, setSearchQuery] = useState('');
+  const [departments, setDepartments] = useState([]);
   const dropdownRef = useRef(null);
 
   // Close dropdown when clicking outside
+  useEffect(() => {
+    const loadDepartments = async () => {
+      const data = await fetchSearchData();
+      if (data && data.length > 0) {
+        setDepartments(data);
+      }
+    };
+    loadDepartments();
+  }, []);
+
   useEffect(() => {
     function handleClickOutside(event) {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {

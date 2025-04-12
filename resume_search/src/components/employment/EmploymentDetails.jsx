@@ -59,7 +59,7 @@ const EmploymentDetails = ({
                   placeholder='Enter Exclude Companies' 
                   List={excludeCompanies} 
                   setList={setExcludeCompanies}
-                  apiEndPoint = {"api/method/resumeparser.apis.search_apis.seach_candidate_company"}
+                  apiEndPoint = {"api/method/resumeparser.apis.search_apis.seach_candidate_company_exclude"}
                    />
               </div>
               

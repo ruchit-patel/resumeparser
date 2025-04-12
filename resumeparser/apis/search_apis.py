@@ -1,6 +1,8 @@
 import frappe
 
 from datetime import datetime, date
+from .open_seach_querys import keyword_search_query,skill_search_query,location_search_query,companies_search_query,designation_search_query,education_institute_search_query
+
 def human_readable_date_diff(target_date_str):
     delta = (target_date_str.date() - date.today()).days
 
@@ -13,227 +15,115 @@ def human_readable_date_diff(target_date_str):
         return f"{abs(delta)} day{'s' if abs(delta) > 1 else ''} ago"
 
 
-@frappe.whitelist(allow_guest=True)
-def seach_keywords(q: str):
+        # OpenSearch query for skills, designations, and companies with prefix matching
+        
+def open_search_query_executor(query):
     try:
         # Get OpenSearch client
         client = frappe.new_doc("Resume").get_opensearch_client()
         index_name = "resumes"
-
-        # OpenSearch query for skills, designations, and companies with prefix matching
-        query = {
-            "size": 0,
-            "_source": False,
-            "query": {
-                "bool": {
-                    "should": [
-                        {
-                            "nested": {
-                                "path": "skills",
-                                "query": {
-                                    "match_phrase_prefix": {
-                                        "skills.skill_name": {
-                                            "query": q,
-                                            "max_expansions": 50
-                                        }
-                                    }
-                                }
-                            }
-                        },
-                        {
-                            "nested": {
-                                "path": "experience",
-                                "query": {
-                                    "match_phrase_prefix": {
-                                        "experience.role_position": {
-                                            "query": q,
-                                            "max_expansions": 50
-                                        }
-                                    }
-                                }
-                            }
-                        },
-                        {
-                            "nested": {
-                                "path": "experience",
-                                "query": {
-                                    "match_phrase_prefix": {
-                                        "experience.company_name": {
-                                            "query": q,
-                                            "max_expansions": 50
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    ],
-                    "minimum_should_match": 1
-                }
-            },
-            "aggs": {
-                "skill_suggestions": {
-                    "nested": {
-                        "path": "skills"
-                    },
-                    "aggs": {
-                        "matching_skills": {
-                            "filter": {
-                                "match_phrase_prefix": {
-                                    "skills.skill_name": {
-                                        "query": q,
-                                        "max_expansions": 50
-                                    }
-                                }
-                            },
-                            "aggs": {
-                                "skills": {
-                                    "terms": {
-                                        "field": "skills.skill_name.keyword",
-                                        "size": 5
-                                    }
-                                }
-                            }
-                        }
-                    }
-                },
-                "designation_suggestions": {
-                    "nested": {
-                        "path": "experience"
-                    },
-                    "aggs": {
-                        "matching_designations": {
-                            "filter": {
-                                "match_phrase_prefix": {
-                                    "experience.role_position": {
-                                        "query": q,
-                                        "max_expansions": 50
-                                    }
-                                }
-                            },
-                            "aggs": {
-                                "designations": {
-                                    "terms": {
-                                        "field": "experience.role_position.keyword",
-                                        "size": 5
-                                    }
-                                }
-                            }
-                        }
-                    }
-                },
-                "company_suggestions": {
-                    "nested": {
-                        "path": "experience"
-                    },
-                    "aggs": {
-                        "matching_companies": {
-                            "filter": {
-                                "match_phrase_prefix": {
-                                    "experience.company_name": {
-                                        "query": q,
-                                        "max_expansions": 50
-                                    }
-                                }
-                            },
-                            "aggs": {
-                                "companies": {
-                                    "terms": {
-                                        "field": "experience.company_name.keyword",
-                                        "size": 5
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-        }
-
         # Execute the query against OpenSearch
         response = client.search(index=index_name, body=query)
         
+        return response
 
-        print("response==============================> :",response)
-        # Extract suggestions from all three categories
-        suggestions = {
+    except Exception as e:
+        frappe.log_error(f"Error in seach_keywords: {str(e)}")
+        return {}
+
+
+@frappe.whitelist(allow_guest=True)
+# tuple in list
+def seach_keywords(q: str):
+    query = keyword_search_query(q)
+    response= open_search_query_executor(query)
+    suggestions = {
             "skills": [],
             "designations": [],
             "companies": []
         }
-        if 'aggregations' in response:
-            # Extract skills
-            skill_buckets = response['aggregations']['skill_suggestions']['matching_skills']['skills']['buckets']
-            suggestions['skills'] = [bucket['key'] for bucket in skill_buckets]
-            
-            # Extract designations
-            designation_buckets = response['aggregations']['designation_suggestions']['matching_designations']['designations']['buckets']
-            suggestions['designations'] = [bucket['key'] for bucket in designation_buckets]
-            
-            # Extract companies
-            company_buckets = response['aggregations']['company_suggestions']['matching_companies']['companies']['buckets']
-            suggestions['companies'] = [bucket['key'] for bucket in company_buckets]
+    if 'aggregations' in response:
+        # Extract skills
+        skill_buckets = response['aggregations']['skill_suggestions']['matching_skills']['skills']['buckets']
+        suggestions['skills'] = [bucket['key'] for bucket in skill_buckets]
         
+        # Extract designations
+        designation_buckets = response['aggregations']['designation_suggestions']['matching_designations']['designations']['buckets']
+        suggestions['designations'] = [bucket['key'] for bucket in designation_buckets]
+        
+        # Extract companies
+        company_buckets = response['aggregations']['company_suggestions']['matching_companies']['companies']['buckets']
+        suggestions['companies'] = [bucket['key'] for bucket in company_buckets]
+    
         print([(item, key) for key, values in suggestions.items() for item in values])
         return [(item, key) for key, values in suggestions.items() for item in values]
-
-    except Exception as e:
-        frappe.log_error(f"Error in seach_keywords: {str(e)}")
-        return {"skills": [], "designations": [], "companies": []}
+    
+    return None
 
 @frappe.whitelist(allow_guest=True)
+# tuple in list
 def seach_skills(q:str):
-    skills = [
-        "Python", "Java", "JavaScript", "C#", "C++", "Ruby", "PHP", "Go", "Swift", "Kotlin", 
-        "SQL", "HTML/CSS", "React", "Angular", "Node.js", "Django", "Flask", "Spring Boot", 
-        "ASP.NET", "Docker", "Kubernetes", "Git/GitHub", "CI/CD", "REST APIs", "GraphQL", 
-        "Microservices", "Cloud Computing (AWS, Azure, GCP)",
-        "Manual Testing", "Automated Testing", "Selenium", "JUnit", "TestNG", "PyTest", 
-        "Postman", "JMeter", "LoadRunner", "Cucumber", "Test Cases and Test Plans", 
-        "Bug Tracking", "Performance Testing", "API Testing", "Regression Testing", 
-        "Integration Testing", "Unit Testing", "End-to-End Testing",
-        "Data Analysis", "Data Cleaning", "Data Visualization", "Pandas", "NumPy", "SQL", "R", 
-        "Excel", "Tableau", "Power BI", "Machine Learning", "Deep Learning", "TensorFlow", 
-        "PyTorch", "Data Mining", "Data Wrangling", "Statistical Analysis", 
-        "Predictive Modeling", "Data Warehousing",
-        "CI/CD", "Jenkins", "Docker", "Kubernetes", "Ansible", "Terraform", "AWS", "Azure", 
-        "GCP", "Bash/Shell Scripting", "Infrastructure as Code (IaC)", 
-        "Monitoring and Logging (Prometheus, Grafana)", "Configuration Management", 
-        "Version Control (Git)", "Container Orchestration",
-        "Linux Administration", "Windows Server", "Bash/Shell Scripting", "Powershell", 
-        "Network Configuration", "System Monitoring", "Security Management", 
-        "User and Permission Management", "Virtualization (VMware, Hyper-V)", 
-        "Backup and Recovery", "Firewall Configuration", "Active Directory", 
-        "DNS/DHCP Configuration", "IT Support"
-    ]
-    filter_data = list(filter(lambda a: q in a, skills))
-    return filter_data
+    query = skill_search_query(q)
+    response = open_search_query_executor(query)
+    suggestions = {"skills": []}
+    if 'aggregations' in response:
+        # Extract skills
+        skill_buckets = response['aggregations']['skill_suggestions']['matching_skills']['skills']['buckets']
+        suggestions['skills'] = [bucket['key'] for bucket in skill_buckets]
+    
+    return [(item, key) for key, values in suggestions.items() for item in values]
 
 
 @frappe.whitelist(allow_guest=True)
+# list view
 def seach_candidate_location(q:str):
-    locations = [
-    "Mumbai", "Delhi", "Bangalore", "Hyderabad", "Ahmedabad", "Chennai", 
-    "Kolkata", "Pune", "Jaipur", "Surat", "Lucknow", "Kanpur", 
-    "Nagpur", "Patna", "Indore", "Bhopal", "Ludhiana", "Agra", 
-    "Nashik", "Vadodara", "Faridabad", "Ghaziabad", "Rajkot", 
-    "Meerut", "Kochi", "Coimbatore", "Mysore", "Guwahati", 
-    "Dehradun", "Ranchi", "Jodhpur", "Gwalior", "Thane", 
-    "Visakhapatnam", "Madurai", "Vijayawada", "Chandigarh", 
-    "Hubli-Dharwad", "Amritsar", "Raipur", "Bhubaneswar", 
-    "Jabalpur", "Guntur", "Noida", "Gurugram", "Aurangabad", 
-    "Solapur", "Rajahmundry", "Tirupati", "Mangalore", 
-    "Navi Mumbai", "Udaipur", "Vellore", "Jalandhar", 
-    "Kota", "Varanasi", "Allahabad", "Bareilly", 
-    "Salem", "Tiruchirappalli", "Gaya", "Dhanbad", 
-    "Bikaner", "Jammu", "Shimla", "Itanagar", 
-    "Shillong", "Aizawl", "Gangtok", "Kohima", 
-    "Imphal", "Agartala", "Panaji", "Port Blair", 
-    "Daman", "Silvassa", "Kavaratti", "Puducherry"
+    query = location_search_query(q)
+    response = open_search_query_executor(query)
+    suggestions = []
+    if 'aggregations' in response:
+        # Extract locations
+        location_buckets = response['aggregations']['city']['buckets']
+        suggestions = [bucket['key'] for bucket in location_buckets]
+    
+    return suggestions
+
+@frappe.whitelist(allow_guest=True)
+def candidate_departments():
+    return [
+        {
+            "name": "Customer Success, Service & Operations",
+            "roles": ["Customer Support", "Service Manager", "Operations Lead", "Account Manager"]
+        },
+        {
+            "name": "Data Science & Analytics",
+            "roles": ["Data Scientist", "Data Analyst", "ML Engineer", "BI Developer"]
+        },
+        {
+            "name": "Engineering - Hardware & Networks",
+            "roles": ["Hardware Engineer", "Network Administrator", "ASIC / RTL / Logic Design Engineer",
+                     "Design Team Lead", "Design Verification Engineer", "EDA Tools Engineer", "Embedded Hardware Engineer"]
+        },
+        {
+            "name": "Engineering - Software & QA",
+            "roles": ["Software Developer", "QA Engineer", "DevOps Engineer", "UI/UX Developer"]
+        },
+        {
+            "name": "Finance & Accounting",
+            "roles": ["Accountant", "Financial Analyst", "Tax Specialist", "Auditor"]
+        },
+        {
+            "name": "Human Resources",
+            "roles": ["HR Manager", "Recruiter", "Training Coordinator", "Compensation Specialist"]
+        },
+        {
+            "name": "IT & Information Security",
+            "roles": ["IT Support", "Security Analyst", "System Administrator", "IT Project Manager"]
+        },
+        {
+            "name": "BFSI, Investments & Trading",
+            "roles": ["Investment Analyst", "Trading Specialist", "Risk Manager", "Compliance Officer"]
+        }
     ]
-
-    filter_data = list(filter(lambda a: q in a, locations))
-    return filter_data
-
 
 @frappe.whitelist(allow_guest=True)
 def seach_candidate_industry(q:str):
@@ -249,50 +139,116 @@ def seach_candidate_industry(q:str):
 
 @frappe.whitelist(allow_guest=True)
 def seach_candidate_company(q:str):
-    companies = [
-    "Google", "Apple", "Microsoft", 
-    "Amazon", "Facebook (Meta)", "Tesla", 
-    "IBM", "Intel", "Samsung", 
-    "Netflix"
-    ]
+    query = companies_search_query(q)
+    response = open_search_query_executor(query)
+    suggestions = []
+    if 'aggregations' in response:
+        # Extract companies
+        company_buckets = response['aggregations']['company_suggestions']['matching_companies']['companies']['buckets']
+        suggestions = [bucket['key'] for bucket in company_buckets]
 
-    filter_data = list(filter(lambda a: q in a, companies))
-    return filter_data
+    return suggestions
+
 
 @frappe.whitelist(allow_guest=True)
+# tuple in list
+def seach_candidate_company_exclude(q:str):
+    query = companies_search_query(q)
+    response = open_search_query_executor(query)
+    suggestions = {"companies": []}
+    if 'aggregations' in response:
+        # Extract companies
+        company_buckets = response['aggregations']['company_suggestions']['matching_companies']['companies']['buckets']
+        suggestions["companies"] = [bucket['key'] for bucket in company_buckets]
+
+    return [(item, key) for key, values in suggestions.items() for item in values]
+
+
+@frappe.whitelist(allow_guest=True)
+# list view
 def seach_candidate_designation(q:str):
-    designations = [
-    "Software Engineer", "Senior Software Engineer", "Lead Developer", 
-    "Principal Engineer", "Software Architect", "Technical Lead", 
-    "Engineering Manager", "Product Manager", "Project Manager", 
-    "Team Lead", "DevOps Engineer", "QA Engineer", 
-    "Test Engineer", "Automation Tester", "Data Analyst", 
-    "Data Scientist", "Data Engineer", "Machine Learning Engineer", 
-    "Business Analyst", "Network Engineer", "System Administrator", 
-    "Database Administrator", "UI/UX Designer", "Frontend Developer", 
-    "Backend Developer", "Full Stack Developer", "Mobile Developer", 
-    "IT Support Specialist", "Technical Support Engineer", "Technical Writer", 
-    "Security Analyst", "Penetration Tester", "Cybersecurity Specialist", 
-    "IT Consultant", "Solutions Architect", "Cloud Architect", 
-    "IT Operations Manager", "Release Manager", "Site Reliability Engineer (SRE)", 
-    "Infrastructure Engineer", "Help Desk Technician", "IT Technician"
+    query = designation_search_query(q)
+    response = open_search_query_executor(query)
+    suggestions = []
+    if 'aggregations' in response:
+        # Extract designations
+        designation_buckets = response['aggregations']['designation_suggestions']['matching_designations']['designations']['buckets']
+        suggestions = [bucket['key'] for bucket in designation_buckets]
+
+    return suggestions
+
+
+@frappe.whitelist(allow_guest=True)
+def candidate_courses():
+    return [
+        {
+            "name": "Customer Success, Service & Operations",
+            "roles": ["Customer Support", "Service Manager", "Operations Lead", "Account Manager"]
+        },
+        {
+            "name": "Data Science & Analytics",
+            "roles": ["Data Scientist", "Data Analyst", "ML Engineer", "BI Developer"]
+        },
+        {
+            "name": "Engineering - Hardware & Networks",
+            "roles": ["Hardware Engineer", "Network Administrator", "ASIC / RTL / Logic Design Engineer",
+                     "Design Team Lead", "Design Verification Engineer", "EDA Tools Engineer", "Embedded Hardware Engineer"]
+        },
+        {
+            "name": "Engineering - Software & QA",
+            "roles": ["Software Developer", "QA Engineer", "DevOps Engineer", "UI/UX Developer"]
+        },
+        {
+            "name": "Finance & Accounting",
+            "roles": ["Accountant", "Financial Analyst", "Tax Specialist", "Auditor"]
+        },
+        {
+            "name": "Human Resources",
+            "roles": ["HR Manager", "Recruiter", "Training Coordinator", "Compensation Specialist"]
+        },
+        {
+            "name": "IT & Information Security",
+            "roles": ["IT Support", "Security Analyst", "System Administrator", "IT Project Manager"]
+        },
+        {
+            "name": "BFSI, Investments & Trading",
+            "roles": ["Investment Analyst", "Trading Specialist", "Risk Manager", "Compliance Officer"]
+        },
+        {
+            "name": "Healthcare & Medical Sciences",
+            "roles": ["Medical Officer", "Clinical Research Analyst", "Healthcare Administrator", "Pharmacy Manager"]
+        },
+        {
+            "name": "Digital Marketing & Communications",
+            "roles": ["Digital Marketing Specialist", "Content Strategist", "Social Media Manager", "SEO Expert"]
+        },
+        {
+            "name": "Supply Chain & Logistics",
+            "roles": ["Supply Chain Manager", "Logistics Coordinator", "Inventory Analyst", "Procurement Specialist"]
+        },
+        {
+            "name": "Research & Development",
+            "roles": ["Research Scientist", "Product Developer", "R&D Manager", "Innovation Specialist"]
+        },
+        {
+            "name": "Legal & Compliance",
+            "roles": ["Legal Counsel", "Compliance Officer", "Contract Manager", "Legal Analyst"]
+        }
     ]
 
-    filter_data = list(filter(lambda a: q in a, designations))
-    return filter_data
 
 
 @frappe.whitelist(allow_guest=True)
 def seach_candidate_edu_institute(q:str):
-    education_institutions = [
-    "Massachusetts Institute of Technology (MIT)", "Stanford University", 
-    "Harvard University", "California Institute of Technology (Caltech)", 
-    "University of Oxford", "University of Cambridge", 
-    "University of Chicago", "Princeton University", 
-    "Imperial College London", "University College London (UCL)"
-    ]
-    filter_data = list(filter(lambda a: q in a, education_institutions))
-    return filter_data
+    query = education_institute_search_query(q)
+    response = open_search_query_executor(query)
+    suggestions = []
+    if 'aggregations' in response:
+        # Extract designations
+        designation_buckets = response['aggregations']['education_institute_suggestions']['matching_institutes']['institutes']['buckets']
+        suggestions = [bucket['key'] for bucket in designation_buckets]
+
+    return suggestions
 
 
 @frappe.whitelist(allow_guest=True)

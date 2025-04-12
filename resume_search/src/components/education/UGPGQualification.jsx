@@ -42,7 +42,7 @@ const EducationQualification = ({ ugQualification,
                             placeholder={"Select institute"}
                             setInputValue={setInstitute}
                             inputValue={institute}
-                            apiEndPoint={"api/method/resumeparser.apis.search_apis.seach_keywords"}
+                            apiEndPoint={"api/method/resumeparser.apis.search_apis.seach_candidate_edu_institute"}
                         />
                     </div>
                 </>
