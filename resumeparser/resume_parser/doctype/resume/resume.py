@@ -10,6 +10,7 @@ import google.genai.types as types
 import pathlib
 import json
 from opensearchpy import OpenSearch
+from pathlib import Path
 
 class Resume(Document):
 
