@@ -113,9 +113,7 @@ const ResumeFindPage = () => {
       verifiedFilters:verifiedFilters,
     }
     
-    console.log(JSONFormate)
-    // alert(JSON.stringify(JSONFormate))
-    navigate(`/resume_search/results/${JSON.stringify(JSONFormate)}`) 
+    navigate('/resume_search/results', { state: { searchData: JSONFormate } })
     // In a real application, this would trigger an API call
   };
 

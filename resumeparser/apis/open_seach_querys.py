@@ -361,124 +361,85 @@ def education_institute_search_query(q: str) -> dict:
     }
             
 
-def final_search_query(data) -> dict:
-    # Calculate age range dates
-    from datetime import datetime, timedelta
-    current_year = datetime.now().year
-    min_birth_year = current_year - int(data.get('candidateMaxAge', 100))
-    max_birth_year = current_year - int(data.get('candidateMinAge', 18))
-
-    # Build must conditions
+def final_search_query(search_data: dict) -> dict:
     must_conditions = []
     should_conditions = []
-    filter_conditions = []
-
-    # Basic filters
-    if data.get('gender') and data['gender'] != 'all':
-        must_conditions.append({
-            "match": {"gender": data['gender']}
-        })
-
-    # Experience filter
-    min_exp = float(data.get('minExperience', 0))
-    max_exp = float(data.get('maxExperience', 100))
     
-    # Calculate total experience from experience array
-    filter_conditions.append({
-        "script": {
-            "script": {
-                "source": """
-                    double total_exp = 0;
-                    if (doc['experience'].size() > 0) {
-                        for (exp in doc['experience']) {
-                            def from_date = exp.from;
-                            def to_date = exp.current_position ? new Date().getTime() : (exp.to != null ? exp.to : new Date().getTime());
-                            total_exp += ((to_date - from_date) / (365.25 * 24 * 60 * 60 * 1000));
+    # Process both skills and searchKeywords
+    for key in ["skills", "searchKeywords"]:
+        for item in search_data.get(key, []):
+            # Determine field path
+            if key == "skills" or item.get("cat") == "skills":
+                path = "skills"
+                field = "skills.skill_name"
+            elif item.get("cat") == "designations":
+                path = "experience"
+                field = "experience.role_position"
+            elif item.get("cat") == "companies":
+                path = "experience"
+                field = "experience.company_name"
+            else:
+                path = "skills"
+                field = "skills.skill_name"
+                
+            # Create condition
+            condition = {
+                "nested": {
+                    "path": path,
+                    "query": {
+                        "match_phrase_prefix": {
+                            field: {
+                                "query": item["text"],
+                                "max_expansions": 50
+                            }
                         }
                     }
-                    return total_exp >= params.min_exp && total_exp <= params.max_exp;
-                """,
-                "params": {
-                    "min_exp": min_exp,
-                    "max_exp": max_exp
                 }
             }
-        }
-    })
+            
+            # Add to appropriate list
+            if item.get("isNecessary", False):
+                must_conditions.append(condition)
+            else:
+                should_conditions.append(condition)
 
-    # Skills matching
-    if data.get('skills'):
-        skill_names = [skill.get('skill_name') for skill in data['skills'] if skill.get('skill_name')]
-        if skill_names:
-            should_conditions.append({
-                "terms": {
-                    "skills.skill_name.keyword": skill_names,
-                    "boost": 2.0
-                }
-            })
-
-    # Education matching
-    if data.get('ugcourse'):
-        education_conditions = []
-        for course in data['ugcourse']:
-            education_conditions.append({
-                "match": {
-                    "education.course_name": {
-                        "query": course.get('course', ''),
-                        "boost": 1.5
-                    }
-                }
-            })
-        should_conditions.extend(education_conditions)
-
-    # Location matching
-    if data.get('location'):
-        should_conditions.append({
-            "match": {
-                "_all": {
-                    "query": data['location'],
-                    "boost": 1.0
-                }
-            }
-        })
-
-    # Department and role matching
-    if data.get('departmentes'):
-        dept_conditions = []
-        for dept in data['departmentes']:
-            dept_conditions.append({
-                "match_phrase": {
-                    "experience.role_position": {
-                        "query": dept.get('role', ''),
-                        "boost": 2.0
-                    }
-                }
-            })
-        should_conditions.extend(dept_conditions)
-
-    # Build the final query
-    query = {
-        "size": 20,  # Get top 20 results
-        "query": {
-            "bool": {
-                "must": must_conditions,
-                "should": should_conditions,
-                "filter": filter_conditions,
-                "minimum_should_match": 1
-            }
-        },
-        "sort": [
-            "_score",
-            {"_id": "desc"}
-        ],
-        "_source": ["_id", "candidate_name", "email", "mobile_number", "experience.role_position", "skills.skill_name"],
-        "highlight": {
-            "fields": {
-                "skills.skill_name": {},
-                "experience.role_position": {},
-                "education.course_name": {}
-            }
+    # Base query structure
+    query_part = {
+        "bool": {
+            "must": must_conditions,
+            "should": should_conditions,
+            "minimum_should_match": 0
         }
     }
-
-    return query
+    
+    # Add experience filtering if needed
+    min_exp = search_data.get("minExperience")
+    max_exp = search_data.get("maxExperience")
+    
+    if min_exp is not None and max_exp is not None:
+        query_part = {
+            "script_score": {
+                "query": query_part,
+                "script": {
+                    "source": """
+                            long totalMillis = 0;
+                            for (exp in params._source.experience) {{
+                                if (exp.from != null && exp.to != null) {{
+                                    ZonedDateTime from = ZonedDateTime.parse(exp.from + 'T00:00:00Z');
+                                    ZonedDateTime to = ZonedDateTime.parse(exp.to + 'T00:00:00Z');
+                                    totalMillis += ChronoUnit.MILLIS.between(from, to);
+                                }}
+                            }}
+                            double totalYears = totalMillis / 1000.0 / 60 / 60 / 24 / 365;
+                            return (totalYears >= {0} && totalYears <= {1}) ? 1 : 0;
+                        """.format(min_exp, max_exp)
+                    }
+                }
+            }
+        
+    # Final structure
+    return {
+        "size": 20,
+        # "_source": ["id"],
+        "query": query_part
+    }

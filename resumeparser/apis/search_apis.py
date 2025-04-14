@@ -270,24 +270,24 @@ def seach_candidate_category(q:str):
 
 import json
 @frappe.whitelist(allow_guest=True)
-def seach_results(data):
-    try:   
-        search_query = json.loads(data)
-        # {"searchKeywords":[],"searchIn":"Entire resume","skills":[],"minExperience":"","maxExperience":"","currency":"INR","minSalary":"","maxSalary":"","location":"",
-        # "departmentes":[],"industry":"","company":"","excludeCompanies":[],"designation":"","noticePeriod":"any","ugcourse":[],"uginstitute":"","ugeducationType":"full-time",
-        # "ugfromYear":"","ugtoYear":"","pgcourse":[],"pginstitute":"","pgeducationType":"full-time","pgfromYear":"","pgtoYear":"","doctorateQualification":[],"gender":"all","disabilitiesOnly":false,
-        # "category":"","candidateMinAge":"","candidateMaxAge":"","jobType":"","employmentType":"","workPermit":"","showCandidates":"all","verifiedFilters":[]}
-        print("Search Query Data :::::::::::::",search_query.keys())
-        # return final_search_query(data)         
-        # return data        
-        data = []
-        for source_row in frappe.get_all("Resume",fields=["*"]):
-            source =  json.loads(source_row.get("extracted_json"))
+def search_results():
+    try:  
+        post_form =  frappe.request.get_json()
+        post_form["minExperience"] = int(post_form["minExperience"]) if post_form.get("minExperience", "").strip().isdigit() else 0
+        post_form["maxExperience"] = int(post_form["maxExperience"]) if post_form.get("maxExperience", "").strip().isdigit() else 100
+        
+        row_query = final_search_query(post_form)
+        response = open_search_query_executor(row_query)
+
+        row_data = response.get('hits', {}).get('hits', [])
+        data = []   
+        for source_row in row_data:
+            source =  source_row.get("_source")
             skills = source.get("skills", [])
             technical_skills = [s.get("skill_name", "") for s in skills if s.get("skill_type") == "Technical"]
             soft_skills = [s.get("skill_name", "") for s in skills if s.get("skill_type") == "Soft"]
             data.append({
-                "id": str(source_row.get("name")),
+                "id": str(source_row.get("_id")),
                 "basicInfo": {
                 "candidate_name": source.get("candidate_name"),
                 "date_of_birth": None,
@@ -315,11 +315,11 @@ def seach_results(data):
                 "Soft": soft_skills,
                 "AdditionalSkills": []
             }
-        })
+            })
         return data
     except Exception as e:
         frappe.log_error(f"Error in seach_results: {str(e)}")
-        return []
+        return str(e)
 
 @frappe.whitelist(allow_guest=True)
 def candidate_detail():
@@ -393,7 +393,8 @@ def candidate_detail():
 
 @frappe.whitelist(allow_guest=True)
 def test():
-    return final_search_query(data)    
+    # return final_search_query(data) 
+    pass   
 
 
 

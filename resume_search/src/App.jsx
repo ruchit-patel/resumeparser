@@ -15,7 +15,7 @@ function App() {
         
         <Routes>
           <Route path="/resume_search/search" element={<ResumeFindPage />} />
-          <Route path="/resume_search/results/:data" element={<ResumeSearchedListPage />} />
+          <Route path="/resume_search/results" element={<ResumeSearchedListPage />} />
           <Route path="/resume_search/detail/:id" element={<ResumeDetailPage />} />
         </Routes>
         

@@ -1,38 +1,58 @@
 import React, { useState, useEffect } from "react";
 import FilterSection from "../components/resumeFilterSection/resumeFilterComponent";
-import { ListFilter, ChevronDown } from "lucide-react";
+import { ListFilter, ChevronDown, Loader } from "lucide-react";
 import CandidateCard from "../components/resumeCard/CandidateCardComponent";
 import PaginationFilter from "../components/resumeFilterSection/resumePaginationCompoent";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
 import { config } from "@/config"
-import { useParams } from 'react-router-dom'; 
+import { useLocation } from 'react-router-dom'; 
 
 // Sample data - in a real app, this would come from an API
-  const fetchSearchData = async (data) => {
-    try {
-      console.log("Search Query Data :",data)
-      const response = await fetch(`${config.backendUrl}/api/method/resumeparser.apis.search_apis.seach_results?data=${JSON.stringify(data)}`);
-      const result = await response.json();
-      return result;
-    } catch (error) {
-      console.error(error);
-      return null;
-    }
-  }; 
+const fetchSearchData = async (data) => {
+  try {
+    console.log("Search Query Data:", data);
 
+    // Get CSRF token from meta tag (usually present in Frappe templates)
+    const csrfToken = window.csrf_token;
+
+    console.log("CSRF Token:", csrfToken);
+
+    const response = await fetch(`${config.backendUrl}/api/method/resumeparser.apis.search_apis.search_results`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-Frappe-CSRF-Token': csrfToken,
+      },
+      credentials: 'include', // important to send cookies
+      body: JSON.stringify(data),
+    });
+
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+
+    const result = await response.json();
+    console.log("Search Result:", result);
+    return result;
+  } catch (error) {
+    console.error('Error in fetchSearchData:', error);
+    return null;
+  }
+};
 
 const ResumeFindPage = () => {
-  const { data } = useParams();
+  const location = useLocation();
+  const searchData = location.state?.searchData;
   const [selectedCandidates, setSelectedCandidates] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [sortBy, setSortBy] = useState("Relevance");
   const [showCount, setShowCount] = useState("40");
   const [allCandidatesData, setAllCandidatesData] = useState([]);
-  const [filteredCandidates, setFilteredCandidates] = useState(allCandidatesData);
+  const [filteredCandidates, setFilteredCandidates] = useState([]);
   const [displayedCandidates, setDisplayedCandidates] = useState([]);
   const [totalPages, setTotalPages] = useState(1);
-
+  const [isLoading, setIsLoading] = useState(false);
 
   const [filters, setFilters] = useState({
     keywords: "",
@@ -50,17 +70,21 @@ const ResumeFindPage = () => {
     verifiedSkills: false,
   });
 
-
   useEffect(() => {
-    if (data) {
-      fetchSearchData(JSON.parse(data)).then((response) => {
-        if (response && response.message) {
-          setAllCandidatesData(response.message);
-        }
-      });
+    if (searchData) {
+      console.log("Search data received:", searchData);
+      setIsLoading(true);
+      fetchSearchData(searchData)
+        .then((response) => {
+          if (response && response.message) {
+            setAllCandidatesData(response.message);
+          }
+        })
+        .finally(() => {
+          setIsLoading(false);
+        });
     }
-  }, [data]);
-
+  }, [searchData]);
 
   // Apply filters to candidates
   useEffect(() => {
@@ -143,7 +167,7 @@ const ResumeFindPage = () => {
     }
 
     setFilteredCandidates(result);
-  }, [allCandidatesData,filters]);
+  }, [allCandidatesData, filters]);
 
   // Apply sorting and pagination
   useEffect(() => {
@@ -236,6 +260,13 @@ const ResumeFindPage = () => {
       [type]: value
     }));
   };
+
+  // Loading spinner component
+  const LoadingSpinner = () => (
+      <div className="flex items-center justify-center h-screen">
+        <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-blue-500"></div>
+      </div>
+  );
 
   return (
     <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
@@ -386,39 +417,52 @@ const ResumeFindPage = () => {
           {/* Results count and pagination */}
           <div className="bg-white rounded-md shadow p-4 flex flex-col sm:flex-row items-center justify-between gap-3">
             <div className="text-xs font-smedium text-gray-500">
-              Showing {displayedCandidates.length} of {filteredCandidates.length} candidates
+              {isLoading 
+                ? "Loading candidates..." 
+                : `Showing ${displayedCandidates.length} of ${filteredCandidates.length} candidates`
+              }
             </div>
-            <PaginationFilter
-              totalPages={totalPages}
-              currentPage={currentPage}
-              onPageChange={handlePageChange}
-              onSortChange={handleSortChange}
-              onShowCountChange={handleShowCountChange}
-            />
+            {!isLoading && (
+              <PaginationFilter
+                totalPages={totalPages}
+                currentPage={currentPage}
+                onPageChange={handlePageChange}
+                onSortChange={handleSortChange}
+                onShowCountChange={handleShowCountChange}
+              />
+            )}
           </div>
 
+          {/* Loading state */}
+          {isLoading && (
+            <div className="bg-white rounded-md shadow p-4">
+              <LoadingSpinner />
+            </div>
+          )}
+
           {/* No results message */}
-          {displayedCandidates.length === 0 && (
+          {!isLoading && displayedCandidates.length === 0 && (
             <div className="bg-white rounded-md shadow p-8 text-center">
               <p className="text-gray-500">No candidates match your search criteria. Try adjusting your filters.</p>
             </div>
           )}
 
           {/* Candidate cards */}
-          <div className="space-y-4 max-h-[600px] overflow-y-auto pr-2">
-            {displayedCandidates.map((candidate) => (
-              <CandidateCard
-                key={candidate.id}
-                candidate={candidate}
-                onSelect={handleSelectCandidate}
-                selected={selectedCandidates.includes(candidate.id)}
-              />
-            ))}
-          </div>
-
+          {!isLoading && (
+            <div className="space-y-4 max-h-[600px] overflow-y-auto pr-2">
+              {displayedCandidates.map((candidate) => (
+                <CandidateCard
+                  key={candidate.id}
+                  candidate={candidate}
+                  onSelect={handleSelectCandidate}
+                  selected={selectedCandidates.includes(candidate.id)}
+                />
+              ))}
+            </div>
+          )}
 
           {/* Bottom pagination for many results */}
-          {displayedCandidates.length > 5 && (
+          {!isLoading && displayedCandidates.length > 5 && (
             <div className="bg-white rounded-md shadow p-4 flex justify-center">
               <PaginationFilter
                 totalPages={totalPages}
