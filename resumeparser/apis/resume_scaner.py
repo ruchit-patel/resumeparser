@@ -1,118 +1,64 @@
-import frappe
-from pathlib import Path
-import shutil
-from datetime import datetime
 import os
+import frappe
+import shutil
 
-# ✅ Global variable for the PDF directory path
-PDF_DIRECTORY_PATH = "/home/jay/project/frappe-bench/resume_store"  # <-- Replace with your actual path
-
-def create_resume_doctype(pdf_path, processed_name):
-    try:
-        new_resume = frappe.new_doc("Resume")
-
-        file_content = pdf_path.read_bytes()
-        file_url = f"/resume_store/{processed_name}"
-
-        file_doc = frappe.get_doc({
-            "doctype": "File",
-            "file_name": processed_name,
-            "file_url": file_url,
-            "attached_to_doctype": "Resume",
-            "attached_to_name": new_resume.name,
-            "content": file_content,
-            "is_private": 0
-        })
-        file_doc.insert()
-        new_resume.resume_file = file_url
-        new_resume.insert()
-        return True, None
-    except Exception as e:
-        return False, str(e)
+PDF_DIRECTORY_PATH = "/home/jay/project/frappe-bench/resume_store"
 
 @frappe.whitelist(allow_guest=True)
-def scan_resumes_from_directory():
-    try:
-        # Use global directory path
-        directory_path = PDF_DIRECTORY_PATH
-        print(f"\nChecking directory: {directory_path}")
+def upload_resumes_from_folder():
+    processed_count = 0
+    skipped_count = 0
+    error_files = []
 
-        os.makedirs(directory_path, exist_ok=True)
-        dir_path = Path(directory_path)
+    for filename in os.listdir(PDF_DIRECTORY_PATH):
+        if not filename.lower().endswith(".pdf"):
+            continue
 
-        all_files = list(dir_path.glob("*"))
-        print(f"All files in directory: {[f.name for f in all_files]}")
+        if filename.startswith("processed_"):
+            skipped_count += 1
+            continue
 
-        pdf_files = [f for f in all_files 
-                     if f.suffix.lower() == '.pdf' 
-                     and not f.name.startswith("processed_")]
-        print(f"PDF files found: {[f.name for f in pdf_files]}")
+        full_path = os.path.join(PDF_DIRECTORY_PATH, filename)
 
-        for file in all_files:
-            if not file.name.startswith("processed_"):
-                print(f"File: {file.name}, Extension: {file.suffix.lower()}")
+        try:
+            # Read the PDF file
+            with open(full_path, "rb") as f:
+                filedata = f.read()
 
-        existing_files = frappe.get_all(
-            "Resume",
-            filters={},
-            fields=["resume_file"]
-        )
-        existing_filenames = {Path(f.resume_file).name.replace("processed_", "") for f in existing_files}
+            # Save file in Frappe
+            uploaded_file = frappe.get_doc({
+                "doctype": "File",
+                "file_name": filename,
+                "is_private": 1,
+                "content": filedata
+            })
+            uploaded_file.save(ignore_permissions=True)
 
-        results = {
-            "total_files": len(pdf_files),
-            "new_files": 0,
-            "skipped_files": 0,
-            "errors": [],
-            "processed_details": []
-        }
+            # Create Resume Doctype entry
+            resume_doc = frappe.get_doc({
+                "doctype": "Resume",
+                "resume_file": uploaded_file.file_url
+            })
+            resume_doc.insert(ignore_permissions=True)
 
-        print(f"\nFound {len(pdf_files)} PDF files in {directory_path}\n")
+            # Rename the original file to mark as processed
+            new_name = "processed_" + filename
+            new_path = os.path.join(PDF_DIRECTORY_PATH, new_name)
+            os.rename(full_path, new_path)
 
-        for pdf_file in pdf_files:
-            try:
-                if pdf_file.name in existing_filenames:
-                    results["skipped_files"] += 1
-                    print(f"Skipping {pdf_file.name} - Already processed")
-                    continue
+            print(f"✅ Processed: {filename}")
+            processed_count += 1
 
-                print(f"Processing new file: {pdf_file.name}")
+        except Exception as e:
+            print(f"❌ Error processing {filename}: {e}")
+            error_files.append({"file": filename, "error": str(e)})
 
-                processed_name = f"processed_{pdf_file.name}"
-                processed_path = pdf_file.parent / processed_name
+    frappe.db.commit()
 
-                shutil.move(str(pdf_file), str(processed_path))
-
-                success, error = create_resume_doctype(processed_path, processed_name)
-
-                if success:
-                    results["new_files"] += 1
-                    results["processed_details"].append({
-                        "file": pdf_file.name,
-                        "status": "Successfully processed"
-                    })
-                    print(f"Successfully processed: {pdf_file.name}")
-                else:
-                    shutil.move(str(processed_path), str(pdf_file))
-                    raise Exception(error)
-
-            except Exception as e:
-                print(f"Error processing {pdf_file.name}: {str(e)}")
-                results["errors"].append({
-                    "file": pdf_file.name,
-                    "error": str(e)
-                })
-
-        print(f"\nProcessing Summary:")
-        print(f"Total PDF files found: {results['total_files']}")
-        print(f"New files processed: {results['new_files']}")
-        print(f"Files skipped: {results['skipped_files']}")
-        print(f"Errors encountered: {len(results['errors'])}\n")
-
-        return results
-
-    except Exception as e:
-        error_msg = f"Error scanning resumes: {str(e)}"
-        print(f"\nError: {error_msg}")
-        frappe.log_error(error_msg)
-        frappe.throw(error_msg)
+    return {
+        "status": "completed",
+        "processed": processed_count,
+        "skipped": skipped_count,
+        "errors": error_files,
+        "total_files": processed_count + skipped_count + len(error_files)
+    }

@@ -418,24 +418,25 @@ def final_search_query(search_data: dict) -> dict:
     
     if min_exp is not None and max_exp is not None:
         query_part = {
-            "script_score": {
-                "query": query_part,
-                "script": {
-                    "source": """
+                "script_score": {
+                    "query": query_part,
+                    "script": {
+                        "source": f"""
                             long totalMillis = 0;
                             for (exp in params._source.experience) {{
                                 if (exp.from != null && exp.to != null) {{
-                                    ZonedDateTime from = ZonedDateTime.parse(exp.from + 'T00:00:00Z');
-                                    ZonedDateTime to = ZonedDateTime.parse(exp.to + 'T00:00:00Z');
+                                    ZonedDateTime from = ZonedDateTime.parse(exp.from + "T00:00:00Z");
+                                    ZonedDateTime to = ZonedDateTime.parse(exp.to + "T00:00:00Z");
                                     totalMillis += ChronoUnit.MILLIS.between(from, to);
                                 }}
                             }}
                             double totalYears = totalMillis / 1000.0 / 60 / 60 / 24 / 365;
-                            return (totalYears >= {0} && totalYears <= {1}) ? 1 : 0;
-                        """.format(min_exp, max_exp)
+                            return (totalYears >= {min_exp} && totalYears <= {max_exp}) ? 1 : 0;
+                        """
                     }
                 }
             }
+
         
     # Final structure
     return {

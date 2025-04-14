@@ -276,9 +276,14 @@ def search_results():
         post_form["minExperience"] = int(post_form["minExperience"]) if post_form.get("minExperience", "").strip().isdigit() else 0
         post_form["maxExperience"] = int(post_form["maxExperience"]) if post_form.get("maxExperience", "").strip().isdigit() else 100
         
-        row_query = final_search_query(post_form)
-        response = open_search_query_executor(row_query)
 
+        # post_form["minExperience"] = None
+        # post_form["maxExperience"] = None
+        row_query = final_search_query(post_form)
+        print("-------------------------------------")
+        print(row_query)
+        print("-------------------------------------")
+        response = open_search_query_executor(row_query)
         row_data = response.get('hits', {}).get('hits', [])
         data = []   
         for source_row in row_data:
