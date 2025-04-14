@@ -32,6 +32,7 @@ const AutocompleteInput = ({placeholder,inputValue,setInputValue,apiEndPoint}) =
       fetchSearchData(inputValue).then((response) => {
         const filtered = response.message
         setSuggestions(filtered)
+        // Only show suggestions if we have results and user is typing
         setShowSuggestions(filtered.length > 0)
         setSelectedIndex(-1)
       });
@@ -86,9 +87,14 @@ const AutocompleteInput = ({placeholder,inputValue,setInputValue,apiEndPoint}) =
         ref={inputRef}
         type="text"
         value={inputValue}
-        onChange={(e) => setInputValue(e.target.value)}
+        onChange={(e) => {
+          setInputValue(e.target.value)
+          // Show suggestions only when typing
+          if (e.target.value.trim()) {
+            setShowSuggestions(true)
+          }
+        }}
         onKeyDown={handleKeyDown}
-        onFocus={() => setShowSuggestions(true)}
         placeholder={placeholder}
         className="w-full"
       />

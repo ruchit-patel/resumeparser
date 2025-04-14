@@ -7,9 +7,11 @@ import EmploymentDetails from '../components/employment/EmploymentDetails';
 import EducationDetails from '../components/education/EducationDetails';
 import DiversityDetails from '../components/diversity/DiversityDetails';
 import '../App.css';
+import { useNavigate } from 'react-router-dom';
 
 const ResumeFindPage = () => {
   // Search Form
+  const navigate = useNavigate();
   const [searchKeywords, setSearchKeywords] = useState([]);
   const [searchIn, setSearchIn] = useState('Entire resume');
   const [skills, setSkills] = useState([]);
@@ -64,7 +66,6 @@ const ResumeFindPage = () => {
   
   // Handle search submission
   const handleSearch = () => {
-    alert("Field are searching ....")
     const JSONFormate = {
       // Search
       searchKeywords:searchKeywords,
@@ -114,6 +115,7 @@ const ResumeFindPage = () => {
     
     console.log(JSONFormate)
     // alert(JSON.stringify(JSONFormate))
+    navigate(`/resume_search/results/${JSON.stringify(JSONFormate)}`) 
     // In a real application, this would trigger an API call
   };
 

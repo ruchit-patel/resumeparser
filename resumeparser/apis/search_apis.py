@@ -1,7 +1,7 @@
 import frappe
 
 from datetime import datetime, date
-from .open_seach_querys import keyword_search_query,skill_search_query,location_search_query,companies_search_query,designation_search_query,education_institute_search_query
+from .open_seach_querys import keyword_search_query,skill_search_query,location_search_query,companies_search_query,designation_search_query,education_institute_search_query,final_search_query
 
 def human_readable_date_diff(target_date_str):
     delta = (target_date_str.date() - date.today()).days
@@ -270,8 +270,16 @@ def seach_candidate_category(q:str):
 
 import json
 @frappe.whitelist(allow_guest=True)
-def seach_results():
-    try:            
+def seach_results(data):
+    try:   
+        search_query = json.loads(data)
+        # {"searchKeywords":[],"searchIn":"Entire resume","skills":[],"minExperience":"","maxExperience":"","currency":"INR","minSalary":"","maxSalary":"","location":"",
+        # "departmentes":[],"industry":"","company":"","excludeCompanies":[],"designation":"","noticePeriod":"any","ugcourse":[],"uginstitute":"","ugeducationType":"full-time",
+        # "ugfromYear":"","ugtoYear":"","pgcourse":[],"pginstitute":"","pgeducationType":"full-time","pgfromYear":"","pgtoYear":"","doctorateQualification":[],"gender":"all","disabilitiesOnly":false,
+        # "category":"","candidateMinAge":"","candidateMaxAge":"","jobType":"","employmentType":"","workPermit":"","showCandidates":"all","verifiedFilters":[]}
+        print("Search Query Data :::::::::::::",search_query.keys())
+        # return final_search_query(data)         
+        # return data        
         data = []
         for source_row in frappe.get_all("Resume",fields=["*"]):
             source =  json.loads(source_row.get("extracted_json"))
@@ -385,7 +393,7 @@ def candidate_detail():
 
 @frappe.whitelist(allow_guest=True)
 def test():
-    return "test"
+    return final_search_query(data)    
 
 
 

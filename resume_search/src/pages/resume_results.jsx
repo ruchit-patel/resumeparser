@@ -6,13 +6,13 @@ import PaginationFilter from "../components/resumeFilterSection/resumePagination
 import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
 import { config } from "@/config"
+import { useParams } from 'react-router-dom'; 
 
 // Sample data - in a real app, this would come from an API
-  const fetchSearchData = async () => {
+  const fetchSearchData = async (data) => {
     try {
-      const myHeaders = new Headers();
-      myHeaders.append("Cookie", "full_name=Guest; sid=Guest; system_user=no; user_id=Guest; user_lang=en");
-      const response = await fetch(`${config.backendUrl}/api/method/resumeparser.apis.search_apis.seach_results`);
+      console.log("Search Query Data :",data)
+      const response = await fetch(`${config.backendUrl}/api/method/resumeparser.apis.search_apis.seach_results?data=${JSON.stringify(data)}`);
       const result = await response.json();
       return result;
     } catch (error) {
@@ -23,6 +23,7 @@ import { config } from "@/config"
 
 
 const ResumeFindPage = () => {
+  const { data } = useParams();
   const [selectedCandidates, setSelectedCandidates] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [sortBy, setSortBy] = useState("Relevance");
@@ -31,6 +32,7 @@ const ResumeFindPage = () => {
   const [filteredCandidates, setFilteredCandidates] = useState(allCandidatesData);
   const [displayedCandidates, setDisplayedCandidates] = useState([]);
   const [totalPages, setTotalPages] = useState(1);
+
 
   const [filters, setFilters] = useState({
     keywords: "",
@@ -50,15 +52,14 @@ const ResumeFindPage = () => {
 
 
   useEffect(() => {
-
-    fetchSearchData().then((response) => {
-      if (response && response.message) {
-        setAllCandidatesData(response.message);
-      }
-    });
-
-
-  }, []);
+    if (data) {
+      fetchSearchData(JSON.parse(data)).then((response) => {
+        if (response && response.message) {
+          setAllCandidatesData(response.message);
+        }
+      });
+    }
+  }, [data]);
 
 
   // Apply filters to candidates
