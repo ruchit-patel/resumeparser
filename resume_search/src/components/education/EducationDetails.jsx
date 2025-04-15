@@ -96,7 +96,7 @@ const EducationDetails = (
                 placeholder={"Enter Qualification"} 
                 setList={setdoctorateQualification} 
                 List={doctorateQualification}
-                apiEndPoint = {"api/method/resumeparser.apis.search_apis.seach_keywords"}
+                apiEndPoint = {"api/method/resumeparser.apis.search_apis.seach_certificates"}
                 />
               </div>
               

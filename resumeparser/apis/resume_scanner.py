@@ -5,7 +5,7 @@ import shutil
 PDF_DIRECTORY_PATH = "/home/jay/project/frappe-bench/resume_store"
 
 @frappe.whitelist(allow_guest=True)
-def upload_resumes_from_folder():
+def resume_scanner():
     processed_count = 0
     skipped_count = 0
     error_files = []

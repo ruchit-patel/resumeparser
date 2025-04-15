@@ -272,7 +272,7 @@ const ResumeFindPage = () => {
     <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
       <div className="flex flex-col lg:flex-row gap-6 items-start">
         {/* LEFT SIDE - FILTERS */}
-        <div className="w-full lg:w-2/5 xl:w-1/4 space-y-4">
+        <div className="w-full lg:w-2/5 xl:w-1/4 space-y-4 hidden">
           <div className="flex items-center gap-2 bg-white shadow-sm rounded-md p-3 h-[60px]">
             <ListFilter className="w-5 h-5" />
             <h1 className="text-xl font-semibold">Filters</h1>
@@ -413,7 +413,8 @@ const ResumeFindPage = () => {
         </div>
 
         {/* RIGHT SIDE - RESULTS */}
-        <div className="w-full lg:w-3/5 xl:w-3/4 space-y-4">
+        <div className="w-full space-y-4">
+        {/* <div className="w-full lg:w-3/5 xl:w-3/4 space-y-4"> */}
           {/* Results count and pagination */}
           <div className="bg-white rounded-md shadow p-4 flex flex-col sm:flex-row items-center justify-between gap-3">
             <div className="text-xs font-smedium text-gray-500">

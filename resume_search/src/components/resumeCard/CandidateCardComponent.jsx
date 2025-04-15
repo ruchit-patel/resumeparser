@@ -10,11 +10,11 @@ import { Eye, Download, FileText, Clock, MessageSquare,
   Bookmark, Phone, AlertCircle ,MapPin,Wallet,BriefcaseBusiness} from "lucide-react"
 
 import { cn } from "@/lib/utils"
-import { useNavigate } from 'react-router-dom';
+import { useLocation } from 'react-router-dom'
 
 const CandidateCard = ({ candidate, onSelect, selected = false }) => {
-  const navigate = useNavigate();
   const [saved, setSaved] = useState(false);
+  const location = useLocation();
 
   const handleCheckboxChange = (checked) => {
     if (onSelect) {
@@ -23,7 +23,11 @@ const CandidateCard = ({ candidate, onSelect, selected = false }) => {
   }
 
   return (
-<Card className="w-full overflow-hidden border-gray-200" onClick={()=> navigate(`/resume_search/detail/${candidate.id}`)}>
+<Card className="w-full overflow-hidden border-gray-200" onClick={() => {
+        if (!location.pathname.includes(`/resume_search/detail/`)) {
+          window.open(`/resume_search/detail/${candidate.id}`, '_blank')
+        }
+      }}>
       <CardContent className="p-0">
         <div className="p-4 pb-3">
           <div className="flex items-start justify-between gap-4">

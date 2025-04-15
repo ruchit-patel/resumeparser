@@ -364,7 +364,283 @@ def education_institute_search_query(q: str) -> dict:
 def final_search_query(search_data: dict) -> dict:
     must_conditions = []
     should_conditions = []
+    must_not_condotions= []
+
+
+    # Education PG
+    if search_data.get("pgcourse") != "" and len(search_data.get("pgcourse")) >= 1:
+      for item in search_data.get("pgcourse", []):
+        condition =  {
+                "nested": {
+                      "path": "education",
+                      "query": {
+                        "match": {
+                          "education.course_name": {
+                            "query": item["department"],
+                            "operator": "or",
+                            "fuzziness": "AUTO"
+                          }
+                        }
+                      }
+                    },
+                "nested": {
+                      "path": "education",
+                      "query": {
+                        "match": {
+                          "education.specialization": {
+                            "query": item["department"],
+                            "operator": "or",
+                            "fuzziness": "AUTO"
+                          }
+                        }
+                      }
+                    },
+                "nested": {
+                      "path": "education",
+                      "query": {
+                        "match": {
+                          "education.course_name": {
+                            "query": item["role"],
+                            "operator": "or",
+                            "fuzziness": "AUTO"
+                          }
+                        }
+                      }
+                    },
+                "nested": {
+                      "path": "education",
+                      "query": {
+                        "match": {
+                          "education.specialization": {
+                            "query": item["role"],
+                            "operator": "or",
+                            "fuzziness": "AUTO"
+                          }
+                        }
+                      }
+                    }
+                
+            }
+        should_conditions.append(condition)
+
+    if search_data.get("pginstitute") != "" and len(search_data.get("pginstitute")) >= 1:
+      condition = {
+                "nested": {
+                    "path": "education",
+                    "query": {
+                        "match": {
+                            "education.school_college_name": {
+                                "query": search_data.get("pginstitute"),
+                                "max_expansions": 50
+                            }
+                        }
+                    }
+                }
+            }
+      should_conditions.append(condition)
+
+
+
+    # Education UG
+    if search_data.get("ugcourse") != "" and len(search_data.get("ugcourse")) >= 1:
+      for item in search_data.get("ugcourse", []):
+        condition =  {
+                "nested": {
+                      "path": "education",
+                      "query": {
+                        "match": {
+                          "education.course_name": {
+                            "query": item["department"],
+                            "operator": "or",
+                            "fuzziness": "AUTO"
+                          }
+                        }
+                      }
+                    },
+                "nested": {
+                      "path": "education",
+                      "query": {
+                        "match": {
+                          "education.specialization": {
+                            "query": item["department"],
+                            "operator": "or",
+                            "fuzziness": "AUTO"
+                          }
+                        }
+                      }
+                    },
+                "nested": {
+                      "path": "education",
+                      "query": {
+                        "match": {
+                          "education.course_name": {
+                            "query": item["role"],
+                            "operator": "or",
+                            "fuzziness": "AUTO"
+                          }
+                        }
+                      }
+                    },
+                "nested": {
+                      "path": "education",
+                      "query": {
+                        "match": {
+                          "education.specialization": {
+                            "query": item["role"],
+                            "operator": "or",
+                            "fuzziness": "AUTO"
+                          }
+                        }
+                      }
+                    }
+                
+            }
+        should_conditions.append(condition)
+
+    if search_data.get("uginstitute") != "" and len(search_data.get("uginstitute")) >= 1:
+      condition = {
+                "nested": {
+                    "path": "education",
+                    "query": {
+                        "match": {
+                            "education.school_college_name": {
+                                "query": search_data.get("pginstitute"),
+                                "max_expansions": 50
+                            }
+                        }
+                    }
+                }
+            }
+      should_conditions.append(condition)
+
     
+    # For Employeement company 
+    if search_data.get("company") != "" and len(search_data.get("company")) >= 1:
+      condition = {
+                "nested": {
+                    "path": "experience",
+                    "query": {
+                        "match": {
+                            "experience.company_name": {
+                                "query": search_data.get("company"),
+                                "max_expansions": 50
+                            }
+                        }
+                    }
+                }
+            }
+      should_conditions.append(condition)
+
+      # For Employeement industry 
+      if search_data.get("industry") != "" and len(search_data.get("industry")) >= 1:
+        condition = {
+                  "nested": {
+                      "path": "experience",
+                      "query": {
+                          "match": {
+                              "experience.company_name": {
+                                  "query": search_data.get("industry"),
+                                  "max_expansions": 50
+                              }
+                          }
+                      }
+                  }
+              }
+        should_conditions.append(condition)
+
+    # For Employeement designation
+    if search_data.get("designation") != "" and len(search_data.get("designation")) >= 1:
+      find_in = [("education","education.course_name"),("experience","experience.role_position"),("experience","experience.job_description")]
+      for item in find_in:
+        condition = {
+                "nested": {
+                      "path": item[0],
+                      "query": {
+                        "match": {
+                          item[1]: {
+                            "query": search_data.get("designation"),
+                            "operator": "or",
+                            "fuzziness": "AUTO"
+                          }
+                        }
+                      }
+                    }
+            }
+        should_conditions.append(condition)
+
+    # For Employeement excludeCompanies
+    if search_data.get("excludeCompanies") != "" and len(search_data.get("excludeCompanies")) >= 1:
+      for item in search_data.get("excludeCompanies", []):
+        condition = {
+                  "nested": {
+                      "path": "experience",
+                      "query": {
+                        "match": {
+                          "experience.company_name": {
+                            "query": item["text"],
+                            "operator": "and",
+                            "fuzziness": "AUTO"
+                          }
+                        }
+                  }
+              }}
+        must_not_condotions.append(condition)
+    # departmentes
+    if search_data.get("departmentes") != "" and len(search_data.get("departmentes")) >= 1:
+      for item in search_data.get("departmentes", []):
+        condition =  {
+                "nested": {
+                      "path": "experience",
+                      "query": {
+                        "match": {
+                          "experience.role_position": {
+                            "query": item["department"],
+                            "operator": "or",
+                            "fuzziness": "AUTO"
+                          }
+                        }
+                      }
+                    },
+                "nested": {
+                      "path": "experience",
+                      "query": {
+                        "match": {
+                          "experience.job_description": {
+                            "query": item["department"],
+                            "operator": "or",
+                            "fuzziness": "AUTO"
+                          }
+                        }
+                      }
+                    },
+                "nested": {
+                      "path": "experience",
+                      "query": {
+                        "match": {
+                          "experience.role_position": {
+                            "query": item["role"],
+                            "operator": "or",
+                            "fuzziness": "AUTO"
+                          }
+                        }
+                      }
+                    },
+                "nested": {
+                      "path": "experience",
+                      "query": {
+                        "match": {
+                          "experience.job_description": {
+                            "query": item["role"],
+                            "operator": "or",
+                            "fuzziness": "AUTO"
+                          }
+                        }
+                      }
+                    }
+                
+            }
+        should_conditions.append(condition)
+
     # Process both skills and searchKeywords
     for key in ["skills", "searchKeywords"]:
         for item in search_data.get(key, []):
@@ -387,7 +663,7 @@ def final_search_query(search_data: dict) -> dict:
                 "nested": {
                     "path": path,
                     "query": {
-                        "match_phrase_prefix": {
+                        "match": {
                             field: {
                                 "query": item["text"],
                                 "max_expansions": 50
@@ -408,6 +684,7 @@ def final_search_query(search_data: dict) -> dict:
         "bool": {
             "must": must_conditions,
             "should": should_conditions,
+            "must_not":must_not_condotions,
             "minimum_should_match": 0
         }
     }
@@ -416,7 +693,7 @@ def final_search_query(search_data: dict) -> dict:
     min_exp = search_data.get("minExperience")
     max_exp = search_data.get("maxExperience")
     
-    if min_exp is not None and max_exp is not None:
+    if min_exp !="" and max_exp != "":
         query_part = {
                 "script_score": {
                     "query": query_part,
@@ -444,3 +721,56 @@ def final_search_query(search_data: dict) -> dict:
         # "_source": ["id"],
         "query": query_part
     }
+
+def certificates_search_query(q: str):
+    return {
+            "size": 0,
+            "_source": False,
+            "query": {
+                "bool": {
+                    "should": [
+                        {
+                            "nested": {
+                                "path": "certificates",
+                                "query": {
+                                    "match_phrase_prefix": {
+                                        "certificates.certificate_name": {
+                                            "query": q,
+                                            "max_expansions": 50
+                                        }
+                                    }
+                                }
+                            }
+                        },
+                    ],
+                    "minimum_should_match": 1
+                }
+            },
+            "aggs": {
+                "certificate_suggestions": {
+                    "nested": {
+                        "path": "certificates"
+                    },
+                    "aggs": {
+                        "matching_certificates": {
+                            "filter": {
+                                "match_phrase_prefix": {
+                                    "certificates.certificate_name": {
+                                        "query": q,
+                                        "max_expansions": 50
+                                    }
+                                }
+                            },
+                            "aggs": {
+                                "certificates": {
+                                    "terms": {
+                                        "field": "certificates.certificate_name.keyword",
+                                        "size": 5
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }

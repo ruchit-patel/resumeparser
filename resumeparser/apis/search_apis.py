@@ -1,7 +1,7 @@
 import frappe
 
 from datetime import datetime, date
-from .open_seach_querys import keyword_search_query,skill_search_query,location_search_query,companies_search_query,designation_search_query,education_institute_search_query,final_search_query
+from .open_seach_querys import keyword_search_query,skill_search_query,location_search_query,companies_search_query,designation_search_query,education_institute_search_query,final_search_query,certificates_search_query
 
 def human_readable_date_diff(target_date_str):
     delta = (target_date_str.date() - date.today()).days
@@ -273,10 +273,8 @@ import json
 def search_results():
     try:  
         post_form =  frappe.request.get_json()
-        post_form["minExperience"] = int(post_form["minExperience"]) if post_form.get("minExperience", "").strip().isdigit() else 0
-        post_form["maxExperience"] = int(post_form["maxExperience"]) if post_form.get("maxExperience", "").strip().isdigit() else 100
-        
-
+        # post_form["minExperience"] = int(post_form["minExperience"]) if post_form.get("minExperience", "").strip().isdigit() else 0
+        # post_form["maxExperience"] = int(post_form["maxExperience"]) if post_form.get("maxExperience", "").strip().isdigit() else 100
         # post_form["minExperience"] = None
         # post_form["maxExperience"] = None
         row_query = final_search_query(post_form)
@@ -401,6 +399,19 @@ def test():
     # return final_search_query(data) 
     pass   
 
+
+@frappe.whitelist(allow_guest=True)
+# tuple in list
+def seach_certificates(q:str):
+    query = certificates_search_query(q)
+    response = open_search_query_executor(query)
+    suggestions = {"certificates": []}
+    if 'aggregations' in response:
+        # Extract certificates
+        certificate_buckets = response['aggregations']['certificate_suggestions']['matching_certificates']['certificates']['buckets']
+        suggestions['certificates'] = [bucket['key'] for bucket in certificate_buckets]
+    
+    return [(item, key) for key, values in suggestions.items() for item in values]
 
 
 
