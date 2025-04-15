@@ -365,63 +365,85 @@ def final_search_query(search_data: dict) -> dict:
     must_conditions = []
     should_conditions = []
     must_not_condotions= []
-
-
     # Education PG
     if search_data.get("pgcourse") != "" and len(search_data.get("pgcourse")) >= 1:
       for item in search_data.get("pgcourse", []):
-        condition =  {
-                "nested": {
-                      "path": "education",
-                      "query": {
-                        "match": {
-                          "education.course_name": {
-                            "query": item["department"],
-                            "operator": "or",
-                            "fuzziness": "AUTO"
-                          }
-                        }
-                      }
-                    },
-                "nested": {
-                      "path": "education",
-                      "query": {
-                        "match": {
-                          "education.specialization": {
-                            "query": item["department"],
-                            "operator": "or",
-                            "fuzziness": "AUTO"
-                          }
-                        }
-                      }
-                    },
-                "nested": {
-                      "path": "education",
-                      "query": {
-                        "match": {
-                          "education.course_name": {
-                            "query": item["role"],
-                            "operator": "or",
-                            "fuzziness": "AUTO"
-                          }
-                        }
-                      }
-                    },
-                "nested": {
-                      "path": "education",
-                      "query": {
-                        "match": {
-                          "education.specialization": {
-                            "query": item["role"],
-                            "operator": "or",
-                            "fuzziness": "AUTO"
-                          }
-                        }
-                      }
+        condition = {
+            "nested": {
+                "path": "education",
+                "query": {
+                    "bool": {
+                        "should": [
+                            # Match for course_name with department
+                            {
+                                "match": {
+                                    "education.course_name": {
+                                        "query": item["department"],
+                                        "operator": "or",
+                                        "fuzziness": "AUTO"
+                                    }
+                                }
+                            },
+                            # Match for specialization with department
+                            {
+                                "match": {
+                                    "education.specialization": {
+                                        "query": item["department"],
+                                        "operator": "or",
+                                        "fuzziness": "AUTO"
+                                    }
+                                }
+                            },
+                            # Match for course_name with role
+                            {
+                                "match": {
+                                    "education.course_name": {
+                                        "query": item["role"],
+                                        "operator": "or",
+                                        "fuzziness": "AUTO"
+                                    }
+                                }
+                            },
+                            # Match for specialization with role
+                            {
+                                "match": {
+                                    "education.specialization": {
+                                        "query": item["role"],
+                                        "operator": "or",
+                                        "fuzziness": "AUTO"
+                                    }
+                                }
+                            },
+                            # Year-based range filter (from and to year)
+                            {
+                                "bool": {
+                                    "must": [
+                                        {
+                                            "range": {
+                                                "education.from": {
+                                                    "gte": f"{search_data.get('pgfromYear')}-01-01",
+                                                    "lte": f"{search_data.get('pgfromYear')}-12-31"
+                                                }
+                                            }
+                                        },
+                                        {
+                                            "range": {
+                                                "education.to": {
+                                                    "gte": f"{search_data.get('pgtoYear')}-01-01",
+                                                    "lte": f"{search_data.get('pgtoYear')}-12-31"
+                                                }
+                                            }
+                                        }
+                                    ]
+                                }
+                            }
+                        ]
                     }
-                
+                }
             }
+        }
         should_conditions.append(condition)
+
 
     if search_data.get("pginstitute") != "" and len(search_data.get("pginstitute")) >= 1:
       condition = {
@@ -431,7 +453,8 @@ def final_search_query(search_data: dict) -> dict:
                         "match": {
                             "education.school_college_name": {
                                 "query": search_data.get("pginstitute"),
-                                "max_expansions": 50
+                                "max_expansions": 50,
+                                "boost": 5.0
                             }
                         }
                     }
@@ -504,8 +527,9 @@ def final_search_query(search_data: dict) -> dict:
                     "query": {
                         "match": {
                             "education.school_college_name": {
-                                "query": search_data.get("pginstitute"),
-                                "max_expansions": 50
+                                "query": search_data.get("uginstitute"),
+                                "max_expansions": 50,
+                                "boost": 5.0
                             }
                         }
                     }
@@ -694,25 +718,35 @@ def final_search_query(search_data: dict) -> dict:
     max_exp = search_data.get("maxExperience")
     
     if min_exp !="" and max_exp != "":
-        query_part = {
-                "script_score": {
-                    "query": query_part,
-                    "script": {
-                        "source": f"""
+       return_data  = f"return (totalYears >= {min_exp} && totalYears <= {max_exp}) ? 1 : 0;"
+    else:
+        return_data = "return _score + totalYears;"
+    query_part = {
+            "script_score": {
+                "query": query_part,
+                "script": {
+                    "source": f"""
                             long totalMillis = 0;
-                            for (exp in params._source.experience) {{
-                                if (exp.from != null && exp.to != null) {{
-                                    ZonedDateTime from = ZonedDateTime.parse(exp.from + "T00:00:00Z");
-                                    ZonedDateTime to = ZonedDateTime.parse(exp.to + "T00:00:00Z");
-                                    totalMillis += ChronoUnit.MILLIS.between(from, to);
+                            if (params._source.experience != null) {{
+                                for (exp in params._source.experience) {{
+                                    if (exp != null && exp.from != null && exp.to != null && !exp.from.isEmpty() && !exp.to.isEmpty()) {{
+                                        try {{
+                                            ZonedDateTime from = ZonedDateTime.parse(exp.from + "T00:00:00Z");
+                                            ZonedDateTime to = ZonedDateTime.parse(exp.to + "T00:00:00Z");
+                                            totalMillis += ChronoUnit.MILLIS.between(from, to);
+                                        }} catch (Exception e) {{
+                                            // Skip invalid dates
+                                        }}
+                                    }}
                                 }}
                             }}
                             double totalYears = totalMillis / 1000.0 / 60 / 60 / 24 / 365;
-                            return (totalYears >= {min_exp} && totalYears <= {max_exp}) ? 1 : 0;
-                        """
-                    }
+                            {return_data}
+                            """
+
                 }
             }
+        }
 
         
     # Final structure

@@ -60,11 +60,11 @@ const ResumeProfileDetailComponent = ({candidate}) => {
             <h3 className="font-medium text-lg mb-3">Work summary</h3>
             <div className="grid grid-cols-[120px_1fr] gap-y-3 text-sm">
               <div className="text-gray-500">Industry</div>
-              <div>{candidate.workSummary.industry}</div>
+              <div>{candidate.experience[0].company_name || "-"}</div>
               <div className="text-gray-500">Department</div>
-              <div>{candidate.workSummary.department}</div>
+              <div>{"-"}</div>
               <div className="text-gray-500">Role</div>
-              <div>{candidate.workSummary.role}</div>
+              <div>{candidate.experience[0].role_position || "-"}</div>
             </div>
           </div>
 
@@ -137,32 +137,72 @@ const ResumeProfileDetailComponent = ({candidate}) => {
           </div>
 
           {/* Certification Section */}
-          <div className="mb-8">
-            <h3 className="font-medium text-lg mb-3">Certification</h3>
-            <div className="flex items-start gap-3">
-              <div className="w-10 h-10 bg-gray-50 rounded-md flex items-center justify-center border">
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  width="20"
-                  height="20"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  className="text-gray-400"
-                >
-                  <path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z" />
-                  <polyline points="14 2 14 8 20 8" />
-                </svg>
-              </div>
-              <div>
-                <h4 className="font-semibold">{candidate.certification?.name}</h4>
-                <p className="text-sm text-gray-700">{candidate.certification?.provider}</p>
+          {candidate.certificates && candidate.certificates.length > 0 && (
+            <div className="mb-8">
+              <h3 className="font-medium text-lg mb-3">Certification</h3>
+              <div className="space-y-4">
+                {candidate.certificates.map((cert, index) => (
+                  <div key={index} className="flex items-start gap-3">
+                    <div className="w-10 h-10 bg-gray-50 rounded-md flex items-center justify-center border">
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        width="20"
+                        height="20"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        strokeWidth="2"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        className="text-gray-400"
+                      >
+                        <path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z" />
+                        <polyline points="14 2 14 8 20 8" />
+                      </svg>
+                    </div>
+                    <div>
+                      <h4 className="font-semibold">{cert.certificate_name || '-'}</h4>
+                      <p className="text-sm text-gray-700">{cert.provider || '-'}</p>
+                    </div>
+                  </div>
+                ))}
               </div>
             </div>
-          </div>
+          )}
+
+
+          {candidate.accomplishments && candidate.accomplishments.length > 0 && (
+            <div className="mb-8">
+              <h3 className="font-medium text-lg mb-3">Accomplishments</h3>
+              <div className="space-y-4">
+                {candidate.accomplishments.map((acc, index) => (
+                  <div key={index} className="flex items-start gap-3">
+                    <div className="w-10 h-10 bg-gray-50 rounded-md flex items-center justify-center border">
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        width="20"
+                        height="20"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        strokeWidth="2"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        className="text-gray-400"
+                      >
+                        <path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z" />
+                        <polyline points="14 2 14 8 20 8" />
+                      </svg>
+                    </div>
+                    <div>
+                      <h4 className="font-semibold">{acc.accomplishment || '-'}</h4>
+                      <p className="text-sm text-gray-700">{acc.description || '-'}</p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
 
           {/* Other details Section */}
           {/* <div className="mb-8">
