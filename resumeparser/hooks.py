@@ -161,6 +161,17 @@ app_license = "mit"
 # 	],
 # }
 
+
+scheduler_events = {
+    "cron": {
+        "*/1 * * * *": [
+            "resumeparser.tasks.resume_scanner"
+        ]
+    }
+}
+
+
+
 # Testing
 # -------
 

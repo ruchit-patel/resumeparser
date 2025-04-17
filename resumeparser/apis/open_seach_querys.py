@@ -1,3 +1,5 @@
+import frappe
+
 
 def skill_search_query(q: str) -> dict:
     return {
@@ -98,7 +100,7 @@ def keyword_search_query(q:str):
                                     }
                                 }
                             }
-                        }
+                        },
                     ],
                     "minimum_should_match": 1
                 }
@@ -362,9 +364,25 @@ def education_institute_search_query(q: str) -> dict:
             
 
 def final_search_query(search_data: dict) -> dict:
+    print("search_data : ---------------",search_data)
     must_conditions = []
     should_conditions = []
     must_not_condotions= []
+    
+    # location
+    if search_data.get("location") != "" and len(search_data.get("location")) >= 1:
+        print("location : ---------------",search_data.get("location"))
+        condition = {
+                "match": {
+                            "city": {
+                                "query": search_data.get("location"),
+                                "max_expansions": 50,
+                                "operator": "or",
+                                "fuzziness": "AUTO",
+                            }
+                        }
+                    }
+        should_conditions.append(condition)
     # Education PG
     if search_data.get("pgcourse") != "" and len(search_data.get("pgcourse")) >= 1:
       for item in search_data.get("pgcourse", []):
@@ -444,7 +462,6 @@ def final_search_query(search_data: dict) -> dict:
         }
         should_conditions.append(condition)
 
-
     if search_data.get("pginstitute") != "" and len(search_data.get("pginstitute")) >= 1:
       condition = {
                 "nested": {
@@ -461,8 +478,6 @@ def final_search_query(search_data: dict) -> dict:
                 }
             }
       should_conditions.append(condition)
-
-
 
     # Education UG
     if search_data.get("ugcourse") != "" and len(search_data.get("ugcourse")) >= 1:
@@ -718,35 +733,25 @@ def final_search_query(search_data: dict) -> dict:
     max_exp = search_data.get("maxExperience")
     
     if min_exp !="" and max_exp != "":
-       return_data  = f"return (totalYears >= {min_exp} && totalYears <= {max_exp}) ? 1 : 0;"
-    else:
-        return_data = "return _score + totalYears;"
-    query_part = {
-            "script_score": {
-                "query": query_part,
-                "script": {
-                    "source": f"""
+        query_part = {
+                "script_score": {
+                    "query": query_part,
+                    "script": {
+                        "source": f"""
                             long totalMillis = 0;
-                            if (params._source.experience != null) {{
-                                for (exp in params._source.experience) {{
-                                    if (exp != null && exp.from != null && exp.to != null && !exp.from.isEmpty() && !exp.to.isEmpty()) {{
-                                        try {{
-                                            ZonedDateTime from = ZonedDateTime.parse(exp.from + "T00:00:00Z");
-                                            ZonedDateTime to = ZonedDateTime.parse(exp.to + "T00:00:00Z");
-                                            totalMillis += ChronoUnit.MILLIS.between(from, to);
-                                        }} catch (Exception e) {{
-                                            // Skip invalid dates
-                                        }}
-                                    }}
+                            for (exp in params._source.experience) {{
+                                if (exp.from != null && exp.to != null) {{
+                                    ZonedDateTime from = ZonedDateTime.parse(exp.from + "T00:00:00Z");
+                                    ZonedDateTime to = ZonedDateTime.parse(exp.to + "T00:00:00Z");
+                                    totalMillis += ChronoUnit.MILLIS.between(from, to);
                                 }}
                             }}
                             double totalYears = totalMillis / 1000.0 / 60 / 60 / 24 / 365;
-                            {return_data}
-                            """
-
+                            return (totalYears >= {min_exp} && totalYears <= {max_exp}) ? 1 : 0;
+                        """
+                    }
                 }
             }
-        }
 
         
     # Final structure

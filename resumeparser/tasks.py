@@ -1,24 +1,29 @@
+
 import os
 import frappe
 import subprocess
+from concurrent.futures import ThreadPoolExecutor, as_completed
+from datetime import datetime
+import json
 
-PDF_DIRECTORY_PATH = "/home/jay/project/frappe-bench/resume_store"
+PDF_DIRECTORY_PATH = frappe.get_doc("All Resume Location").folder_location
+
+def logging(title,error):
+    log = frappe.get_doc({
+        "doctype": "Error Log",
+        "method": title,
+        "error":error
+    })
+    log.insert(ignore_permissions=True)
+    frappe.db.commit()
+
 
 def convert_docx_to_pdf(input_path, output_path):
-    unoconv_path = "/usr/bin/unoconv"
-    
-    # Check if unoconv is installed at the given path
-    if not os.path.exists(unoconv_path):
-        raise FileNotFoundError("unoconv is not installed or path is incorrect.")
-
-    # Command to convert DOCX to PDF using unoconv
     command = [
-        unoconv_path,
-        "-f", "pdf",  # Output format (pdf)
-        "-o", output_path,  # Specify output PDF file path
-        input_path  # Input DOCX file path
+        "libreoffice", "--headless", "--convert-to", "pdf",
+        input_path, "--outdir", os.path.dirname(output_path)
     ]
-
+    
     try:
         subprocess.run(command, check=True)
         print(f"✅ Conversion completed. PDF saved at: {output_path}")
@@ -27,7 +32,6 @@ def convert_docx_to_pdf(input_path, output_path):
         raise  # Re-raise exception for further handling if necessary
 
 
-@frappe.whitelist(allow_guest=True)
 def resume_scanner():
     processed_count = 0
     skipped_count = 0
@@ -42,7 +46,8 @@ def resume_scanner():
                 convert_docx_to_pdf(input_path, output_pdf_path)
             except Exception as e:
                 print(f"❌ Error converting {filename} to PDF: {e}")
-                error_files.append({"file": filename, "error": f"Conversion failed: {str(e)}"})
+                logging("RESUME SCANNING  : Error converting file",str(e))
+                error_files.append({"file": filename, "error": f"Conversion failed: {str(e)}","type":"convertion"})
 
     # Step 2: Process .pdf files and delete originals after processing
     for filename in os.listdir(PDF_DIRECTORY_PATH):
@@ -87,26 +92,26 @@ def resume_scanner():
 
             if os.path.exists(original_docx_path):
                 os.remove(original_docx_path)
-                print(f"🗑️ Deleted original DOCX: {original_docx_path}")
             elif os.path.exists(original_doc_path):  # If it's a .doc file
                 os.remove(original_doc_path)
-                print(f"🗑️ Deleted original DOC: {original_doc_path}")
-
             # Delete the processed PDF as well
             if os.path.exists(full_path):
                 os.remove(full_path)
-                print(f"🗑️ Deleted original PDF: {full_path}")
-
         except Exception as e:
-            print(f"❌ Error processing {filename}: {e}")
-            error_files.append({"file": filename, "error": str(e)})
+            logging(f"RESUME SCANNING  : Error in Scanning resume for {filename}",str(e))
+            error_files.append({"file": filename, "error": str(e),"type":"scanning"})
 
     frappe.db.commit()
 
-    return {
+    data =  {
         "status": "completed",
         "processed": processed_count,
         "skipped": skipped_count,
         "errors": error_files,
         "total_files": processed_count + skipped_count + len(error_files)
     }
+    logging(f"RESUME SCANNING  : Summy for batch scanning",str(json.dumps(data, indent=2)))
+    return data
+
+
+

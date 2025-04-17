@@ -77,15 +77,22 @@ def seach_skills(q:str):
 @frappe.whitelist(allow_guest=True)
 # list view
 def seach_candidate_location(q:str):
-    query = location_search_query(q)
-    response = open_search_query_executor(query)
-    suggestions = []
-    if 'aggregations' in response:
-        # Extract locations
-        location_buckets = response['aggregations']['city']['buckets']
-        suggestions = [bucket['key'] for bucket in location_buckets]
+    # query = location_search_query(q)
+    # response = open_search_query_executor(query)
+    # suggestions = []
+    # if 'aggregations' in response:
+    #     # Extract locations
+    #     location_buckets = response['aggregations']['city']['buckets']
+    #     suggestions = [bucket['key'] for bucket in location_buckets]
     
-    return suggestions
+    # return suggestions
+
+
+    data = frappe.get_all("Locations", filters={"name": ["like", f"%{q}%"]}, fields=["name","parent_locations"])
+    if data:
+        return [f"{item["name"]}, {item["parent_locations"]}" for item in data]
+    else:
+        return ["No data found"] 
 
 @frappe.whitelist(allow_guest=True)
 def candidate_departments():
@@ -395,9 +402,14 @@ def candidate_detail():
     
 
 @frappe.whitelist(allow_guest=True)
-def test():
-    # return final_search_query(data) 
-    pass   
+def test(q:str):
+    data = frappe.get_all("Locations", filters={"name": ["like", f"%{q}%"]}, fields=["name","parent_locations"])
+    if data:
+        return [f"{item["name"]},{item["parent_locations"]}" for item in data]
+        return data
+    else:
+        return ["No data found"] 
+
 
 
 @frappe.whitelist(allow_guest=True)
