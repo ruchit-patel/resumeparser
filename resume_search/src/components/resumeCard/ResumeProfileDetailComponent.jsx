@@ -60,11 +60,13 @@ const ResumeProfileDetailComponent = ({candidate}) => {
             <h3 className="font-medium text-lg mb-3">Work summary</h3>
             <div className="grid grid-cols-[120px_1fr] gap-y-3 text-sm">
               <div className="text-gray-500">Industry</div>
-              <div>{candidate.experience[0].company_name || "-"}</div>
+              <div>{candidate.workSummary.industry || "-"}</div>
               <div className="text-gray-500">Department</div>
               <div>{"-"}</div>
               <div className="text-gray-500">Role</div>
-              <div>{candidate.experience[0].role_position || "-"}</div>
+              <div>{candidate.workSummary.role || "-"}</div>
+              <div className="text-gray-500">Total Experience</div>
+              <div>{candidate.basicInfo.total_experience ? `${candidate.basicInfo.total_experience} Years` : "-"}</div>
             </div>
           </div>
 
@@ -231,7 +233,7 @@ const ResumeProfileDetailComponent = ({candidate}) => {
               </div>
               <div>
                 <div className="text-gray-500 mb-1">Gender</div>
-                <div>{candidate.basicInfo.gende}</div>
+                <div>{candidate.basicInfo.gender}</div>
               </div>
               <div>
                 <div className="text-gray-500 mb-1">Marital status</div>
