@@ -2,6 +2,20 @@ import frappe
 
 from datetime import datetime, date
 from .open_seach_querys import keyword_search_query,skill_search_query,location_search_query,companies_search_query,designation_search_query,education_institute_search_query,final_search_query,certificates_search_query
+import json
+
+def read_courses_from_json(file_path):
+    try:
+        with open(file_path, 'r', encoding='utf-8') as file:
+            courses = json.load(file)
+            return courses
+    except FileNotFoundError:
+        print(f"Error: The file {file_path} was not found.")
+        return []
+    except json.JSONDecodeError:
+        print(f"Error: The file {file_path} contains invalid JSON.")
+        return []
+    
 
 def human_readable_date_diff(target_date_str):
     delta = (target_date_str.date() - date.today()).days
@@ -77,17 +91,6 @@ def seach_skills(q:str):
 @frappe.whitelist(allow_guest=True)
 # list view
 def seach_candidate_location(q:str):
-    # query = location_search_query(q)
-    # response = open_search_query_executor(query)
-    # suggestions = []
-    # if 'aggregations' in response:
-    #     # Extract locations
-    #     location_buckets = response['aggregations']['city']['buckets']
-    #     suggestions = [bucket['key'] for bucket in location_buckets]
-    
-    # return suggestions
-
-
     data = frappe.get_all("Locations", filters={"name": ["like", f"%{q}%"]}, fields=["name","parent_locations"])
     if data:
         return [f"{item["name"]}, {item["parent_locations"]}" for item in data]
@@ -96,49 +99,43 @@ def seach_candidate_location(q:str):
 
 @frappe.whitelist(allow_guest=True)
 def candidate_departments():
-    return [
-        {
-            "name": "Customer Success, Service & Operations",
-            "roles": ["Customer Support", "Service Manager", "Operations Lead", "Account Manager"]
-        },
-        {
-            "name": "Data Science & Analytics",
-            "roles": ["Data Scientist", "Data Analyst", "ML Engineer", "BI Developer"]
-        },
-        {
-            "name": "Engineering - Hardware & Networks",
-            "roles": ["Hardware Engineer", "Network Administrator", "ASIC / RTL / Logic Design Engineer",
-                     "Design Team Lead", "Design Verification Engineer", "EDA Tools Engineer", "Embedded Hardware Engineer"]
-        },
-        {
-            "name": "Engineering - Software & QA",
-            "roles": ["Software Developer", "QA Engineer", "DevOps Engineer", "UI/UX Developer"]
-        },
-        {
-            "name": "Finance & Accounting",
-            "roles": ["Accountant", "Financial Analyst", "Tax Specialist", "Auditor"]
-        },
-        {
-            "name": "Human Resources",
-            "roles": ["HR Manager", "Recruiter", "Training Coordinator", "Compensation Specialist"]
-        },
-        {
-            "name": "IT & Information Security",
-            "roles": ["IT Support", "Security Analyst", "System Administrator", "IT Project Manager"]
-        },
-        {
-            "name": "BFSI, Investments & Trading",
-            "roles": ["Investment Analyst", "Trading Specialist", "Risk Manager", "Compliance Officer"]
-        }
-    ]
+    file_path = frappe.get_app_path('resumeparser', 'apis', 'education_departments.json')
+    course_data = read_courses_from_json(file_path)
+    return course_data
+
 
 @frappe.whitelist(allow_guest=True)
 def seach_candidate_industry(q:str):
     industries = [
-    "Information Technology (IT)", "Finance", "Healthcare", 
-    "Manufacturing", "Retail", "Education", 
-    "Telecommunication", "Hospitality", "Energy", 
-    "Transportation and Logistics"
+    "Information Technology (IT)",
+    "Finance & Banking",
+    "Healthcare & Pharmaceuticals",
+    "Manufacturing & Industrial Production",
+    "Retail & E-commerce",
+    "Education & E-Learning",
+    "Telecommunications & Media",
+    "Hospitality & Tourism",
+    "Energy & Utilities",
+    "Transportation & Logistics",
+    "Real Estate & Construction",
+    "Agriculture & Agribusiness",
+    "Automotive & Aerospace",
+    "Consumer Goods & Services",
+    "Entertainment & Leisure",
+    "Legal & Compliance",
+    "Insurance & Risk Management",
+    "Mining & Natural Resources",
+    "Professional Services",
+    "Public Sector & Government",
+    "Technology Hardware & Equipment",
+    "Semiconductors & Electronics",
+    "Renewable Energy & Sustainability",
+    "Cybersecurity & Data Privacy",
+    "Artificial Intelligence & Machine Learning",
+    "Blockchain & Fintech",
+    "Sports & Recreation",
+    "Art & Culture",
+    "Nonprofit & Social Impact"
     ]
     filter_data = list(filter(lambda a: q in a, industries))
     return filter_data
@@ -187,63 +184,9 @@ def seach_candidate_designation(q:str):
 
 @frappe.whitelist(allow_guest=True)
 def candidate_courses():
-    return [
-        {
-            "name": "Customer Success, Service & Operations",
-            "roles": ["Customer Support", "Service Manager", "Operations Lead", "Account Manager"]
-        },
-        {
-            "name": "Data Science & Analytics",
-            "roles": ["Data Scientist", "Data Analyst", "ML Engineer", "BI Developer"]
-        },
-        {
-            "name": "Engineering - Hardware & Networks",
-            "roles": ["Hardware Engineer", "Network Administrator", "ASIC / RTL / Logic Design Engineer",
-                     "Design Team Lead", "Design Verification Engineer", "EDA Tools Engineer", "Embedded Hardware Engineer"]
-        },
-        {
-            "name": "Engineering - Software & QA",
-            "roles": ["Software Developer", "QA Engineer", "DevOps Engineer", "UI/UX Developer"]
-        },
-        {
-            "name": "Finance & Accounting",
-            "roles": ["Accountant", "Financial Analyst", "Tax Specialist", "Auditor"]
-        },
-        {
-            "name": "Human Resources",
-            "roles": ["HR Manager", "Recruiter", "Training Coordinator", "Compensation Specialist"]
-        },
-        {
-            "name": "IT & Information Security",
-            "roles": ["IT Support", "Security Analyst", "System Administrator", "IT Project Manager"]
-        },
-        {
-            "name": "BFSI, Investments & Trading",
-            "roles": ["Investment Analyst", "Trading Specialist", "Risk Manager", "Compliance Officer"]
-        },
-        {
-            "name": "Healthcare & Medical Sciences",
-            "roles": ["Medical Officer", "Clinical Research Analyst", "Healthcare Administrator", "Pharmacy Manager"]
-        },
-        {
-            "name": "Digital Marketing & Communications",
-            "roles": ["Digital Marketing Specialist", "Content Strategist", "Social Media Manager", "SEO Expert"]
-        },
-        {
-            "name": "Supply Chain & Logistics",
-            "roles": ["Supply Chain Manager", "Logistics Coordinator", "Inventory Analyst", "Procurement Specialist"]
-        },
-        {
-            "name": "Research & Development",
-            "roles": ["Research Scientist", "Product Developer", "R&D Manager", "Innovation Specialist"]
-        },
-        {
-            "name": "Legal & Compliance",
-            "roles": ["Legal Counsel", "Compliance Officer", "Contract Manager", "Legal Analyst"]
-        }
-    ]
-
-
+    file_path = frappe.get_app_path('resumeparser', 'apis', 'education_courses.json')
+    course_data = read_courses_from_json(file_path)
+    return course_data
 
 @frappe.whitelist(allow_guest=True)
 def seach_candidate_edu_institute(q:str):
@@ -280,10 +223,6 @@ import json
 def search_results():
     try:  
         post_form =  frappe.request.get_json()
-        # post_form["minExperience"] = int(post_form["minExperience"]) if post_form.get("minExperience", "").strip().isdigit() else 0
-        # post_form["maxExperience"] = int(post_form["maxExperience"]) if post_form.get("maxExperience", "").strip().isdigit() else 100
-        # post_form["minExperience"] = None
-        # post_form["maxExperience"] = None
         row_query = final_search_query(post_form)
         print("-------------------------------------")
         print(row_query)
@@ -333,22 +272,22 @@ def search_results():
 
 @frappe.whitelist(allow_guest=True)
 def candidate_detail():
-    try:    
+    try:
         path = frappe.request.path
         candidate_id = path.strip("/").split("/")[-1]
-        # candidate_id = 50
-        client = frappe.new_doc("Resume").get_opensearch_client()
-        index_name = "resumes"
-        
+
+        # Get OpenSearch client and fetch resume data
+        resume_doc = frappe.get_doc("Resume", candidate_id)
         try:
+            client = frappe.new_doc("Resume").get_opensearch_client()
+            index_name = "resumes"
             response = client.get(index=index_name, id=candidate_id)
-            source = response.get("_source", {})
-            
-            # Get skills with proper error handling
+            source = response['_source']
+            # Categorize skills
             skills = source.get("skills", [])
-            technical_skills = [s.get("skill_name", "") for s in skills if s.get("skill_type") == "Technical"]
-            soft_skills = [s.get("skill_name", "") for s in skills if s.get("skill_type") == "Soft"]
-            
+            technical_skills = [s.get("skill_name") for s in skills if s.get("skill_type") == "Technical"]
+            soft_skills = [s.get("skill_name") for s in skills if s.get("skill_type") == "Soft"]
+
             return {
                 "id": str(candidate_id),
                 "basicInfo": {
@@ -361,7 +300,8 @@ def candidate_detail():
                     "city": source.get("city"),
                     "maritalStatus": source.get("marital_status", "-"),
                     "castCategory": source.get("cast_category", "-"),
-                    "physicallyChallenged": source.get("physically_challenged", "-")
+                    "physicallyChallenged": source.get("physically_challenged", "-"),
+                    "total_experience": source.get("total_experience"),
                 },
                 "workSummary": {
                     "industry": source.get("industry"),
@@ -376,30 +316,31 @@ def candidate_detail():
                 "skills": {
                     "TechnicalSkill": technical_skills,
                     "Soft": soft_skills,
-                    "AdditionalSkills": []
+                    "AdditionalSkills": []  # Add logic here if needed
                 },
-                # "languages": source.get("languages", [
-                #     {"name": "English", "level": "Beginner", "abilities": ["Read", "Write", "Speak"]},
-                #     {"name": "Hindi", "level": "Proficient", "abilities": ["Read", "Write", "Speak"]},
-                #     {"name": "Gujarati", "level": "Beginner", "abilities": ["Read", "Write", "Speak"]},
-                #     {"name": "Tamil", "level": "Beginner", "abilities": ["Speak"]}
-                # ]),
                 "desiredJob": {
                     "employmentType": source.get("employment_type", "Permanent"),
                     "employmentStatus": source.get("employment_status", "Full time")
                 },
                 "resume": {
-                    "link": frappe.get_doc("Resume", candidate_id).get("resume_file"),
-                    "lastUpdate": human_readable_date_diff(frappe.get_doc("Resume", candidate_id).get("modified"))
+                    "link": resume_doc.get("resume_file"),
+                    "lastUpdate": human_readable_date_diff(resume_doc.get("modified"))
                 }
             }
+
         except Exception as e:
-            frappe.log_error(f"Error getting document from OpenSearch: {str(e)}")
-            return {"status": "error", "message": "Error retrieving candidate details"}
+            frappe.log_error(f"Error fetching from OpenSearch for candidate {candidate_id}: {str(e)}")
+            return {
+                "status": "error",
+                "message": f"Failed to retrieve resume details for candidate {candidate_id} {str(e)}"
+            }
+
     except Exception as e:
-        frappe.log_error(f"Error fetching candidate details: {str(e)}")
-        return {"status": "error", "message": str(e)}
-    
+        frappe.log_error(f"General error in candidate_detail: {str(e)}")
+        return {
+            "status": "error",
+            "message": str(e)
+        }
 
 @frappe.whitelist(allow_guest=True)
 def test(q:str):

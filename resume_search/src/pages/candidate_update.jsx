@@ -1,354 +1,515 @@
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Plus, Trash2 } from "lucide-react";
-import { useState } from "react";
-
+import { Car, Plus, Trash2 } from "lucide-react";
+import { useState, useEffect } from "react";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Textarea } from "@/components/ui/textarea";
+import { useParams } from 'react-router-dom'; 
+import {config} from "@/config";
+import { useNavigate } from 'react-router-dom';
 
 const UpdateProfile = () => {
-  const [keySkills, setKeySkills] = useState([""]);
-  const [softSkills, setSoftSkills] = useState([""]);
-  const [workExperience, setWorkExperience] = useState([{
-    role_position: "",
-    company_name: "",
-    from: "",
-    to: "",
-    job_description: ""
-  }]);
-  const [education, setEducation] = useState<Education[]>([{
-    course_name: "",
-    school_college_name: "",
-    from: "",
-    to: "",
-    specialization: ""
-  }]);
+  const { id } = useParams();
+  const navigate = useNavigate();
+  const [isLoading, setIsLoading] = useState(false);
+  const [formData, setFormData] = useState({
+    candidate_name: "",
+    date_of_birth: null,
+    address: "",
+    gender: "",
+    mobile_number: "",
+    email: "",
+    city: "",
+    age: null,
+    industry: "",
+    total_experience: 0,
+    role: "",
+    education: [],
+    experience: [],
+    skills: []
+  });
+  
+  const updateCandidateDetail = async (data) => {
+      try {
+        const csrfToken = window.csrf_token;
 
-  // Handlers for multiple entries
-  const addKeySkill = () => setKeySkills([...keySkills, ""]);
-  const addSoftSkill = () => setSoftSkills([...softSkills, ""]);
-  const removeKeySkill = (index: number) => {
-    const newSkills = keySkills.filter((_, i) => i !== index);
-    setKeySkills(newSkills);
-  };
-  const removeSoftSkill = (index: number) => {
-    const newSkills = softSkills.filter((_, i) => i !== index);
-    setSoftSkills(newSkills);
+        const response = await fetch(`${config.backendUrl}/api/method/resumeparser.apis.update_profile.candidate_update/${id}`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'X-Frappe-CSRF-Token': csrfToken,
+          },
+          credentials: 'include', // important to send cookies
+          body: JSON.stringify(data),
+        });
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        const result = await response.json();
+        return result;
+      } catch (error) {
+        console.error('Error in fetchSearchData:', error);
+        return null;
+      }
+    };
+
+  const fetchCandidateDetail = async () => {
+    try {
+      const response = await fetch(`${config.backendUrl}/api/method/resumeparser.apis.update_profile.candidate_get/${id}`);
+      const result = await response.json();
+      return result;
+    } catch (error) {
+      console.log('Error fetching candidate details:', error);
+      return null;
+    }
   };
 
-  const addWorkExperience = () => {
-    setWorkExperience([...workExperience, {
-      role_position: "",
-      company_name: "",
-      from: "",
-      to: "",
-      job_description: ""
-    }]);
-  };
+  useEffect(() => {
+    if (id) {
+      setIsLoading(true);
+      fetchCandidateDetail().then((response) => {
+        if (response?.message) {
+          setFormData(response.message)
+          console.log('Candidate data loaded:', response.message);
+        }
+      }).finally(() => {
+        setIsLoading(false);
+      });
+    }
+  }, [id]);
 
   const addEducation = () => {
-    setEducation([...education, {
-      course_name: "",
-      school_college_name: "",
-      from: "",
-      to: "",
-      specialization: ""
-    }]);
+    setFormData(prev => ({
+      ...prev,
+      education: [...prev.education, {
+        school_college_name: "",
+        school_college_city: null,
+        course_name: "",
+        specialization: null,
+        from: "",
+        to: null,
+        evaluation_score: null
+      }]
+    }));
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    // Handle form submission here
-    console.log("Form submitted");
+  const addExperience = () => {
+    setFormData(prev => ({
+      ...prev,
+      experience: [...prev.experience, {
+        company_name: "",
+        role_position: "",
+        from: "",
+        to: null,
+        current_position: false,
+        location: null,
+        job_description: "",
+        url: null,
+        project_department: null
+      }]
+    }));
   };
+
+  const addSkill = (type) => {
+    setFormData(prev => ({
+      ...prev,
+      skills: [{ skill_name: "", skill_type: type },...prev.skills]
+    }));
+  };
+
+  const handleSubmit = (e) => {
+    setIsLoading(true);
+    e.preventDefault();
+    updateCandidateDetail(formData).then((response) => {console.log(response)}).finally(() => {
+      setIsLoading(false);
+      navigate(`/resume_search/detail/${id}`)
+    })
+    
+  };
+
+
+  const LoadingSpinner = () => (
+    <div className="flex items-center justify-center h-screen">
+      <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-blue-500"></div>
+    </div>
+  );
 
   return (
-    <div className="w-full max-w-4xl mx-auto bg-white rounded-lg shadow p-6">
-      <h1 className="text-2xl font-bold mb-6">Update Profile</h1>
-      
-      <form onSubmit={handleSubmit}>
-        <div className="space-y-8">
-          {/* Personal Information */}
-          <div className="space-y-4">
-            <h2 className="text-xl font-semibold">Personal Information</h2>
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <Label htmlFor="name">Full Name</Label>
-                <Input id="name" placeholder="Enter your full name" />
-              </div>
-              <div>
-                <Label htmlFor="age">Age</Label>
-                <Input id="age" type="number" placeholder="Enter your age" />
-              </div>
-              <div>
-                <Label htmlFor="gender">Gender</Label>
-                <Input id="gender" placeholder="Enter your gender" />
-              </div>
-              <div>
-                <Label htmlFor="dob">Date of Birth</Label>
-                <Input id="dob" type="date" />
-              </div>
-            </div>
-          </div>
+    <div className="container mx-auto py-8 px-4 flex flex-col gap-3">
+         <Card className="p-4">
+                <CardTitle className="text-2xl font-bold item-center">Update Profile</CardTitle>
+         </Card>
 
-          {/* Key Skills */}
-          <div className="space-y-4">
-            <div className="flex justify-between items-center">
-              <h2 className="text-xl font-semibold">Key Skills</h2>
-              <Button type="button" variant="outline" size="sm" onClick={addKeySkill}>
-                <Plus className="w-4 h-4 mr-2" /> Add Skill
-              </Button>
+         {/* Loading state */}
+         {isLoading && (
+            <div className="bg-white rounded-lg shadow-lg p-6 text-center">
+              <LoadingSpinner />
+              <p className="text-gray-600 mt-4">Loading candidates...</p>
             </div>
-            {keySkills.map((skill, index) => (
-              <div key={index} className="flex gap-2">
-                <Input
-                  placeholder="Enter a key skill"
-                  value={skill}
-                  onChange={(e) => {
-                    const newSkills = [...keySkills];
-                    newSkills[index] = e.target.value;
-                    setKeySkills(newSkills);
-                  }}
-                />
-                {keySkills.length > 1 && (
-                  <Button
-                    type="button"
-                    variant="outline"
-                    size="icon"
-                    onClick={() => removeKeySkill(index)}
-                  >
-                    <Trash2 className="w-4 h-4" />
-                  </Button>
-                )}
-              </div>
-            ))}
-          </div>
+          )}
 
-          {/* Soft Skills */}
-          <div className="space-y-4">
-            <div className="flex justify-between items-center">
-              <h2 className="text-xl font-semibold">Soft Skills</h2>
-              <Button type="button" variant="outline" size="sm" onClick={addSoftSkill}>
-                <Plus className="w-4 h-4 mr-2" /> Add Skill
-              </Button>
-            </div>
-            {softSkills.map((skill, index) => (
-              <div key={index} className="flex gap-2">
-                <Input
-                  placeholder="Enter a soft skill"
-                  value={skill}
-                  onChange={(e) => {
-                    const newSkills = [...softSkills];
-                    newSkills[index] = e.target.value;
-                    setSoftSkills(newSkills);
-                  }}
-                />
-                {softSkills.length > 1 && (
-                  <Button
-                    type="button"
-                    variant="outline"
-                    size="icon"
-                    onClick={() => removeSoftSkill(index)}
-                  >
-                    <Trash2 className="w-4 h-4" />
-                  </Button>
-                )}
-              </div>
-            ))}
-          </div>
-
-          {/* Work Summary */}
-          <div className="space-y-4">
-            <h2 className="text-xl font-semibold">Work Summary</h2>
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <Label htmlFor="industry">Industry</Label>
-                <Input id="industry" placeholder="Enter your industry" />
-              </div>
-              <div>
-                <Label htmlFor="role">Role</Label>
-                <Input id="role" placeholder="Enter your role" />
-              </div>
-              <div>
-                <Label htmlFor="department">Department</Label>
-                <Input id="department" placeholder="Enter your department" />
-              </div>
-              <div>
-                <Label htmlFor="total_experience">Total Experience (Years)</Label>
-                <Input id="total_experience" type="number" placeholder="Enter total experience" />
-              </div>
-            </div>
-          </div>
-
-          {/* Work Experience */}
-          <div className="space-y-4">
-            <div className="flex justify-between items-center">
-              <h2 className="text-xl font-semibold">Work Experience</h2>
-              <Button type="button" variant="outline" size="sm" onClick={addWorkExperience}>
-                <Plus className="w-4 h-4 mr-2" /> Add Experience
-              </Button>
-            </div>
-            {workExperience.map((exp, index) => (
-              <div key={index} className="border p-4 rounded-lg space-y-4">
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <Label>Role/Position</Label>
+          <form onSubmit={handleSubmit} className="space-y-8">
+            {/* Personal Information */}
+            <Card className="p-4">
+                <div className="space-y-4">
+                <h2 className="text-xl font-semibold border-b pb-2">Personal Information</h2>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                    <Label htmlFor="candidate_name">Full Name</Label>
                     <Input
-                      placeholder="Enter role/position"
-                      value={exp.role_position}
-                      onChange={(e) => {
-                        const newExp = [...workExperience];
-                        newExp[index] = { ...exp, role_position: e.target.value };
-                        setWorkExperience(newExp);
-                      }}
+                        id="candidate_name"
+                        value={formData.candidate_name}
+                        onChange={(e) => setFormData(prev => ({ ...prev, candidate_name: e.target.value }))}
+                        className="mt-1"
                     />
-                  </div>
-                  <div>
-                    <Label>Company Name</Label>
+                    </div>
+                    <div>
+                    <Label htmlFor="email">Email</Label>
                     <Input
-                      placeholder="Enter company name"
-                      value={exp.company_name}
-                      onChange={(e) => {
-                        const newExp = [...workExperience];
-                        newExp[index] = { ...exp, company_name: e.target.value };
-                        setWorkExperience(newExp);
-                      }}
+                        id="email"
+                        type="email"
+                        value={formData.email}
+                        onChange={(e) => setFormData(prev => ({ ...prev, email: e.target.value }))}
+                        className="mt-1"
                     />
-                  </div>
-                  <div>
-                    <Label>Start Date</Label>
+                    </div>
+                    <div>
+                    <Label htmlFor="mobile_number">Mobile Number</Label>
                     <Input
-                      type="date"
-                      value={exp.from}
-                      onChange={(e) => {
-                        const newExp = [...workExperience];
-                        newExp[index] = { ...exp, from: e.target.value };
-                        setWorkExperience(newExp);
-                      }}
+                        id="mobile_number"
+                        value={formData.mobile_number}
+                        onChange={(e) => setFormData(prev => ({ ...prev, mobile_number: e.target.value }))}
+                        className="mt-1"
                     />
-                  </div>
-                  <div>
-                    <Label>End Date</Label>
+                    </div>
+                    <div>
+                    <Label htmlFor="gender">Gender</Label>
                     <Input
-                      type="date"
-                      value={exp.to}
-                      onChange={(e) => {
-                        const newExp = [...workExperience];
-                        newExp[index] = { ...exp, to: e.target.value };
-                        setWorkExperience(newExp);
-                      }}
+                        id="gender"
+                        value={formData.gender}
+                        onChange={(e) => setFormData(prev => ({ ...prev, gender: e.target.value }))}
+                        className="mt-1"
                     />
-                  </div>
+                    </div>
+                    <div>
+                    <Label htmlFor="date_of_birth">Date of Birth</Label>
+                    <Input
+                        id="date_of_birth"
+                        type="date"
+                        value={formData.date_of_birth || ''}
+                        onChange={(e) => setFormData(prev => ({ ...prev, date_of_birth: e.target.value }))}
+                        className="mt-1"
+                    />
+                    </div>
+                    <div>
+                    <Label htmlFor="city">City</Label>
+                    <Input
+                        id="city"
+                        value={formData.city}
+                        onChange={(e) => setFormData(prev => ({ ...prev, city: e.target.value }))}
+                        className="mt-1"
+                    />
+                    </div>
+                    <div className="md:col-span-2">
+                    <Label htmlFor="address">Address</Label>
+                    <Input
+                        id="address"
+                        value={formData.address}
+                        onChange={(e) => setFormData(prev => ({ ...prev, address: e.target.value }))}
+                        className="mt-1"
+                    />
+                    </div>
                 </div>
-                <div>
-                  <Label>Job Description</Label>
-                  <Input
-                    placeholder="Enter job description"
-                    value={exp.job_description}
-                    onChange={(e) => {
-                      const newExp = [...workExperience];
-                      newExp[index] = { ...exp, job_description: e.target.value };
-                      setWorkExperience(newExp);
-                    }}
-                  />
                 </div>
-                {workExperience.length > 1 && (
-                  <Button
-                    type="button"
-                    variant="destructive"
-                    onClick={() => {
-                      const newExp = workExperience.filter((_, i) => i !== index);
-                      setWorkExperience(newExp);
-                    }}
-                  >
-                    Remove Experience
-                  </Button>
-                )}
-              </div>
-            ))}
-          </div>
+            </Card>
 
-          {/* Education */}
-          <div className="space-y-4">
-            <div className="flex justify-between items-center">
-              <h2 className="text-xl font-semibold">Education</h2>
-              <Button type="button" variant="outline" size="sm" onClick={addEducation}>
-                <Plus className="w-4 h-4 mr-2" /> Add Education
+            {/* Work Summary */}
+            <Card className="p-4">
+                <div className="space-y-4">
+                <h2 className="text-xl font-semibold border-b pb-2">Work Summary</h2>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                    <Label htmlFor="industry">Industry</Label>
+                    <Input
+                        id="industry"
+                        value={formData.industry}
+                        onChange={(e) => setFormData(prev => ({ ...prev, industry: e.target.value }))}
+                        className="mt-1"
+                    />
+                    </div>
+                    <div>
+                    <Label htmlFor="role">Role</Label>
+                    <Input
+                        id="role"
+                        value={formData.role}
+                        onChange={(e) => setFormData(prev => ({ ...prev, role: e.target.value }))}
+                        className="mt-1"
+                    />
+                    </div>
+                    <div>
+                    <Label htmlFor="total_experience">Total Experience (Years)</Label>
+                    <Input
+                        id="total_experience"
+                        type="number"
+                        step="0.1"
+                        value={formData.total_experience}
+                        onChange={(e) => setFormData(prev => ({ ...prev, total_experience: parseFloat(e.target.value) }))}
+                        className="mt-1"
+                    />
+                    </div>
+                </div>
+                </div>
+            </Card>
+
+            {/* Skills */}
+            <Card className="p-4">
+                <div className="space-y-4">
+                <div className="flex justify-between items-center border-b pb-2">
+                    <h2 className="text-xl font-semibold">Skills</h2>
+                    <div className="space-x-2">
+                    <Button type="button" variant="outline" size="sm" onClick={() => addSkill("Technical")}>
+                        <Plus className="w-4 h-4 mr-1" /> Add Technical Skill
+                    </Button>
+                    <Button type="button" variant="outline" size="sm" onClick={() => addSkill("Soft")}>
+                        <Plus className="w-4 h-4 mr-1" /> Add Soft Skill
+                    </Button>
+                    </div>
+                </div>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    {formData.skills.map((skill, index) => (
+                    <div className="flex gap-4 items-start">
+                        <div className="flex-1">
+                        <Input
+                            placeholder={`${skill.skill_type} Skill`}
+                            value={skill.skill_name}
+                            onChange={(e) => {
+                            const newSkills = [...formData.skills];
+                            newSkills[index] = { ...skill, skill_name: e.target.value };
+                            setFormData(prev => ({ ...prev, skills: newSkills }));
+                            }}
+                        />
+                        </div>
+                        <Button
+                        type="button"
+                        variant="destructive"
+                        size="icon"
+                        onClick={() => {
+                            const newSkills = formData.skills.filter((_, i) => i !== index);
+                            setFormData(prev => ({ ...prev, skills: newSkills }));
+                        }}
+                        >
+                        <Trash2 className="w-4 h-4" />
+                        </Button>
+                    </div>
+                    ))}
+                </div>
+                </div>
+            </Card>
+            {/* Experience */}
+            <Card className="p-4">
+                <div className="space-y-4">
+                <div className="flex justify-between items-center border-b pb-2">
+                    <h2 className="text-xl font-semibold">Work Experience</h2>
+                    <Button type="button" variant="outline" size="sm" onClick={addExperience}>
+                    <Plus className="w-4 h-4 mr-1" /> Add Experience
+                    </Button>
+                </div>
+                {formData.experience.map((exp, index) => (
+                    <Card className="p-4">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                        <Label>Company Name</Label>
+                        <Input
+                            value={exp.company_name}
+                            onChange={(e) => {
+                            const newExp = [...formData.experience];
+                            newExp[index] = { ...exp, company_name: e.target.value };
+                            setFormData(prev => ({ ...prev, experience: newExp }));
+                            }}
+                            className="mt-1"
+                        />
+                        </div>
+                        <div>
+                        <Label>Role/Position</Label>
+                        <Input
+                            value={exp.role_position}
+                            onChange={(e) => {
+                            const newExp = [...formData.experience];
+                            newExp[index] = { ...exp, role_position: e.target.value };
+                            setFormData(prev => ({ ...prev, experience: newExp }));
+                            }}
+                            className="mt-1"
+                        />
+                        </div>
+                        <div>
+                        <Label>Start Date</Label>
+                        <Input
+                            type="date"
+                            value={exp.from}
+                            onChange={(e) => {
+                            const newExp = [...formData.experience];
+                            newExp[index] = { ...exp, from: e.target.value };
+                            setFormData(prev => ({ ...prev, experience: newExp }));
+                            }}
+                            className="mt-1"
+                        />
+                        </div>
+                        <div>
+                        <Label>End Date</Label>
+                        <Input
+                            type="date"
+                            value={exp.to || ''}
+                            onChange={(e) => {
+                            const newExp = [...formData.experience];
+                            newExp[index] = { ...exp, to: e.target.value || null };
+                            setFormData(prev => ({ ...prev, experience: newExp }));
+                            }}
+                            className="mt-1"
+                        />
+                        </div>
+                        <div className="md:col-span-2">
+                        <Label>Job Description</Label>
+                        <Textarea
+                            value={exp.job_description}
+                            onChange={(e) => {
+                            const newExp = [...formData.experience];
+                            newExp[index] = { ...exp, job_description: e.target.value };
+                            setFormData(prev => ({ ...prev, experience: newExp }));
+                            }}
+                            className="mt-1"
+                        />
+                        </div>
+                    </div>
+                    {formData.experience.length > 1 && (
+                        <Button
+                        type="button"
+                        variant="destructive"
+                        onClick={() => {
+                            const newExp = formData.experience.filter((_, i) => i !== index);
+                            setFormData(prev => ({ ...prev, experience: newExp }));
+                        }}
+                        className="mt-4"
+                        >
+                        Remove Experience
+                        </Button>
+                    )}
+                    </Card>
+                ))}
+                </div>
+            </Card>
+
+            {/* Education */}
+            <Card className="p-4">
+                <div className="space-y-4">
+                <div className="flex justify-between items-center border-b pb-2">
+                    <h2 className="text-xl font-semibold">Education</h2>
+                    <Button type="button" variant="outline" size="sm" onClick={addEducation}>
+                    <Plus className="w-4 h-4 mr-1" /> Add Education
+                    </Button>
+                </div>
+                {formData.education.map((edu, index) => (
+                    <Card className="p-4">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                        <Label>School/College Name</Label>
+                        <Input
+                            value={edu.school_college_name}
+                            onChange={(e) => {
+                            const newEdu = [...formData.education];
+                            newEdu[index] = { ...edu, school_college_name: e.target.value };
+                            setFormData(prev => ({ ...prev, education: newEdu }));
+                            }}
+                            className="mt-1"
+                        />
+                        </div>
+                        <div>
+                        <Label>Course Name</Label>
+                        <Input
+                            value={edu.course_name}
+                            onChange={(e) => {
+                            const newEdu = [...formData.education];
+                            newEdu[index] = { ...edu, course_name: e.target.value };
+                            setFormData(prev => ({ ...prev, education: newEdu }));
+                            }}
+                            className="mt-1"
+                        />
+                        </div>
+                        <div>
+                        <Label>Specialization</Label>
+                        <Input
+                            value={edu.specialization || ''}
+                            onChange={(e) => {
+                            const newEdu = [...formData.education];
+                            newEdu[index] = { ...edu, specialization: e.target.value };
+                            setFormData(prev => ({ ...prev, education: newEdu }));
+                            }}
+                            className="mt-1"
+                        />
+                        </div>
+                        <div>
+                        <Label>City</Label>
+                        <Input
+                            value={edu.school_college_city || ''}
+                            onChange={(e) => {
+                            const newEdu = [...formData.education];
+                            newEdu[index] = { ...edu, school_college_city: e.target.value };
+                            setFormData(prev => ({ ...prev, education: newEdu }));
+                            }}
+                            className="mt-1"
+                        />
+                        </div>
+                        <div>
+                        <Label>Start Date</Label>
+                        <Input
+                            type="date"
+                            value={edu.from}
+                            onChange={(e) => {
+                            const newEdu = [...formData.education];
+                            newEdu[index] = { ...edu, from: e.target.value };
+                            setFormData(prev => ({ ...prev, education: newEdu }));
+                            }}
+                            className="mt-1"
+                        />
+                        </div>
+                        <div>
+                        <Label>End Date</Label>
+                        <Input
+                            type="date"
+                            value={edu.to || ''}
+                            onChange={(e) => {
+                            const newEdu = [...formData.education];
+                            newEdu[index] = { ...edu, to: e.target.value || null };
+                            setFormData(prev => ({ ...prev, education: newEdu }));
+                            }}
+                            className="mt-1"
+                        />
+                        </div>
+                    </div>
+                    {formData.education.length > 1 && (
+                        <Button
+                        type="button"
+                        variant="destructive"
+                        onClick={() => {
+                            const newEdu = formData.education.filter((_, i) => i !== index);
+                            setFormData(prev => ({ ...prev, education: newEdu }));
+                        }}
+                        className="mt-4"
+                        >
+                        Remove Education
+                        </Button>
+                    )}
+                    </Card>
+                ))}
+                </div>
+            </Card>
+
+            <div className="pt-4">
+              <Button type="submit" className="w-full">
+                Update Profile
               </Button>
             </div>
-            {education.map((edu, index) => (
-              <div key={index} className="border p-4 rounded-lg space-y-4">
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <Label>Course Name</Label>
-                    <Input
-                      placeholder="Enter course name"
-                      value={edu.course_name}
-                      onChange={(e) => {
-                        const newEdu = [...education];
-                        newEdu[index] = { ...edu, course_name: e.target.value };
-                        setEducation(newEdu);
-                      }}
-                    />
-                  </div>
-                  <div>
-                    <Label>School/College Name</Label>
-                    <Input
-                      placeholder="Enter school/college name"
-                      value={edu.school_college_name}
-                      onChange={(e) => {
-                        const newEdu = [...education];
-                        newEdu[index] = { ...edu, school_college_name: e.target.value };
-                        setEducation(newEdu);
-                      }}
-                    />
-                  </div>
-                  <div>
-                    <Label>Start Date</Label>
-                    <Input
-                      type="date"
-                      value={edu.from}
-                      onChange={(e) => {
-                        const newEdu = [...education];
-                        newEdu[index] = { ...edu, from: e.target.value };
-                        setEducation(newEdu);
-                      }}
-                    />
-                  </div>
-                  <div>
-                    <Label>End Date</Label>
-                    <Input
-                      type="date"
-                      value={edu.to}
-                      onChange={(e) => {
-                        const newEdu = [...education];
-                        newEdu[index] = { ...edu, to: e.target.value };
-                        setEducation(newEdu);
-                      }}
-                    />
-                  </div>
-                </div>
-                {education.length > 1 && (
-                  <Button
-                    type="button"
-                    variant="destructive"
-                    onClick={() => {
-                      const newEdu = education.filter((_, i) => i !== index);
-                      setEducation(newEdu);
-                    }}
-                  >
-                    Remove Education
-                  </Button>
-                )}
-              </div>
-            ))}
-          </div>
-        </div>
-
-        <div className="mt-8">
-          <Button type="submit" className="w-full">Update Profile</Button>
-        </div>
-      </form>
+          </form>
     </div>
   );
 };

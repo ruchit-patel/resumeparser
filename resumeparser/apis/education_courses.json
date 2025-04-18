@@ -1,0 +1,198 @@
+[
+    {
+      "name": "Any Computers (Degree/Diploma)",
+      "roles": ["Computer Engineering", "Software Engineering", "Information Technology", "Data Science", "Artificial Intelligence", "Machine Learning", "Cybersecurity", "Computer Applications", "Computer Networking", "Cloud Computing", "Database Management", "Web Development", "Mobile Application Development", "DevOps Engineering", "Systems Architecture"]
+    },
+    {
+      "name": "Any Engineering",
+      "roles": ["Mechanical Engineering", "Electrical Engineering", "Civil Engineering", "Chemical Engineering", "Electronics Engineering", "Aerospace Engineering", "Automotive Engineering", "Biomedical Engineering", "Industrial Engineering", "Materials Engineering", "Petroleum Engineering", "Agricultural Engineering", "Mining Engineering", "Nuclear Engineering", "Marine Engineering", "Robotics Engineering"]
+    },
+    {
+      "name": "Any Hotel-Management",
+      "roles": ["Hotel Administration", "Restaurant Management", "Hospitality Operations", "Event Management", "Food & Beverage Management", "Accommodation Management", "Tourism Management", "Culinary Arts", "Catering Management", "Housekeeping Management", "Front Office Operations", "Hospitality Marketing", "Resort Management", "Club Management", "Cruise Ship Management"]
+    },
+    {
+      "name": "Any Management",
+      "roles": ["Business Administration", "Human Resource Management", "Financial Management", "Marketing Management", "Operations Management", "Project Management", "Supply Chain Management", "Strategic Management", "International Business Management", "Retail Management", "Healthcare Management", "Sports Management", "Media Management", "Entrepreneurship", "Logistics Management", "Risk Management"]
+    },
+    {
+      "name": "Any Medical",
+      "roles": ["Medicine (MBBS)", "Dentistry", "Nursing", "Pharmacy", "Physiotherapy", "Occupational Therapy", "Medical Laboratory Technology", "Radiology & Imaging", "Optometry", "Audiology", "Speech Therapy", "Dietetics & Nutrition", "Paramedical Sciences", "Hospital Administration", "Public Health", "Ayurveda", "Homeopathy", "Unani Medicine", "Veterinary Sciences"]
+    },
+    {
+      "name": "B.Tech/B.E (From Top Ranked Colleges)",
+      "roles": ["Computer Science & Engineering", "Electronics & Communication", "Electrical Engineering", "Mechanical Engineering", "Civil Engineering", "Chemical Engineering", "Information Technology", "Biotechnology", "Aerospace Engineering", "Metallurgical Engineering", "Petroleum Engineering", "Production Engineering", "Industrial Engineering", "Materials Science"]
+    },
+    {
+      "name": "IITs",
+      "roles": ["Engineering Programs", "Science Programs", "Management Programs", "Design Programs", "Research Programs", "Interdisciplinary Programs", "Dual Degree Programs", "Integrated M.Tech Programs"]
+    },
+    {
+      "name": "ITI",
+      "roles": ["Electrician", "Fitter", "Machinist", "Welder", "Plumber", "Carpenter", "Electronics Mechanic", "Computer Operator", "Diesel Mechanic", "AC & Refrigeration Technician", "Automobile Mechanic", "Turner", "Draughtsman", "Tool & Die Maker", "Wireman"]
+    },
+    {
+      "name": "Journalism/Mass Communication",
+      "roles": ["Print Journalism", "Broadcast Journalism", "Digital Media", "Public Relations", "Advertising", "Corporate Communication", "Media Management", "Film & Television Production", "Radio Production", "Photojournalism", "Content Writing", "Social Media Management", "Event Management", "Media Research", "Documentary Filmmaking"]
+    },
+    {
+      "name": "NITs",
+      "roles": ["Engineering Programs", "Science Programs", "Architecture Programs", "Management Programs", "Computer Applications", "Research Programs", "Integrated M.Tech Programs", "Dual Degree Programs"]
+    },
+    {
+      "name": "New IITs",
+      "roles": ["Computer Science & Engineering", "Electronics & Communication", "Electrical Engineering", "Mechanical Engineering", "Civil Engineering", "Chemical Engineering", "Materials Science & Engineering", "Biotechnology", "Data Science & AI", "Energy Engineering", "Metallurgical Engineering", "Systems Science"]
+    },
+    {
+      "name": "New NITs",
+      "roles": ["Computer Science & Engineering", "Electronics & Communication", "Electrical Engineering", "Mechanical Engineering", "Civil Engineering", "Chemical Engineering", "Information Technology", "Biotechnology", "Architecture", "Management Studies"]
+    },
+    {
+      "name": "Old IITs",
+      "roles": ["Computer Science & Engineering", "Electronics & Communication", "Electrical Engineering", "Mechanical Engineering", "Civil Engineering", "Chemical Engineering", "Aerospace Engineering", "Engineering Physics", "Material Science & Engineering", "Metallurgical Engineering", "Naval Architecture", "Biotechnology", "Mathematics & Computing"]
+    },
+    {
+      "name": "Old NITs",
+      "roles": ["Computer Science & Engineering", "Electronics & Communication", "Electrical Engineering", "Mechanical Engineering", "Civil Engineering", "Chemical Engineering", "Information Technology", "Biotechnology", "Mining Engineering", "Metallurgical Engineering", "Architecture", "Applied Sciences"]
+    },
+    {
+      "name": "Top Architecture and Planning Institutes",
+      "roles": ["Architecture", "Urban Planning", "Landscape Architecture", "Interior Design", "Urban Design", "Regional Planning", "Housing", "Transport Planning", "Environmental Planning", "Infrastructure Planning", "Conservation Architecture", "Sustainable Architecture"]
+    },
+    {
+      "name": "Top Dental Institutes",
+      "roles": ["General Dentistry", "Orthodontics", "Periodontics", "Prosthodontics", "Endodontics", "Oral & Maxillofacial Surgery", "Pediatric Dentistry", "Public Health Dentistry", "Oral Pathology", "Oral Medicine & Radiology", "Conservative Dentistry", "Implantology"]
+    },
+    {
+      "name": "Top Engineering Institutes",
+      "roles": ["Computer Science & Engineering", "Electronics & Communication", "Electrical Engineering", "Mechanical Engineering", "Civil Engineering", "Chemical Engineering", "Aerospace Engineering", "Biotechnology", "Information Technology", "Metallurgical Engineering", "Naval Architecture", "Mining Engineering", "Agricultural Engineering"]
+    },
+    {
+      "name": "Top Institutes",
+      "roles": ["Engineering", "Medicine", "Management", "Law", "Sciences", "Humanities", "Commerce", "Design", "Architecture", "Pharmacy", "Dental Sciences", "Agricultural Sciences", "Veterinary Sciences", "Research Programs"]
+    },
+    {
+      "name": "Top Law Institutes",
+      "roles": ["Corporate Law", "Constitutional Law", "Criminal Law", "International Law", "Intellectual Property Law", "Taxation Law", "Human Rights Law", "Environmental Law", "Media Law", "Banking Law", "Cyber Law", "Family Law", "Maritime Law", "Competition Law"]
+    },
+    {
+      "name": "Top Medical Institutes",
+      "roles": ["MBBS", "MD/MS Programs", "Super Specialty Programs", "Nursing", "Paramedical Courses", "Public Health", "Hospital Administration", "Medical Research", "Dental Sciences", "Pharmacy", "Physiotherapy", "Occupational Therapy", "Speech Therapy", "Optometry"]
+    },
+    {
+      "name": "Top Pharmacy Institutes",
+      "roles": ["Pharmaceutical Sciences", "Pharmacology", "Pharmaceutics", "Pharmaceutical Chemistry", "Pharmacognosy", "Pharmaceutical Analysis", "Clinical Pharmacy", "Pharmacy Practice", "Industrial Pharmacy", "Regulatory Affairs", "Pharmaceutical Technology", "Pharmaceutical Quality Assurance", "Pharmaceutical Biotechnology", "Pharmaceutical Marketing"]
+    },
+    {
+      "name": "Top Research Institutes",
+      "roles": ["Physical Sciences", "Biological Sciences", "Engineering Sciences", "Mathematical Sciences", "Chemical Sciences", "Environmental Sciences", "Medical Sciences", "Agricultural Sciences", "Social Sciences", "Economic Sciences", "Computer & Information Sciences", "Earth Sciences", "Space Sciences", "Materials Sciences"]
+    },
+    {
+      "name": "UG Popular Course",
+      "roles": ["B.Tech", "MBBS", "BBA", "B.Com", "B.Sc", "LLB", "BCA", "B.Arch", "B.Pharma", "B.Des", "BHM", "B.Ed", "BA", "BDS", "BAMS"]
+    },
+    {
+      "name": "Vocational-Training",
+      "roles": ["Automotive Skills", "Construction Skills", "Electronics & Hardware", "Healthcare Services", "Hospitality & Tourism", "IT & ITES Skills", "Logistics", "Manufacturing Skills", "Retail Skills", "Telecom Skills", "Textile & Apparel", "Agriculture Skills", "Beauty & Wellness", "Media & Entertainment Skills"]
+    },
+    {
+      "name": "B.A",
+      "roles": ["English Literature", "History", "Political Science", "Economics", "Psychology", "Sociology", "Geography", "Philosophy", "Journalism", "Foreign Languages", "Fine Arts", "Music", "Anthropology", "Education", "Public Administration"]
+    },
+    {
+      "name": "B.Arch",
+      "roles": ["Architecture Design", "Building Construction", "Building Materials", "Architectural Drawing", "History of Architecture", "Urban Design", "Landscape Architecture", "Interior Architecture", "Sustainable Architecture", "Housing", "Building Services", "Building Technology", "Architectural Conservation"]
+    },
+    {
+      "name": "B.B.A / B.M.S",
+      "roles": ["Marketing Management", "Finance Management", "Human Resource Management", "Operations Management", "International Business", "Entrepreneurship", "Retail Management", "Banking & Insurance", "E-Commerce", "Business Analytics", "Supply Chain Management", "Tourism & Hospitality Management", "Digital Marketing"]
+    },
+    {
+      "name": "B.Com",
+      "roles": ["Accounting", "Finance", "Banking", "Taxation", "Cost Accounting", "Business Economics", "Business Law", "Auditing", "Business Statistics", "Corporate Accounting", "Financial Markets", "Investment Management", "E-Commerce", "Insurance & Risk Management"]
+    },
+    {
+      "name": "B.Des.",
+      "roles": ["Product Design", "Graphic Design", "Fashion Design", "Interior Design", "Industrial Design", "Textile Design", "UI/UX Design", "Animation & Game Design", "Communication Design", "Furniture Design", "Ceramic Design", "Accessory Design", "Exhibition Design", "Automobile Design"]
+    },
+    {
+      "name": "B.Ed",
+      "roles": ["Elementary Education", "Secondary Education", "Special Education", "Science Education", "Mathematics Education", "Language Education", "Social Science Education", "Environmental Education", "Educational Technology", "Guidance & Counseling", "Education Management", "Inclusive Education"]
+    },
+    {
+      "name": "B.El.Ed",
+      "roles": ["Elementary Teaching", "Primary School Teaching", "Education Administration", "Curriculum Development", "Child Development & Pedagogy", "Language Education", "Mathematics Education", "Environmental Studies", "Arts Education", "Social Science Education", "Inclusive Education"]
+    },
+    {
+      "name": "B.P.Ed",
+      "roles": ["Physical Education Teaching", "Sports Training", "Fitness Training", "Health Education", "Sports Management", "Recreation Management", "Athletic Training", "Sports Psychology", "Sports Physiology", "Adventure Sports", "Yoga Education", "Sports Biomechanics"]
+    },
+    {
+      "name": "B.Pharma",
+      "roles": ["Pharmaceutics", "Pharmaceutical Chemistry", "Pharmacology", "Pharmacognosy", "Pharmaceutical Analysis", "Clinical Pharmacy", "Regulatory Affairs", "Quality Assurance", "Drug Design", "Hospital Pharmacy", "Industrial Pharmacy", "Pharmaceutical Biotechnology", "Pharmacovigilance"]
+    },
+    {
+      "name": "B.Sc",
+      "roles": ["Physics", "Chemistry", "Mathematics", "Biology", "Computer Science", "Information Technology", "Statistics", "Electronics", "Biotechnology", "Microbiology", "Biochemistry", "Environmental Science", "Geology", "Nursing", "Agriculture", "Home Science", "Forestry", "Food Technology", "Animation & Multimedia"]
+    },
+    {
+      "name": "B.Tech/B.E.",
+      "roles": ["Computer Science & Engineering", "Electronics & Communication", "Electrical Engineering", "Mechanical Engineering", "Civil Engineering", "Chemical Engineering", "Information Technology", "Biotechnology", "Aerospace Engineering", "Metallurgical Engineering", "Petroleum Engineering", "Production Engineering", "Industrial Engineering", "Marine Engineering", "Mining Engineering", "Agricultural Engineering"]
+    },
+    {
+      "name": "B.U.M.S",
+      "roles": ["Unani Medicine", "Ilmul Advia (Pharmacology)", "Moalejat (Medicine)", "Ilmul Jarahat (Surgery)", "Amraz-e-Niswan (Gynecology)", "Ilaj bit Tadbeer (Regimenal Therapy)", "Tahaffuzi wa Samaji Tibb (Preventive & Social Medicine)", "Ilmul Atfal (Pediatrics)", "Amraz-e-Jild wa Tazeeniyat (Dermatology & Cosmetology)"]
+    },
+    {
+      "name": "BAMS",
+      "roles": ["Ayurvedic Medicine", "Dravyaguna (Ayurvedic Pharmacology)", "Kaya Chikitsa (Internal Medicine)", "Shalya Tantra (Surgery)", "Shalakya Tantra (ENT & Ophthalmology)", "Prasuti Tantra (Obstetrics & Gynecology)", "Kaumarbhritya (Pediatrics)", "Agad Tantra (Toxicology)", "Panchakarma (Detoxification Therapy)", "Swasthavritta (Preventive Medicine)"]
+    },
+    {
+      "name": "BCA",
+      "roles": ["Software Development", "Web Development", "Database Management", "Computer Networking", "Mobile Application Development", "System Analysis & Design", "Computer Graphics", "Artificial Intelligence", "Data Science", "Cloud Computing", "Cybersecurity", "Internet of Things", "Digital Marketing"]
+    },
+    {
+      "name": "BDS",
+      "roles": ["General Dentistry", "Orthodontics", "Periodontics", "Prosthodontics", "Endodontics", "Oral Surgery", "Pediatric Dentistry", "Public Health Dentistry", "Oral Pathology", "Oral Medicine & Radiology", "Dental Implantology", "Cosmetic Dentistry"]
+    },
+    {
+      "name": "BFA",
+      "roles": ["Painting", "Sculpture", "Applied Art", "Printmaking", "Photography", "Animation", "Ceramics", "Visual Communication", "Art History", "Textile Design", "Mural Design", "Portraiture", "Digital Art", "Installation Art"]
+    },
+    {
+      "name": "BHM",
+      "roles": ["Front Office Operations", "Food & Beverage Service", "Food Production", "Housekeeping Operations", "Hotel Engineering", "Accommodation Management", "Tourism Management", "Event Management", "Club Management", "Resort Management", "Cruise Ship Management", "Restaurant Management", "Catering Management"]
+    },
+    {
+      "name": "BHMCT",
+      "roles": ["Hotel Administration", "Food & Beverage Management", "Hospitality Operations", "Accommodation Management", "Front Office Management", "Food Production Management", "Catering Technology", "Tourism Management", "Event Management", "Facility Management", "Hospitality Marketing", "Revenue Management", "Hospitality Finance"]
+    },
+    {
+      "name": "BHMS",
+      "roles": ["Homeopathic Medicine", "Materia Medica", "Organon of Medicine", "Homeopathic Pharmacy", "Practice of Medicine", "Surgery", "Obstetrics & Gynecology", "Pediatrics", "Community Medicine", "Repertory", "Psychiatry", "Dermatology", "Homeopathic Case Taking & Management"]
+    },
+    {
+      "name": "BVSC",
+      "roles": ["Veterinary Medicine", "Veterinary Surgery", "Animal Husbandry", "Veterinary Parasitology", "Veterinary Microbiology", "Veterinary Pathology", "Veterinary Public Health", "Animal Nutrition", "Animal Genetics & Breeding", "Poultry Science", "Livestock Production Management", "Wildlife Medicine", "Veterinary Radiology"]
+    },
+    {
+      "name": "Diploma",
+      "roles": ["Mechanical Engineering", "Civil Engineering", "Electrical Engineering", "Electronics Engineering", "Computer Engineering", "Information Technology", "Chemical Engineering", "Automobile Engineering", "Mining Engineering", "Textile Technology", "Architecture", "Pharmacy", "Hotel Management", "Fashion Design", "Commercial Art", "Interior Design", "Agriculture", "Medical Laboratory Technology", "Nursing"]
+    },
+    {
+      "name": "ITI Certification",
+      "roles": ["Electrician", "Fitter", "Machinist", "Welder", "Plumber", "Carpenter", "Electronics Mechanic", "Computer Operator", "Diesel Mechanic", "AC & Refrigeration Technician", "Automobile Mechanic", "Turner", "Draughtsman", "Tool & Die Maker", "Wireman", "Mason", "Painter", "Sheet Metal Worker"]
+    },
+    {
+      "name": "LLB",
+      "roles": ["Corporate Law", "Criminal Law", "Constitutional Law", "International Law", "Civil Law", "Intellectual Property Law", "Tax Law", "Human Rights Law", "Environmental Law", "Cyber Law", "Family Law", "Labour Law", "Banking Law", "Media & Entertainment Law", "Real Estate Law"]
+    },
+    {
+      "name": "MBBS",
+      "roles": ["General Medicine", "General Surgery", "Pediatrics", "Obstetrics & Gynecology", "Orthopedics", "Ophthalmology", "ENT", "Dermatology", "Psychiatry", "Radiology", "Anesthesiology", "Pathology", "Community Medicine", "Forensic Medicine", "Emergency Medicine"]
+    },
+    {
+      "name": "Other Graduate",
+      "roles": ["Bachelor of Social Work", "Bachelor of Library Science", "Bachelor of Physical Education", "Bachelor of Tourism Administration", "Bachelor of Fine Arts", "Bachelor of Fisheries Science", "Bachelor of Performing Arts", "Bachelor of Mass Communication", "Bachelor of Business Studies", "Bachelor of Vocational Studies", "Bachelor of Aviation", "Bachelor of Fashion Technology", "Bachelor of Physiotherapy", "Bachelor of Occupational Therapy", "Bachelor of Speech Therapy", "Bachelor of Audiology"]
+    }
+  ]

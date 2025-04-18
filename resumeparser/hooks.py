@@ -144,32 +144,40 @@ app_license = "mit"
 # ---------------
 
 # scheduler_events = {
-# 	"all": [
-# 		"resumeparser.tasks.all"
-# 	],
-# 	"daily": [
-# 		"resumeparser.tasks.daily"
-# 	],
-# 	"hourly": [
-# 		"resumeparser.tasks.hourly"
-# 	],
-# 	"weekly": [
-# 		"resumeparser.tasks.weekly"
-# 	],
-# 	"monthly": [
-# 		"resumeparser.tasks.monthly"
-# 	],
+	# "all": [
+	# 	"resumeparser.tasks.all"
+	# ],
+	# "daily": [
+	# 	"resumeparser.tasks.daily"
+	# ],
+	# "hourly": [
+	# 	"resumeparser.tasks.hourly"
+	# ],
+	# "weekly": [
+	# 	"resumeparser.tasks.weekly"
+	# ],
+	# "monthly": [
+	# 	"resumeparser.tasks.monthly"
+	# ],
+# }
+
+
+# scheduler_events = {
+#     "cron": {
+#         "*/1 * * * *": [
+#             "resumeparser.tasks.resume_scanner"
+#         ]
+#     },
 # }
 
 
 scheduler_events = {
     "cron": {
-        "*/1 * * * *": [
+        "0 0 * * *": [  # Every day at 12:00 AM
             "resumeparser.tasks.resume_scanner"
         ]
     }
 }
-
 
 
 # Testing

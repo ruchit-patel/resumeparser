@@ -50,17 +50,19 @@ class Resume(Document):
 		client = genai.Client(api_key=api_key)
 
 		prompt = """
-			You are an AI assistant specializing in structured data extraction. Given a PDF resume, extract relevant information and return it as a structured JSON object. Follow the exact schema provided below. If certain details are missing, leave them as null or empty arrays but do not infer information. Ensure the extracted text retains proper formatting for addresses, descriptions, and long text fields.
-
-			Extraction Guidelines
-			Names & Contact Info: Extract names exactly as written. Validate email and phone numbers if possible.
-			Gender: For gender, if not specified try to guess it from the name, or pronounces used in the resume. If you can't infer, set it to null.
-			Education & Experience: Extract date ranges and convert them to the format YYYY-MM-DD. If the dates are incomplete and only month and year provided, round off the day to first day of that month. If only year is provided round of month and day to 1st Jan of that year. If you cant parse a date, then return null. If the candidate is still working at a company, set "current_position": true and "to": null. If "current_position" is false, extract the "to" date.
-			Projects, Skills & Certifications: Ensure the skills are categorized correctly, and certifications include issue dates if available. Extract relevant projects, ensure descriptions are clean, and list all associated skills.
-			Skills: Categorize them as Technical or Soft. and make sure they are unique.
-			Accomplishments: If URLs are mentioned, include them; otherwise, leave them empty.
-			Formatting: Maintain proper text case and avoid unwanted line breaks.
-
+			You are an AI assistant specialized in extracting structured information from resumes. Given a scanned or digital resume, extract the data into a structured JSON object strictly following the schema below. Use the provided resume content to fill fields with direct information. For missing fields, intelligently infer values using strong contextual clues from the resume content. If inference is not possible with high confidence, leave the field as null or an empty array. Do not include any explanation or additional text.
+			Advanced Extraction Rules:
+			Name & Contact Information: Extract the full name, email, and mobile number exactly as they appear. Validate formats where possible.
+			Gender: Predict the gender as "Male", "Female", or "Other" using the full name and contextual resume content.
+			Date of Birth & Age: If the date of birth is available, use it to calculate the age by comparing it with today’s date. If only the age is available, extract it directly. If neither is found, set both as null.
+			Total Experience: Calculate the total experience in years by summing all the durations from the experience entries. If a job is marked as current using keywords like "Present", "Currently Working", "-", "Ongoing", etc., use the current date as the end date to compute the duration.
+			Current Position: If the candidate is currently working somewhere, set current_position = true and "to": null in that entry.
+			Role: Determine the most recent role or position title from the latest job experience and use it as the candidate’s primary role.
+			Address & City: If the address is partially mentioned, extract the city from any part of the resume and include it in both the city and address fields where appropriate.
+			Education & Dates: Convert all date ranges to "YYYY-MM-DD" format. If only month and year are present, assume the first of that month. If only year is available, default to "01-01" of that year. If parsing fails, return null.
+			Skills: Extract unique skills and categorize them as either "Technical" or "Soft".
+			Certificates, Projects, Accomplishments: Clean and extract descriptions, include relevant URLs and issue dates where mentioned.
+			Return Format: Return the extracted data strictly in the following JSON format:
 			{
 				"candidate_name": "string",
 				"date_of_birth": "YYYY-MM-DD",
@@ -69,76 +71,101 @@ class Resume(Document):
 				"mobile_number": "string",
 				"email": "string",
 				"city": "string",
+				"age": numeric,
+				"industry": "Information Technology (IT)" | "Finance & Banking" | "Healthcare & Pharmaceuticals" | "Manufacturing & Industrial Production" | "Retail & E-commerce" | "Education & E-Learning" | "Telecommunications & Media" | "Hospitality & Tourism" | "Energy & Utilities" | "Transportation & Logistics" | "Real Estate & Construction" | "Agriculture & Agribusiness" | "Automotive & Aerospace" | "Consumer Goods & Services" | "Entertainment & Leisure" | "Legal & Compliance" | "Insurance & Risk Management" | "Mining & Natural Resources" | "Professional Services" | "Public Sector & Government" | "Technology Hardware & Equipment" | "Semiconductors & Electronics" | "Renewable Energy & Sustainability" | "Cybersecurity & Data Privacy" | "Artificial Intelligence & Machine Learning" | "Blockchain & Fintech" | "Sports & Recreation" | "Art & Culture" | "Nonprofit & Social Impact"
+				"total_experience": numeric,
+				"role": "string",
 				"education": [
 					{
-						"school_college_name": "string",
-						"school_college_city": "string",
-						"course_name": "string",
-						"specialization": "string",
-						"from": "YYYY-MM-DD",
-						"to": "YYYY-MM-DD",
-						"evaluation_score": "string"
+					"school_college_name": "string",
+					"school_college_city": "string",
+					"course_name": "string",
+					"specialization": "string",
+					"from": "YYYY-MM-DD",
+					"to": "YYYY-MM-DD",
+					"evaluation_score": "string"
 					}
 				],
 				"experience": [
 					{
-						"company_name": "string",
-						"role_position": "string",
-						"from": "YYYY-MM-DD",
-						"to": "YYYY-MM-DD | null",
-						"current_position": true | false,
-						"location": "string",
-						"job_description": "string",
-						"url": "string",
-						"project_department": "string"
+					"company_name": "string",
+					"role_position": "string",
+					"from": "YYYY-MM-DD",
+					"to": "YYYY-MM-DD | null",
+					"current_position": true | false,
+					"location": "string",
+					"job_description": "string",
+					"url": "string",
+					"project_department": "string"
 					}
 				],
 				"projects": [
 					{
-						"project_name": "string",
-						"description": "string",
-						"url": "string"
+					"project_name": "string",
+					"description": "string",
+					"url": "string"
 					}
 				],
 				"skills": [
 					{
-						"skill_name": "string",
-						"skill_type": "Technical | Soft"
+					"skill_name": "string",
+					"skill_type": "Technical | Soft"
 					}
 				],
 				"certificates": [
 					{
-						"certificate_name": "string",
-						"provider": "string",
-						"issue_date": "YYYY-MM-DD",
-						"url": "string",
-						"description": "string"
+					"certificate_name": "string",
+					"provider": "string",
+					"issue_date": "YYYY-MM-DD",
+					"url": "string",
+					"description": "string"
 					}
 				],
 				"accomplishments": [
 					{
-						"accomplishment": "string",
-						"when": "YYYY-MM-DD",
-						"url": "string",
-						"description": "string"
+					"accomplishment": "string",
+					"when": "YYYY-MM-DD",
+					"url": "string",
+					"description": "string"
 					}
 				]
 			}
-			If you dont find any of the above fields in the resume, then return null or empty array for that field, even for the dates. Do not include any other information or explanation in the response. Just return the JSON object as per the schema provided above. Do not include any additional text or comments. The JSON should be valid and well-structured. If you encounter any errors while processing the resume, return an error message in the following format:
+		If any error occurs during extraction, return the response in the following format:
 			{
-				"error": "Error message here"
+			"error": "Error message here"
 			}
-			Extract and return the JSON in this exact format. Do not include additional information beyond what is specified.
+		Important: Do not infer or assume values unless strong textual or contextual evidence is found. Do not include any additional text or explanation outside the JSON response. The output should be a valid JSON object only.
 		"""
-		response = client.models.generate_content(
-		model="gemini-1.5-flash-8b",
-		contents=[
-			types.Part.from_bytes(
-				data=filepath.read_bytes(),
-				mime_type='application/pdf',
-			),
-			prompt])
-		print(response.text)
+		max_retries = 3
+		attempt = 0
+		success = False
+
+		while attempt < max_retries and not success:
+			try:
+				response = client.models.generate_content(
+					model="gemini-1.5-flash-8b",
+					contents=[
+						types.Part.from_bytes(
+							data=filepath.read_bytes(),
+							mime_type='application/pdf',
+						),
+						prompt
+					]
+				)
+				print(response.text)
+				success = True  # Exit the loop if successful
+
+			except Exception as e:
+				attempt += 1
+				if attempt == max_retries:
+					log = frappe.get_doc({
+						"doctype": "Error Log",
+						"method": f"Gemini API call Error Attempt :{attempt}",
+						"error": str(e)
+					})
+					log.insert(ignore_permissions=True)
+					frappe.db.commit()
+					frappe.throw(f"Error during Gemini API call after {max_retries} attempts: {str(e)}")
 		# Remove unwanted characters from the response
 		response_text = response.text.strip()
 
@@ -152,14 +179,11 @@ class Resume(Document):
 
 		try:
 			data = json.loads(response_text)  # Convert to dictionary
-			print("-------------------------------------------------")
 			print(data)
-			print("-------------------------------------------------")
 			self.extracted_json = json.dumps(data, indent=4)  # Store as formatted JSON string
 			self.candidate_name = data.get("candidate_name")
 		except json.JSONDecodeError:
 			frappe.throw("Invalid JSON response from Gemini API.")
-
 
 	def after_insert(self):
 		"""Update the resume fields in OpenSearch"""
