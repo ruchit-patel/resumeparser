@@ -380,5 +380,19 @@ def seach_certificates(q:str):
 
 
 
+@frappe.whitelist(allow_guest=True)
+# for update page
+def seach_candidate_skills(q:str):
+    query = skill_search_query(q)
+    response = open_search_query_executor(query)
+    suggestions = {"skills": []}
+    if 'aggregations' in response:
+        # Extract skills
+        skill_buckets = response['aggregations']['skill_suggestions']['matching_skills']['skills']['buckets']
+        return [bucket['key'] for bucket in skill_buckets]
+    return []
+
+
+
 
 

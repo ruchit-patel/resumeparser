@@ -115,9 +115,10 @@ const UpdateProfile = () => {
   const addSkill = (type) => {
     setFormData(prev => ({
       ...prev,
-      skills: [...prev.skills, { skill_name: "", skill_type: type }]
+      skills: [{ skill_name: "", skill_type: type }, ...prev.skills]
     }));
   };
+  
 
   const addCertificate = () => {
     setFormData(prev => ({
@@ -243,11 +244,11 @@ const UpdateProfile = () => {
                         </div>
                         <div>
                           <Label htmlFor="city">City</Label>
-                          <Input
-                            id="city"
-                            value={formData.city}
-                            onChange={(e) => setFormData(prev => ({ ...prev, city: e.target.value }))}
-                            className="mt-1"
+                          <AutocompleteInput 
+                              placeholder={"Add City"} 
+                              inputValue={formData.city} 
+                              setInputValue={(value) => setFormData(prev => ({ ...prev, city: value }))}
+                              apiEndPoint = {"api/method/resumeparser.apis.search_apis.seach_candidate_location"}
                           />
                         </div>
                         <div className="md:col-span-2">
@@ -317,15 +318,29 @@ const UpdateProfile = () => {
                     <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-4">
                       {formData.skills.map((skill, index) => (
                         <div key={index} className="flex gap-2 items-center">
-                          <AutocompleteInput 
-                               placeholder={`${skill.skill_type} Skill`}
-                              inputValue={skill.skill_name} 
-                              setInputValue={(value) => {
-                                const newSkills = [...formData.skills];
-                                newSkills[index] = { ...skill, skill_name: value };
-                                setFormData(prev => ({ ...prev, skills: newSkills }));
-                              }}
-                              apiEndPoint = {"api/method/resumeparser.apis.search_apis.seach_candidate_role"}
+
+                              {/* <AutocompleteInput 
+                                placeholder={"Add Role"} 
+                                inputValue={skill.skill_name} 
+                                setInputValue={(value) => {
+                                  const newSkills = [...formData.skills];
+                                  newSkills[index] = { ...skill, skill_name:value };
+                                  setFormData(prev => ({ ...prev, skills: newSkills }));
+                                }}
+                                apiEndPoint = {"api/method/resumeparser.apis.search_apis.seach_candidate_skills"}
+                              /> */}
+
+
+                          <Input
+                            placeholder={`${skill.skill_type} Skill`}
+                            value={skill.skill_name}
+                            onChange={(e) => {
+                              const newSkills = [...formData.skills];
+                              newSkills[index] = { ...skill, skill_name: e.target.value };
+                              setFormData(prev => ({ ...prev, skills: newSkills }));
+                            }}
+                            className="flex-1"
+                            readOnly={!isFormVisible && skill.skill_name !== ""}
                           />
                           {isFormVisible && (
                             <Button
@@ -370,7 +385,19 @@ const UpdateProfile = () => {
                             </div>
                             <div>
                               <Label>Role/Position</Label>
-                              <Input
+ 
+                              <AutocompleteInput 
+                                placeholder={"Add Role"} 
+                                inputValue={exp.role_position} 
+                                setInputValue={(value) => {
+                                  const newExp = [...formData.experience];
+                                  newExp[index] = { ...exp, role_position: value };
+                                  setFormData(prev => ({ ...prev, experience: newExp }));
+                                }}
+                                apiEndPoint = {"api/method/resumeparser.apis.search_apis.seach_candidate_role"}
+                              />
+
+                              {/* <Input
                                 value={exp.role_position}
                                 onChange={(e) => {
                                   const newExp = [...formData.experience];
@@ -378,7 +405,7 @@ const UpdateProfile = () => {
                                   setFormData(prev => ({ ...prev, experience: newExp }));
                                 }}
                                 className="mt-1"
-                              />
+                              /> */}
                             </div>
                             <div>
                               <Label>Start Date</Label>
