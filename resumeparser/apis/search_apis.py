@@ -324,7 +324,8 @@ def candidate_detail():
                 },
                 "resume": {
                     "link": resume_doc.get("resume_file"),
-                    "lastUpdate": human_readable_date_diff(resume_doc.get("modified"))
+                    "lastUpdate": human_readable_date_diff(resume_doc.get("modified")),
+                    "resume_approval": bool(resume_doc.get("approve_status")),
                 }
             }
 

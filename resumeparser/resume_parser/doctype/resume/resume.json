@@ -8,7 +8,10 @@
  "field_order": [
   "resume_file",
   "extracted_json",
-  "candidate_name"
+  "candidate_name",
+  "upload_by",
+  "approved_by",
+  "approve_status"
  ],
  "fields": [
   {
@@ -27,12 +30,31 @@
    "fieldname": "candidate_name",
    "fieldtype": "Data",
    "label": "Candidate Name"
+  },
+  {
+   "default": "Menual",
+   "fieldname": "upload_by",
+   "fieldtype": "Select",
+   "label": "Upload By",
+   "options": "Menual\nAuto"
+  },
+  {
+   "fieldname": "approved_by",
+   "fieldtype": "Link",
+   "label": "Approved By",
+   "options": "User"
+  },
+  {
+   "default": "0",
+   "fieldname": "approve_status",
+   "fieldtype": "Check",
+   "label": "Approve Status"
   }
  ],
  "grid_page_length": 50,
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2025-04-10 15:31:29.432825",
+ "modified": "2025-04-19 10:53:25.189067",
  "modified_by": "Administrator",
  "module": "Resume Parser",
  "name": "Resume",

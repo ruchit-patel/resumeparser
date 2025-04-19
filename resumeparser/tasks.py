@@ -74,7 +74,8 @@ def resume_scanner():
 
             resume_doc = frappe.get_doc({
                 "doctype": "Resume",
-                "resume_file": uploaded_file.file_url
+                "resume_file": uploaded_file.file_url,
+                "upload_by":"Auto"
             })
             resume_doc.insert(ignore_permissions=True)
 

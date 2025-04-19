@@ -11,10 +11,12 @@ import { Eye, Download, FileText, Clock, MessageSquare,
 
 import { cn } from "@/lib/utils"
 import { useLocation } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom';
 
 const CandidateCard = ({ candidate, onSelect, selected = false }) => {
   const [saved, setSaved] = useState(false);
   const location = useLocation();
+  const navigate = useNavigate();
 
   const handleCheckboxChange = (checked) => {
     if (onSelect) {
@@ -177,6 +179,8 @@ const CandidateCard = ({ candidate, onSelect, selected = false }) => {
                 <span className="cursor-pointer hover:underline">Save</span>
                 <span className="text-gray-300">|</span>
                 <span className="cursor-pointer hover:underline">Share</span>
+                <span className="text-gray-300">|</span>
+                <span className="cursor-pointer hover:underline" onClick={()=>{navigate(`/resume_search/update/${candidate.id}`)}} >Edit</span>
               </div>
             </div>
 
