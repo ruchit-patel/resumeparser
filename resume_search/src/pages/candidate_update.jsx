@@ -7,7 +7,8 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Textarea } from "@/components/ui/textarea";
 import { useParams, useNavigate } from 'react-router-dom';
 import { config } from "@/config";
-
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import AutocompleteInput from '@/components/common/AutoCompleteInputComponent';
 const isFormVisible = true; // Can be moved to a config file or made dynamic
 
 const UpdateProfile = () => {
@@ -216,12 +217,19 @@ const UpdateProfile = () => {
                         </div>
                         <div>
                           <Label htmlFor="gender">Gender</Label>
-                          <Input
-                            id="gender"
+                          <Select
                             value={formData.gender}
-                            onChange={(e) => setFormData(prev => ({ ...prev, gender: e.target.value }))}
-                            className="mt-1"
-                          />
+                            onValueChange={(value) => setFormData(prev => ({ ...prev, gender: value }))}
+                          >
+                            <SelectTrigger id="gender" className="mt-1">
+                              <SelectValue placeholder="Select gender" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="male">Male</SelectItem>
+                              <SelectItem value="female">Female</SelectItem>
+                              <SelectItem value="other">Other</SelectItem>
+                            </SelectContent>
+                          </Select>
                         </div>
                         <div>
                           <Label htmlFor="date_of_birth">Date of Birth</Label>
@@ -261,20 +269,20 @@ const UpdateProfile = () => {
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <div>
                           <Label htmlFor="industry">Industry</Label>
-                          <Input
-                            id="industry"
-                            value={formData.industry}
-                            onChange={(e) => setFormData(prev => ({ ...prev, industry: e.target.value }))}
-                            className="mt-1"
+                          <AutocompleteInput 
+                              placeholder={"Add Industry"} 
+                              inputValue={formData.industry} 
+                              setInputValue={(value) => setFormData(prev => ({ ...prev, industry: value }))}
+                              apiEndPoint = {"api/method/resumeparser.apis.search_apis.seach_candidate_industry"}
                           />
                         </div>
                         <div>
                           <Label htmlFor="role">Role</Label>
-                          <Input
-                            id="role"
-                            value={formData.role}
-                            onChange={(e) => setFormData(prev => ({ ...prev, role: e.target.value }))}
-                            className="mt-1"
+                          <AutocompleteInput 
+                              placeholder={"Add Role"} 
+                              inputValue={formData.role} 
+                              setInputValue={(value) => setFormData(prev => ({ ...prev, role: value }))}
+                              apiEndPoint = {"api/method/resumeparser.apis.search_apis.seach_candidate_role"}
                           />
                         </div>
                         <div>
@@ -309,16 +317,15 @@ const UpdateProfile = () => {
                     <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-4">
                       {formData.skills.map((skill, index) => (
                         <div key={index} className="flex gap-2 items-center">
-                          <Input
-                            placeholder={`${skill.skill_type} Skill`}
-                            value={skill.skill_name}
-                            onChange={(e) => {
-                              const newSkills = [...formData.skills];
-                              newSkills[index] = { ...skill, skill_name: e.target.value };
-                              setFormData(prev => ({ ...prev, skills: newSkills }));
-                            }}
-                            className="flex-1"
-                            readOnly={!isFormVisible && skill.skill_name !== ""}
+                          <AutocompleteInput 
+                               placeholder={`${skill.skill_type} Skill`}
+                              inputValue={skill.skill_name} 
+                              setInputValue={(value) => {
+                                const newSkills = [...formData.skills];
+                                newSkills[index] = { ...skill, skill_name: value };
+                                setFormData(prev => ({ ...prev, skills: newSkills }));
+                              }}
+                              apiEndPoint = {"api/method/resumeparser.apis.search_apis.seach_candidate_role"}
                           />
                           {isFormVisible && (
                             <Button

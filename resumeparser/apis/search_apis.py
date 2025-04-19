@@ -142,6 +142,16 @@ def seach_candidate_industry(q:str):
 
 
 @frappe.whitelist(allow_guest=True)
+def seach_candidate_role(q:str):
+    file_path = frappe.get_app_path('resumeparser', 'apis', 'education_departments.json')
+    role_data = read_courses_from_json(file_path)
+    all_roles = [role for dept in role_data for role in dept["roles"]]
+    filter_data = list(filter(lambda a: q in a, all_roles))
+    return filter_data
+
+
+
+@frappe.whitelist(allow_guest=True)
 def seach_candidate_company(q:str):
     query = companies_search_query(q)
     response = open_search_query_executor(query)
