@@ -9,6 +9,8 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { config } from "@/config";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import AutocompleteInput from '@/components/common/AutoCompleteInputComponent';
+import CustomSelectionAddInput from "@/components/common/CustomSelectionAddInput";
+import MultiAutoSuggations from "@/components/common/MultiAutoSuggationsComponent";
 const isFormVisible = true; // Can be moved to a config file or made dynamic
 
 const UpdateProfile = () => {
@@ -318,19 +320,6 @@ const UpdateProfile = () => {
                     <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-4">
                       {formData.skills.map((skill, index) => (
                         <div key={index} className="flex gap-2 items-center">
-
-                              {/* <AutocompleteInput 
-                                placeholder={"Add Role"} 
-                                inputValue={skill.skill_name} 
-                                setInputValue={(value) => {
-                                  const newSkills = [...formData.skills];
-                                  newSkills[index] = { ...skill, skill_name:value };
-                                  setFormData(prev => ({ ...prev, skills: newSkills }));
-                                }}
-                                apiEndPoint = {"api/method/resumeparser.apis.search_apis.seach_candidate_skills"}
-                              /> */}
-
-
                           <Input
                             placeholder={`${skill.skill_type} Skill`}
                             value={skill.skill_name}
@@ -396,16 +385,6 @@ const UpdateProfile = () => {
                                 }}
                                 apiEndPoint = {"api/method/resumeparser.apis.search_apis.seach_candidate_role"}
                               />
-
-                              {/* <Input
-                                value={exp.role_position}
-                                onChange={(e) => {
-                                  const newExp = [...formData.experience];
-                                  newExp[index] = { ...exp, role_position: e.target.value };
-                                  setFormData(prev => ({ ...prev, experience: newExp }));
-                                }}
-                                className="mt-1"
-                              /> */}
                             </div>
                             <div>
                               <Label>Start Date</Label>
@@ -489,14 +468,15 @@ const UpdateProfile = () => {
                             </div>
                             <div>
                               <Label>Course Name</Label>
-                              <Input
-                                value={edu.course_name}
-                                onChange={(e) => {
+                              <AutocompleteInput 
+                                placeholder={"Add Course Name"} 
+                                inputValue={edu.course_name || ''} 
+                                setInputValue={(value) => {
                                   const newEdu = [...formData.education];
-                                  newEdu[index] = { ...edu, course_name: e.target.value };
+                                  newEdu[index] = { ...edu, course_name: value };
                                   setFormData(prev => ({ ...prev, education: newEdu }));
                                 }}
-                                className="mt-1"
+                                apiEndPoint = {"api/method/resumeparser.apis.search_apis.seach_candidate_courses"}
                               />
                             </div>
                             <div>

@@ -29,11 +29,11 @@ const Header = () => {
                 Search Job & Respose
               </button>
 
-              <button
+              {/* <button
                 onClick={() => navigate('/resume_search/results')}
                 className="border-b-2 border-blue-500 text-gray-900 px-1 pt-1 text-sm font-medium">
                 ResDesk
-              </button>
+              </button> */}
               
             </nav>
           </div>

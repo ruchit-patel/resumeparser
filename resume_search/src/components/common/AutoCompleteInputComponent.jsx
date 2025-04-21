@@ -33,15 +33,7 @@ const AutocompleteInput = ({ placeholder, inputValue, setInputValue, apiEndPoint
     setSelectedIndex(-1);
   };
 
-  useEffect(() => {
-    if (inputValue.trim()) {
-      getSuggestions(inputValue);
-    } else {
-      setSuggestions([]);
-      setShowSuggestions(false);
-      setLastFetchedQuery("");
-    }
-  }, [inputValue]);
+  // Removed automatic API call on inputValue change to prevent suggestions for pre-filled data
 
   useEffect(() => {
     const handleClickOutside = (e) => {
@@ -76,6 +68,11 @@ const AutocompleteInput = ({ placeholder, inputValue, setInputValue, apiEndPoint
       selectOption(suggestions[selectedIndex]);
     } else if (e.key === "Escape") {
       setShowSuggestions(false);
+    } else {
+      // Only fetch suggestions when user is typing
+      if (inputValue.trim()) {
+        getSuggestions(inputValue);
+      }
     }
   };
 
@@ -85,8 +82,22 @@ const AutocompleteInput = ({ placeholder, inputValue, setInputValue, apiEndPoint
         ref={inputRef}
         type="text"
         value={inputValue}
-        onChange={(e) => setInputValue(e.target.value)}
-        onClick={() => getSuggestions(inputValue)}
+        onChange={(e) => {
+          setInputValue(e.target.value);
+          // Only fetch suggestions when user is typing
+          if (e.target.value.trim()) {
+            getSuggestions(e.target.value);
+          } else {
+            setSuggestions([]);
+            setShowSuggestions(false);
+          }
+        }}
+        onClick={() => {
+          // Only fetch suggestions on click if there's text and user is actively interacting
+          if (inputValue.trim()) {
+            getSuggestions(inputValue);
+          }
+        }}
         onKeyDown={handleKeyDown}
         placeholder={placeholder}
         className="w-full"
