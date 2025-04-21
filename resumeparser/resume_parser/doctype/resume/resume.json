@@ -32,11 +32,11 @@
    "label": "Candidate Name"
   },
   {
-   "default": "Menual",
+   "default": "Manual",
    "fieldname": "upload_by",
    "fieldtype": "Select",
    "label": "Upload By",
-   "options": "Menual\nAuto"
+   "options": "Manual\nAuto"
   },
   {
    "fieldname": "approved_by",
@@ -54,7 +54,7 @@
  "grid_page_length": 50,
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2025-04-19 10:53:25.189067",
+ "modified": "2025-04-21 11:34:31.830385",
  "modified_by": "Administrator",
  "module": "Resume Parser",
  "name": "Resume",

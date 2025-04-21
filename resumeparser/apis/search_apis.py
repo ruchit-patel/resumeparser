@@ -61,7 +61,7 @@ def seach_keywords(q: str):
         skill_buckets = response['aggregations']['skill_suggestions']['matching_skills']['skills']['buckets']
         suggestions['skills'] = [bucket['key'] for bucket in skill_buckets]
         
-        # Extract designations
+    #     # Extract designations
         designation_buckets = response['aggregations']['designation_suggestions']['matching_designations']['designations']['buckets']
         suggestions['designations'] = [bucket['key'] for bucket in designation_buckets]
         
@@ -69,10 +69,7 @@ def seach_keywords(q: str):
         company_buckets = response['aggregations']['company_suggestions']['matching_companies']['companies']['buckets']
         suggestions['companies'] = [bucket['key'] for bucket in company_buckets]
     
-        print([(item, key) for key, values in suggestions.items() for item in values])
-        return [(item, key) for key, values in suggestions.items() for item in values]
-    
-    return None
+    return [(item, key) for key, values in suggestions.items() for item in values]
 
 @frappe.whitelist(allow_guest=True)
 # tuple in list
@@ -394,5 +391,16 @@ def seach_candidate_skills(q:str):
 
 
 
+@frappe.whitelist(allow_guest=True)
+def seach_candidate_courses(q:str):
+    file_path = frappe.get_app_path('resumeparser', 'apis', 'education_courses.json')
+    course_data = read_courses_from_json(file_path)
+    all_roles = [role for dept in course_data for role in dept["roles"]]
+    filter_data = list(filter(lambda a: q in a, all_roles))
+    return filter_data
+    
 
-
+@frappe.whitelist(allow_guest=True)
+def all_users():
+    users = frappe.get_all('User', fields=["name", "email"])
+    return users

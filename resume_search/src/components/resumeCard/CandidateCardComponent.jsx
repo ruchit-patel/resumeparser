@@ -6,8 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Card, CardContent } from "@/components/ui/card";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { Check, Copy } from "lucide-react";
+import ShareComponent from "@/components/common/ShareComponent";
 import { 
   Bookmark, 
   Phone, 
@@ -25,16 +24,7 @@ const CandidateCard = ({ candidate, onSelect, selected = false }) => {
   const navigate = useNavigate();
   const location = useLocation();
   const [shareDialogOpen, setShareDialogOpen] = useState(false);
-  const [copied, setCopied] = useState(false);
-  
-  // Generate shareable URL
-  const shareableUrl = `${window.location.origin}${location.pathname}?candidate=${candidate.id}`;
-  
-  const handleCopyClick = () => {
-    navigator.clipboard.writeText(shareableUrl);
-    setCopied(true);
-    setTimeout(() => setCopied(false), 2000);
-  };
+
 
   const handleCheckboxChange = (checked) => {
     if (onSelect) {
@@ -219,36 +209,14 @@ const CandidateCard = ({ candidate, onSelect, selected = false }) => {
         </CardContent>
       </Card>
       
-      {/* Share Dialog */}
-      <Dialog open={shareDialogOpen} onOpenChange={setShareDialogOpen}>
-        <DialogContent className="sm:max-w-md">
-          <DialogHeader>
-            <DialogTitle>Share Candidate Profile</DialogTitle>
-          </DialogHeader>
-          <div className="flex items-center space-x-2">
-            <div className="grid flex-1 gap-2">
-              <div className="flex items-center border rounded-md p-2">
-                <input
-                  className="flex-1 border-none outline-none bg-transparent text-sm"
-                  value={shareableUrl}
-                  readOnly
-                />
-                <button
-                  onClick={handleCopyClick}
-                  className="ml-2 p-1 rounded-md hover:bg-gray-100 focus:outline-none"
-                  title="Copy to clipboard"
-                >
-                  {copied ? (
-                    <Check className="h-4 w-4 text-green-500" />
-                  ) : (
-                    <Copy className="h-4 w-4" />
-                  )}
-                </button>
-              </div>
-            </div>
-          </div>
-        </DialogContent>
-      </Dialog>
+      {/* Share Component with User Selection */}
+      <ShareComponent 
+        title="Share Candidate Profile"
+        itemId={candidate.id}
+        itemType="candidate"
+        open={shareDialogOpen}
+        onOpenChange={setShareDialogOpen}
+      />
     </>
   );
 }
