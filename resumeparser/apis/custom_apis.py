@@ -62,3 +62,41 @@ def save_resume_status(resume=None):
     except Exception as e:
         frappe.log_error(f"Error in save_resume_status: {str(e)}")
         return {"message": False, "status": "error", "error": str(e)}
+
+
+@frappe.whitelist(allow_guest=True)
+def redirect_to_docshare():
+    return {
+        "value": 100,  # This is a placeholder value - replace with your actual value
+        "fieldtype": "Currency",
+        "route_options": {"docshare_type": "Read"},
+        "route": ["List", "DocShare"]
+    }
+
+
+@frappe.whitelist(allow_guest=True)
+def redirect_to_resume_with_filter():
+    """Redirect to the Resume list filtered by Resumes shared with current user"""
+    # Get the currently logged in user
+    current_user = frappe.session.user
+    
+    # Get all Resume documents shared with the current user
+    shared_resumes = frappe.get_all('DocShare', 
+                                  filters={'user': current_user, 'share_doctype': 'Resume'},
+                                  fields=['share_name'])
+    
+    # Extract just the Resume IDs
+    resume_ids = [d.share_name for d in shared_resumes] if shared_resumes else []
+    
+    # Count of shared resumes
+    approved_count = len(resume_ids)
+    
+    return {
+        "value": approved_count,  # Count of resumes shared with current user
+        "fieldtype": "Int",
+        # Filter to show only the specific Resume IDs that are shared with the user
+        "route_options": {
+            "name": ["in", resume_ids] if resume_ids else ["=", "none_found_placeholder"]
+        },
+        "route": ["List", "Resume"]
+    }
