@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -24,6 +24,57 @@ const CandidateCard = ({ candidate, onSelect, selected = false }) => {
   const navigate = useNavigate();
   const location = useLocation();
   const [shareDialogOpen, setShareDialogOpen] = useState(false);
+  
+  // Function to fetch resume save status
+  const fetchResumeStatus = async (resumeId) => {
+    try {
+      const response = await fetch(
+        `/api/method/resumeparser.apis.custom_apis.save_resume_status?resume=${resumeId}`,
+        {
+          method: 'GET',
+          credentials: 'include',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        }
+      );
+      const data = await response.json();
+      setSaved(data.message.message);
+      return data.message.message;
+    } catch (error) {
+      console.error('Error checking save status:', error);
+      return false;
+    }
+  };
+
+  // Function to save or delete resume
+  const saveResumeStatus = async (resumeId) => {
+    try {
+      const response = await fetch(
+        `/api/method/resumeparser.apis.custom_apis.save_resume?resume=${resumeId}`,
+        {
+          method: 'GET',
+          credentials: 'include',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        }
+      );
+      const data = await response.json();
+      setSaved(data.message.status === "saved");
+      return data.message;
+    } catch (error) {
+      console.error('Error saving resume:', error);
+      return { status: "error", message: error.toString() };
+    }
+  };
+  
+  // Check if resume is saved when component mounts
+  useEffect(() => {
+    if (candidate && candidate.id) {
+      fetchResumeStatus(candidate.id);
+    }
+  }, [candidate]);
 
 
   const handleCheckboxChange = (checked) => {
@@ -138,7 +189,11 @@ const CandidateCard = ({ candidate, onSelect, selected = false }) => {
                     className="h-7 w-7 absolute -top-1 -right-1 bg-white rounded-full shadow-sm border"
                     onClick={(e) => {
                       e.stopPropagation();
-                      setSaved(!saved);
+                      // Call function to toggle saved status
+                      saveResumeStatus(candidate.id).then(() => {
+                        // Refresh status after saving
+                        fetchResumeStatus(candidate.id);
+                      });
                     }}
                   >
                     <Bookmark
@@ -181,7 +236,19 @@ const CandidateCard = ({ candidate, onSelect, selected = false }) => {
                 <div className="flex items-center justify-center gap-3 text-xs text-blue-600 mt-4">
                   <span className="cursor-pointer hover:underline" onClick={(e) => e.stopPropagation()}>Comment</span>
                   <span className="text-gray-300">|</span>
-                  <span className="cursor-pointer hover:underline" onClick={(e) => e.stopPropagation()}>Save</span>
+                  <span 
+                    className={`cursor-pointer hover:underline ${saved ? 'text-red-600' : 'text-blue-600'}`}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      // Call function to toggle saved status
+                      saveResumeStatus(candidate.id).then(() => {
+                        // Refresh status after saving
+                        fetchResumeStatus(candidate.id);
+                      });
+                    }}
+                  >
+                    {saved ? 'Unsave' : 'Save'}
+                  </span>
                   <span className="text-gray-300">|</span>
                   <span 
                     className="cursor-pointer hover:underline" 

@@ -399,8 +399,3 @@ def seach_candidate_courses(q:str):
     filter_data = list(filter(lambda a: q in a, all_roles))
     return filter_data
     
-
-@frappe.whitelist(allow_guest=True)
-def all_users():
-    users = frappe.get_all('User', fields=["name", "email"])
-    return users

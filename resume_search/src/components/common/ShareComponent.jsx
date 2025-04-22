@@ -40,7 +40,7 @@ const ShareComponent = ({
   useEffect(() => {
     const fetchUsers = async () => {
       try {
-        const response = await fetch(`${config.backendUrl}/api/method/resumeparser.apis.search_apis.all_users`, {
+        const response = await fetch(`${config.backendUrl}/api/method/resumeparser.apis.custom_apis.all_users`, {
           method: 'GET',
           credentials: 'include', // This ensures cookies are sent with the request
           headers: {

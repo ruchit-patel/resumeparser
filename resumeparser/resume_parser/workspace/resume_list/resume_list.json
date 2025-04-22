@@ -1,7 +1,7 @@
 {
  "app": "frappe",
  "charts": [],
- "content": "[{\"id\":\"jzNYkVXadI\",\"type\":\"number_card\",\"data\":{\"number_card_name\":\"Total Resumes \",\"col\":4}},{\"id\":\"16S0IF6F3j\",\"type\":\"number_card\",\"data\":{\"number_card_name\":\"Manual Upload\",\"col\":4}},{\"id\":\"bQo7ZtES5F\",\"type\":\"number_card\",\"data\":{\"number_card_name\":\"Auto Upload\",\"col\":4}},{\"id\":\"qkdKQTctrP\",\"type\":\"number_card\",\"data\":{\"number_card_name\":\"Approved Resumes\",\"col\":4}},{\"id\":\"4VQ_RzuDpG\",\"type\":\"number_card\",\"data\":{\"number_card_name\":\"Saved Resume\",\"col\":4}},{\"id\":\"HVMX5i9bjl\",\"type\":\"number_card\",\"data\":{\"number_card_name\":\"Share With Me\",\"col\":4}},{\"id\":\"9go-JireCs\",\"type\":\"quick_list\",\"data\":{\"quick_list_name\":\"Approved Resumes\",\"col\":12}},{\"id\":\"GqKjOQSym9\",\"type\":\"quick_list\",\"data\":{\"quick_list_name\":\"All Resumes\",\"col\":12}}]",
+ "content": "[{\"id\":\"jzNYkVXadI\",\"type\":\"number_card\",\"data\":{\"number_card_name\":\"Total Resumes \",\"col\":4}},{\"id\":\"16S0IF6F3j\",\"type\":\"number_card\",\"data\":{\"number_card_name\":\"Manual Upload\",\"col\":4}},{\"id\":\"bQo7ZtES5F\",\"type\":\"number_card\",\"data\":{\"number_card_name\":\"Auto Upload\",\"col\":4}},{\"id\":\"qkdKQTctrP\",\"type\":\"number_card\",\"data\":{\"number_card_name\":\"Approved Resumes\",\"col\":4}},{\"id\":\"4VQ_RzuDpG\",\"type\":\"number_card\",\"data\":{\"number_card_name\":\"Saved Resume\",\"col\":4}},{\"id\":\"HVMX5i9bjl\",\"type\":\"number_card\",\"data\":{\"number_card_name\":\"Share With Me\",\"col\":4}},{\"id\":\"GqKjOQSym9\",\"type\":\"quick_list\",\"data\":{\"quick_list_name\":\"All Resumes\",\"col\":6}},{\"id\":\"9go-JireCs\",\"type\":\"quick_list\",\"data\":{\"quick_list_name\":\"Approved Resumes\",\"col\":6}}]",
  "creation": "2025-04-10 16:04:35.073500",
  "custom_blocks": [],
  "docstatus": 0,
@@ -15,8 +15,8 @@
  "label": "Resume List",
  "link_type": "DocType",
  "links": [],
- "modified": "2025-04-21 15:46:31.346868",
- "modified_by": "jaypatelsayaji@gmail.com",
+ "modified": "2025-04-21 18:38:04.963973",
+ "modified_by": "Administrator",
  "module": "Resume Parser",
  "name": "Resume List",
  "number_cards": [
