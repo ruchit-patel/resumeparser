@@ -16,8 +16,10 @@ const Header = () => {
                   <path d="M12 8v8M8 12h8" stroke="white" strokeWidth="2" />
                 </svg> */}
 
-              <img src="/assets/resumeparser/resume_search/resume.svg" className='h-10 w-10 mx-5' alt="Icon" />
-                Resume Finder
+              <div className="flex items-center cursor-pointer" onClick={() => {window.location.href = '/app/resume-list';}}>
+                <img src="/assets/resumeparser/resume_search/resume.svg" className='h-10 w-10 mx-5' alt="Icon" />
+                <span>Resume Finder</span>
+              </div>
               </div>
             </div>
             
