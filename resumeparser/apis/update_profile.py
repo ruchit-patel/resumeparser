@@ -126,5 +126,5 @@ def saved_resumes():
             })
         return data
     except Exception as e:
-        frappe.log_error(f"Error in seach_results: {str(e)}")
+        frappe.log_error(f"Error in saved_resumes: {str(e)}")
         return str(e)
