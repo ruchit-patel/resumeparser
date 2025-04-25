@@ -8,6 +8,7 @@ import EducationDetails from '../components/education/EducationDetails';
 import DiversityDetails from '../components/diversity/DiversityDetails';
 import '../App.css';
 import { useNavigate } from 'react-router-dom';
+import SaveResumesComponent from './SaveResumesComponent';
 
 const ResumeFindPage = () => {
   // Search Form
@@ -244,12 +245,7 @@ const ResumeFindPage = () => {
               </TabsContent>
               
               <TabsContent value="saved">
-                <Card className="mt-6">
-                  <CardContent className="pt-6">
-                    <h2 className="text-xl font-semibold mb-4">Saved Notes</h2>
-                    <p className="text-gray-600">You don't have any saved notes yet.</p>
-                  </CardContent>
-                </Card>
+                <SaveResumesComponent />
               </TabsContent>
             </Tabs>
           </div>

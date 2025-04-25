@@ -813,3 +813,15 @@ def certificates_search_query(q: str):
                 }
             }
         }
+
+
+
+def get_resume_from_id(resume_ids):
+    return {
+        "query": {
+            "terms": {
+                "_id": resume_ids
+            }
+        }
+    }
+
