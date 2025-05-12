@@ -7,19 +7,22 @@ import { Checkbox } from '../ui/checkbox';
 import CustomSelectionAddInput from '../common/CustomSelectionAddInput';
 import MultiAutoSuggations from '../common/MultiAutoSuggationsComponent';
 import AutocompleteInput from '../common/AutoCompleteInputComponent';
-const SearchForm = ({ 
-  searchKeywords,setSearchKeywords, 
-  searchIn,setSearchIn,
-  skills,setSkills,
-  minExperience,setMinExperience, 
-  maxExperience,setMaxExperience,
-  location,setLocation,
-  minSalary,setMinSalary,
-  maxSalary,setMaxSalary,
-  currency,setCurrency
-}) => {
+const SearchForm = ({ formState, updateFormField }) => {
   const [includeSalary, setIncludeSalary] = useState(false);
-  const [isSearchText,setIsSearchText]= useState(false); // Optional when something do when inputfield is
+  const [isSearchText, setIsSearchText] = useState(false); // Optional when something do when inputfield is
+  
+  // Destructure values from formState for convenience
+  const {
+    searchKeywords,
+    searchIn,
+    skills,
+    minExperience,
+    maxExperience,
+    location,
+    minSalary,
+    maxSalary,
+    currency
+  } = formState;
 
   return (
     <Card className="mb-6">
@@ -36,7 +39,7 @@ const SearchForm = ({
             apiEndPoint = {"api/method/resumeparser.apis.search_apis.seach_keywords"}
             placeholder={"Enter keywords like skills, designation, and company"}
             keywords={searchKeywords}
-            setKeywords={setSearchKeywords}
+            setKeywords={(value) => updateFormField('searchKeywords', value)}
             setHideSection={setIsSearchText}           
             />
           </div>
@@ -47,7 +50,7 @@ const SearchForm = ({
                 Search keyword in {"   "}
               </label>
               <div className="flex items-center space-x-2">
-                <Select value={searchIn} onValueChange={setSearchIn}>
+                <Select value={searchIn} onValueChange={(value) => updateFormField('searchIn', value)}>
                   <SelectTrigger className="border-none p-0 m-0 items-top h-auto !important">
                     <SelectValue placeholder="+" />
                   </SelectTrigger>
@@ -68,7 +71,7 @@ const SearchForm = ({
         label='IT Skill' 
         placeholder='Enter skill' 
         List={skills} 
-        setList={setSkills} 
+        setList={(value) => updateFormField('skills', value)} 
         apiEndPoint = {"api/method/resumeparser.apis.search_apis.seach_skills"}
         />
 
@@ -80,14 +83,14 @@ const SearchForm = ({
               placeholder="Min experience" 
               className="w-1/3"
               value={minExperience}
-              onChange={(e) => setMinExperience(e.target.value)}
+              onChange={(e) => updateFormField('minExperience', e.target.value)}
             />
             <span className="text-gray-500">to</span>
             <Input 
               placeholder="Max experience" 
               className="w-1/3"
               value={maxExperience}
-              onChange={(e) => setMaxExperience(e.target.value)}
+              onChange={(e) => updateFormField('maxExperience', e.target.value)}
             />
             <span className="text-gray-500">Years</span>
           </div>
@@ -98,7 +101,7 @@ const SearchForm = ({
           <Label>Current location of candidate</Label>
           <AutocompleteInput placeholder={"Enter city Name"} 
           inputValue={location} 
-          setInputValue={setLocation} 
+          setInputValue={(value) => updateFormField('location', value)} 
           apiEndPoint = {"api/method/resumeparser.apis.search_apis.seach_candidate_location"}/>
         </div>
         
@@ -106,7 +109,7 @@ const SearchForm = ({
         <div className="space-y-2 flex flex-col">
           <Label>Annual Salary</Label>
           <div className="flex items-center space-x-2">
-            <Select value={currency} onValueChange={setCurrency}>
+            <Select value={currency} onValueChange={(value) => updateFormField('currency', value)}>
               <SelectTrigger className="w-1/4">
                 <SelectValue placeholder="Currency" />
               </SelectTrigger>
@@ -120,14 +123,14 @@ const SearchForm = ({
               placeholder="Minimum" 
               className="w-1/4"
               value={minSalary}
-              onChange={(e) => setMinSalary(e.target.value)}
+              onChange={(e) => updateFormField('minSalary', e.target.value)}
             />
             <span className="text-gray-500">to</span>
             <Input 
               placeholder="Maximum" 
               className="w-1/4"
               value={maxSalary}
-              onChange={(e) => setMaxSalary(e.target.value)}
+              onChange={(e) => updateFormField('maxSalary', e.target.value)}
             />
             <span className="text-gray-500">Lacs</span>
           </div>

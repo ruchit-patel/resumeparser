@@ -9,24 +9,27 @@ import { Toggle } from '../ui/toggle';
 import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from '../ui/select';
 import { Checkbox } from '../ui/checkbox';
 import AutocompleteInput from '../common/AutoCompleteInputComponent';
-const DiversityDetails = ({ gender, setGender,
-        disabilitiesOnly, setDisabilitiesOnly,
-        category , setCategory,
-        candidateMinAge , setCandidateMinAge,
-        candidateMaxAge , setCandidateMaxAge,
-        jobType, setJobType,
-        employmentType, setEmploymentType,
-        workPermit, setWorkPermit,
-        showCandidates, setShowCandidates,
-        verifiedFilters, setVerifiedFilters,
-      }) => {
+const DiversityDetails = ({ formState, updateFormField }) => {
+  // Destructure values from formState for convenience
+  const {
+    gender,
+    disabilitiesOnly,
+    category,
+    candidateMinAge,
+    candidateMaxAge,
+    jobType,
+    employmentType,
+    workPermit,
+    showCandidates,
+    verifiedFilters
+  } = formState;
 
   const handleVerifiedFilterChange = (value) => {
-    setVerifiedFilters(prev => 
-      prev.includes(value) 
-        ? prev.filter(item => item !== value)
-        : [...prev, value]
-    );
+    const newVerifiedFilters = verifiedFilters.includes(value)
+      ? verifiedFilters.filter(item => item !== value)
+      : [...verifiedFilters, value];
+      
+    updateFormField('verifiedFilters', newVerifiedFilters);
   };
 
   return (
@@ -44,7 +47,7 @@ const DiversityDetails = ({ gender, setGender,
                 {/* Gender */}
                 <div className="space-y-2 flex flex-col">
                   <Label>Gender</Label>
-                  <ToggleGroup type="single" value={gender} onValueChange={(value) => value && setGender(value)}>
+                  <ToggleGroup type="single" value={gender} onValueChange={(value) => value && updateFormField('gender', value)}>
                     <ToggleGroupItem value="all" variant="pill" size="pill">All candidates</ToggleGroupItem>
                     <ToggleGroupItem value="male" variant="pill" size="pill">Male candidates</ToggleGroupItem>
                     <ToggleGroupItem value="female" variant="pill" size="pill">Female candidates</ToggleGroupItem>
@@ -56,7 +59,7 @@ const DiversityDetails = ({ gender, setGender,
                   <Checkbox 
                     id="diversity-checkbox" 
                     checked={disabilitiesOnly}
-                    onCheckedChange={setDisabilitiesOnly}
+                    onCheckedChange={(value) => updateFormField('disabilitiesOnly', value)}
                   />
                   <Label htmlFor="diversity-checkbox" className="font-normal">
                   Person with Disabilities only
@@ -68,7 +71,7 @@ const DiversityDetails = ({ gender, setGender,
                   <Label htmlFor="candidate-category">Candidate Category</Label>
                   <AutocompleteInput 
                   placeholder={"Add candidate category"} 
-                  setInputValue={setCategory} 
+                  setInputValue={(value) => updateFormField('category', value)} 
                   inputValue={category}
                   apiEndPoint = {"api/method/resumeparser.apis.search_apis.seach_candidate_category"}
                   />
@@ -82,14 +85,14 @@ const DiversityDetails = ({ gender, setGender,
                       placeholder="Min age" 
                       className="w-1/3"
                       value={candidateMinAge}
-                      onChange={(e)=>setCandidateMinAge(e.target.value)}
+                      onChange={(e) => updateFormField('candidateMinAge', e.target.value)}
                     />
                     <span className="text-gray-500">to</span>
                     <Input 
                       placeholder="Max age" 
                       className="w-1/3"
                       value={candidateMaxAge}
-                      onChange={(e)=>setCandidateMaxAge(e.target.value)}
+                      onChange={(e) => updateFormField('candidateMaxAge', e.target.value)}
                     />
                     <span className="text-gray-500">Years</span>
                   </div>
@@ -104,7 +107,7 @@ const DiversityDetails = ({ gender, setGender,
               <div className="space-y-2 flex flex-col">
                 <Label>Show candidates seeking</Label>
                 <div className="flex space-x-2">
-                  <Select onValueChange={setJobType}>
+                  <Select onValueChange={(value) => updateFormField('jobType', value)}>
                     <SelectTrigger className="w-1/3">
                       <SelectValue placeholder="Job type" />
                     </SelectTrigger>
@@ -114,7 +117,7 @@ const DiversityDetails = ({ gender, setGender,
                       <SelectItem value="contract">Contract</SelectItem>
                     </SelectContent>
                   </Select>
-                  <Select onValueChange={setEmploymentType}>
+                  <Select onValueChange={(value) => updateFormField('employmentType', value)}>
                     <SelectTrigger className="w-1/3">
                       <SelectValue placeholder="Employment type" />
                     </SelectTrigger>
@@ -131,7 +134,7 @@ const DiversityDetails = ({ gender, setGender,
                   <Label htmlFor="work-permit">Work permit for</Label>
                   <AutocompleteInput 
                   placeholder={"Choose category"} 
-                  setInputValue={setWorkPermit} 
+                  setInputValue={(value) => updateFormField('workPermit', value)} 
                   inputValue={workPermit}
                   apiEndPoint = {"api/method/resumeparser.apis.search_apis.seach_candidate_category"}/>
                   
@@ -145,7 +148,7 @@ const DiversityDetails = ({ gender, setGender,
                 {/* Show */}
                 <div className="space-y-2 flex flex-col">
                   <Label>Show</Label>
-                  <ToggleGroup type="single" value={showCandidates} onValueChange={(value) => value && setShowCandidates(value)}>
+                  <ToggleGroup type="single" value={showCandidates} onValueChange={(value) => value && updateFormField('showCandidates', value)}>
                     <ToggleGroupItem value="all" variant="pill" size="pill">All candidates</ToggleGroupItem>
                     <ToggleGroupItem value="new" variant="pill" size="pill">New registrations</ToggleGroupItem>
                     <ToggleGroupItem value="modified" variant="pill" size="pill">Modified candidates</ToggleGroupItem>

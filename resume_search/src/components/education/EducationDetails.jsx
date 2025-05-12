@@ -10,27 +10,23 @@ import AutocompleteInput from '../common/AutoCompleteInputComponent';
 import CourceSelector from './CourceSelection';
 import CustomSelectionAddInput from '../common/CustomSelectionAddInput';
 import EducationQualification from './UGPGQualification';
-const EducationDetails = (
-  {
-    ugQualification, setUgQualification,
-    pgQualification, setPgQualification,
-    
-    ugcourse, ugsetCourse,
-    uginstitute, ugsetInstitute,
-    ugeducationType, ugsetEducationType,
-    ugfromYear, ugsetFromYear,
-    ugtoYear, ugsetToYear,
-
-    pgcourse, pgsetCourse,
-    pginstitute, pgsetInstitute,
-    pgeducationType, pgsetEducationType,
-    pgfromYear, pgsetFromYear,
-    pgtoYear, pgsetToYear,
-
-
-    doctorateQualification, setdoctorateQualification,
-  }
-) => {
+const EducationDetails = ({ formState, updateFormField }) => {
+  // Destructure values from formState for convenience
+  const {
+    ugQualification,
+    pgQualification,
+    ugcourse,
+    uginstitute,
+    ugeducationType,
+    ugfromYear,
+    ugtoYear,
+    pgcourse,
+    pginstitute,
+    pgeducationType,
+    pgfromYear,
+    pgtoYear,
+    doctorateQualification
+  } = formState;
 
 
   return (
@@ -45,7 +41,7 @@ const EducationDetails = (
               {/* UG Qualification */}
               <div className="space-y-2 flex flex-col">
                 <Label className="block text-sm font-medium">UG Qualification</Label>
-                <ToggleGroup type="single" value={ugQualification} onValueChange={(value) => value && setUgQualification(value)}>
+                <ToggleGroup type="single" value={ugQualification} onValueChange={(value) => value && updateFormField('ugQualification', value)}>
                   <ToggleGroupItem value="any" variant="pill" size="pill">Any UG qualification</ToggleGroupItem>
                   <ToggleGroupItem value="specific" variant="pill" size="pill">Specific UG qualification</ToggleGroupItem>
                   <ToggleGroupItem value="none" variant="pill" size="pill">No UG qualification</ToggleGroupItem>
@@ -54,22 +50,21 @@ const EducationDetails = (
 
               <EducationQualification ugQualification={ugQualification}
                   course={ugcourse}
-                  setCourse={ugsetCourse}
+                  setCourse={(value) => updateFormField('ugcourse', value)}
                   institute={uginstitute}
-                  setInstitute={ugsetInstitute}
+                  setInstitute={(value) => updateFormField('uginstitute', value)}
                   educationType={ugeducationType}
-                  setEducationType={ugsetEducationType}
+                  setEducationType={(value) => updateFormField('ugeducationType', value)}
                   fromYear={ugfromYear}
-                  setFromYear={ugsetFromYear}
+                  setFromYear={(value) => updateFormField('ugfromYear', value)}
                   toYear={ugtoYear}
-                  setToYear={ugsetToYear}
-              
+                  setToYear={(value) => updateFormField('ugtoYear', value)}
               />
               
               {/* PG Qualification */}
               <div className="space-y-2 flex flex-col">
                 <Label className="block text-sm font-medium">PG Qualification</Label>
-                <ToggleGroup type="single" value={pgQualification} onValueChange={(value) => value && setPgQualification(value)}>
+                <ToggleGroup type="single" value={pgQualification} onValueChange={(value) => value && updateFormField('pgQualification', value)}>
                   <ToggleGroupItem value="any" variant="pill" size="pill">Any PG qualification</ToggleGroupItem>
                   <ToggleGroupItem value="specific" variant="pill" size="pill">Specific PG qualification</ToggleGroupItem>
                   <ToggleGroupItem value="none" variant="pill" size="pill">No PG qualification</ToggleGroupItem>
@@ -78,15 +73,15 @@ const EducationDetails = (
               
               <EducationQualification ugQualification={pgQualification}
                   course={pgcourse}
-                  setCourse={pgsetCourse}
+                  setCourse={(value) => updateFormField('pgcourse', value)}
                   institute={pginstitute}
-                  setInstitute={pgsetInstitute}
+                  setInstitute={(value) => updateFormField('pginstitute', value)}
                   educationType={pgeducationType}
-                  setEducationType={pgsetEducationType}
+                  setEducationType={(value) => updateFormField('pgeducationType', value)}
                   fromYear={pgfromYear}
-                  setFromYear={pgsetFromYear}
+                  setFromYear={(value) => updateFormField('pgfromYear', value)}
                   toYear={pgtoYear}
-                  setToYear={pgsetToYear}/>
+                  setToYear={(value) => updateFormField('pgtoYear', value)}/>
 
               {/* Add PPG/Doctorate Qualification */}
               
@@ -94,7 +89,7 @@ const EducationDetails = (
                 <CustomSelectionAddInput 
                 label={"PPG Doctorate Qualification"} 
                 placeholder={"Enter Qualification"} 
-                setList={setdoctorateQualification} 
+                setList={(value) => updateFormField('doctorateQualification', value)} 
                 List={doctorateQualification}
                 apiEndPoint = {"api/method/resumeparser.apis.search_apis.seach_certificates"}
                 />

@@ -8,14 +8,16 @@ import CustomSelectionAddInput from '../common/CustomSelectionAddInput';
 import DepartmentRoleSelector from './DepartmentSelection';
 import AutocompleteInput from '../common/AutoCompleteInputComponent';
 
-const EmploymentDetails = ({
-  departmentes,setDepartmentes,
-  industry,setIndustry,
-  company,setCompany,
-  excludeCompanies,setExcludeCompanies,
-  designation,setDesignation,
-  noticePeriod,setNoticePeriod
-}) => {
+const EmploymentDetails = ({ formState, updateFormField }) => {
+  // Destructure values from formState for convenience
+  const {
+    departmentes,
+    industry,
+    company,
+    excludeCompanies,
+    designation,
+    noticePeriod
+  } = formState;
   return (
     <Card className="mb-6">
       <Accordion type="single" collapsible>
@@ -28,7 +30,7 @@ const EmploymentDetails = ({
               {/* Department and Role */}
               <div className="space-y-2 flex flex-col">
                 <Label htmlFor="department-role">Department and Role</Label>
-                <DepartmentRoleSelector  selectedItems={departmentes} setSelectedItems={setDepartmentes}/>
+                <DepartmentRoleSelector  selectedItems={departmentes} setSelectedItems={(value) => updateFormField('departmentes', value)}/>
               </div>
               
               {/* Industry */}
@@ -37,7 +39,7 @@ const EmploymentDetails = ({
                 <AutocompleteInput 
                 placeholder={"Add Industry"} 
                 inputValue={industry} 
-                setInputValue={setIndustry}
+                setInputValue={(value) => updateFormField('industry', value)}
                 apiEndPoint = {"api/method/resumeparser.apis.search_apis.seach_candidate_industry"}
                 />
                
@@ -49,7 +51,7 @@ const EmploymentDetails = ({
                 <AutocompleteInput 
                 placeholder={"Add Company Name"} 
                 inputValue={company} 
-                setInputValue={setCompany}
+                setInputValue={(value) => updateFormField('company', value)}
                 apiEndPoint = {"api/method/resumeparser.apis.search_apis.seach_candidate_company"}
                 />
 
@@ -58,7 +60,7 @@ const EmploymentDetails = ({
                   label='Exclude Companies' 
                   placeholder='Enter Exclude Companies' 
                   List={excludeCompanies} 
-                  setList={setExcludeCompanies}
+                  setList={(value) => updateFormField('excludeCompanies', value)}
                   apiEndPoint = {"api/method/resumeparser.apis.search_apis.seach_candidate_company_exclude"}
                    />
               </div>
@@ -69,7 +71,7 @@ const EmploymentDetails = ({
                 <AutocompleteInput 
                 placeholder={"Add Designation"} 
                 inputValue={designation} 
-                setInputValue={setDesignation}
+                setInputValue={(value) => updateFormField('designation', value)}
                 apiEndPoint = {"api/method/resumeparser.apis.search_apis.seach_candidate_designation"}
                 />
 
@@ -79,7 +81,7 @@ const EmploymentDetails = ({
               {/* Notice Period / Availability to join */}
               <div className="space-y-2 flex flex-col">
                 <Label>Notice Period / Availability to join</Label>
-                <ToggleGroup type="single" value={noticePeriod} onValueChange={(value) => value && setNoticePeriod(value)}>
+                <ToggleGroup type="single" value={noticePeriod} onValueChange={(value) => value && updateFormField('noticePeriod', value)}>
                   <ToggleGroupItem value="any" variant="pill" size="pill">Any</ToggleGroupItem>
                   <ToggleGroupItem value="0-15" variant="pill" size="pill">0-15 days +</ToggleGroupItem>
                   <ToggleGroupItem value="1-month" variant="pill" size="pill">1 month +</ToggleGroupItem>
