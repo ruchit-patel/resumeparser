@@ -96,10 +96,8 @@ const ResumeFindPage = () => {
 
   return (
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-        <div className="flex flex-col md:flex-row space-y-6 md:space-y-0 md:space-x-6">
-          
           {/* Left column - Search forms */}
-          <div className="md:w-4/5 space-y-6">
+          
             <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
               <TabsList className="bg-transparent border-b w-full justify-start rounded-none h-auto p-0">
                 <TabsTrigger 
@@ -116,9 +114,9 @@ const ResumeFindPage = () => {
                 </TabsTrigger>
               </TabsList>
               
-              <TabsContent value="search" className="mt-6 space-y-6">
-
-
+              <TabsContent value="search" className="mt-6 flex flex-col md:flex-row space-y-6 md:space-y-0 md:space-x-6">
+                {/* Left column - Search forms */}
+              <div className="md:w-4/5 space-y-6">
                 {/*  Search Form */}
                 <SearchForm 
                   formState={formState}
@@ -149,25 +147,26 @@ const ResumeFindPage = () => {
                   </Button>
 
                 </div>
+
+              </div>
+
+               {/* Right column - Recent searches */}
+              <div className="md:w-1/5">
+                  <RecentSearches 
+                    applySearch={applyRecentSearch}
+                    selectedSearchId={selectedSearchId}
+                    onClearFields={clearSearchFields}
+                  />     
+              </div>
+
+
               </TabsContent>
               
               <TabsContent value="saved">
                 <SaveResumesComponent />
               </TabsContent>
             </Tabs>
-          </div>
-          
-          {/* Right column - Recent searches */}
-          <div className="md:w-1/5">
-              <RecentSearches 
-                applySearch={applyRecentSearch}
-                selectedSearchId={selectedSearchId}
-                onClearFields={clearSearchFields}
-              />     
-          </div>
 
-
-        </div>
       </main>
   );
 }
