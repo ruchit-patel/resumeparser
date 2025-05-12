@@ -14,8 +14,8 @@ import RecentSearches from '../components/search/RecentSearches';
 const ResumeFindPage = () => {
   const navigate = useNavigate();
   
-  // Initialize a single form state with all fields
-  const [formState, setFormState] = useState({
+  // Initial form state
+  const initialFormState = {
     // Search Form
     searchKeywords: [],
     searchIn: 'Entire resume',
@@ -26,7 +26,6 @@ const ResumeFindPage = () => {
     maxSalary: '',
     location: '',
     currency: 'INR',
-
     // Employment Details
     departmentes: [],
     industry: '',
@@ -34,7 +33,6 @@ const ResumeFindPage = () => {
     excludeCompanies: [],
     designation: '',
     noticePeriod: 'any',
-
     // Education Details
     ugQualification: '',
     pgQualification: '',
@@ -49,7 +47,6 @@ const ResumeFindPage = () => {
     pgeducationType: 'full-time',
     pgfromYear: '',
     pgtoYear: '',
-
     // Diversity and Additional Details
     gender: 'all',
     disabilitiesOnly: false,
@@ -61,7 +58,12 @@ const ResumeFindPage = () => {
     workPermit: '',
     showCandidates: 'all',
     verifiedFilters: []
-  });
+  };
+
+  const [formState, setFormState] = useState(initialFormState);
+  const [activeTab, setActiveTab] = useState('search');
+  const [selectedSearchId, setSelectedSearchId] = useState(null);
+  
 
   // Function to update any field in the form
   const updateFormField = (field, value) => {
@@ -71,12 +73,25 @@ const ResumeFindPage = () => {
     }));
   };
 
-  // State for active tab
-  const [activeTab, setActiveTab] = useState('search');
-  
+  const clearSearchFields = () => {
+    setFormState(initialFormState);
+    setSelectedSearchId(null);
+  };
+  // Function to clear the form
+  const clearForm = () => {
+    setFormState(initialFormState);
+    setSelectedSearchId(null);
+  };
+
   // Handle search submission
   const handleSearch = () => {
-    navigate(`/resume_search/results`,{state :{searchData : formState}});
+    navigate(`/resume_search/results`, { state: { searchData: formState } });
+  };
+
+  // Function to apply a recent search
+  const applyRecentSearch = (searchData, id) => {
+    setFormState(searchData);
+    setSelectedSearchId(id);
   };
 
   return (
@@ -144,7 +159,11 @@ const ResumeFindPage = () => {
           
           {/* Right column - Recent searches */}
           <div className="md:w-1/5">
-            <RecentSearches />
+              <RecentSearches 
+                applySearch={applyRecentSearch}
+                selectedSearchId={selectedSearchId}
+                onClearFields={clearSearchFields}
+              />     
           </div>
 
 
