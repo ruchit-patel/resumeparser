@@ -1,128 +1,36 @@
-const recentSearchesRow = [
-  {
-    id: 1,
-    title: "Python & JavaScript Developer",
-    timestamp: "2 hours ago",
-    data: {
-      searchKeywords: [
-        { text: "Python", cat: "skills", isNecessary: false },
-        { text: "Javascript", cat: "skills", isNecessary: false }
-      ],
-      searchIn: "Entire resume",
-      skills: [
-        { text: "Python", cat: "skills", isNecessary: false },
-        { text: "Java Script", cat: "skills", isNecessary: false }
-      ],
-      minExperience: "10",
-      maxExperience: "20",
-      currency: "INR",
-      minSalary: "10",
-      maxSalary: "12",
-      location: "Valsad, Gujarat",
-      departmentes: [
-        { department: "IT Department", role: "IT Manager", fullString: "IT Department - IT Manager" },
-        { department: "IT Department", role: "IT Director", fullString: "IT Department - IT Director" },
-        { department: "IT Department", role: "Senior Developer", fullString: "IT Department - Senior Developer" }
-      ],
-      industry: "Information Technology (IT)",
-      company: "Meril Life Science",
-      excludeCompanies: [
-        { text: "Mahindra Comviva", cat: "companies", isNecessary: false }
-      ],
-      designation: "Software Developer",
-      noticePeriod: "1-month",
-      ugcourse: [],
-      uginstitute: "",
-      ugeducationType: "full-time",
-      ugfromYear: "",
-      ugtoYear: "",
-      pgcourse: [],
-      pginstitute: "",
-      pgeducationType: "full-time",
-      pgfromYear: "",
-      pgtoYear: "",
-      doctorateQualification: [],
-      gender: "all",
-      disabilitiesOnly: false,
-      category: "",
-      candidateMinAge: "",
-      candidateMaxAge: "",
-      jobType: "",
-      employmentType: "",
-      workPermit: "",
-      showCandidates: "all",
-      verifiedFilters: []
-    }
-  },
-  {
-    id: 2,
-    title: "React Frontend Developer",
-    timestamp: "5 hours ago",
-    data: {
-      searchKeywords: [
-        { text: "React", cat: "skills", isNecessary: false },
-        { text: "Frontend", cat: "skills", isNecessary: false }
-      ],
-      searchIn: "Entire resume",
-      skills: [
-        { text: "React", cat: "skills", isNecessary: false },
-        { text: "JavaScript", cat: "skills", isNecessary: false },
-        { text: "CSS", cat: "skills", isNecessary: false }
-      ],
-      minExperience: "3",
-      maxExperience: "8",
-      currency: "INR",
-      minSalary: "8",
-      maxSalary: "15",
-      location: "Bangalore, Karnataka",
-      departmentes: [
-        { department: "IT Department", role: "Frontend Developer", fullString: "IT Department - Frontend Developer" }
-      ],
-      industry: "Information Technology (IT)",
-      company: "",
-      excludeCompanies: [],
-      designation: "Frontend Developer",
-      noticePeriod: "1-month",
-      ugcourse: [],
-      uginstitute: "",
-      ugeducationType: "full-time",
-      ugfromYear: "",
-      ugtoYear: "",
-      pgcourse: [],
-      pginstitute: "",
-      pgeducationType: "full-time",
-      pgfromYear: "",
-      pgtoYear: "",
-      doctorateQualification: [],
-      gender: "all",
-      disabilitiesOnly: false,
-      category: "",
-      candidateMinAge: "",
-      candidateMaxAge: "",
-      jobType: "",
-      employmentType: "",
-      workPermit: "",
-      showCandidates: "all",
-      verifiedFilters: []
-    }
-  }
-];
 
 import React, { useState, useEffect } from 'react';
 import { Card, CardHeader, CardContent } from '../ui/card';
 import { Button } from '../ui/button';
-import { Clock } from 'lucide-react';
-
+import { Clock } from 'lucide-react'; 
+import { useFrappeGetDocList } from 'frappe-react-sdk';
+import dayjs from 'dayjs';
+import relativeTime from 'dayjs/plugin/relativeTime';
 const RecentSearches = ({
   applySearch,
   selectedSearchId,
   onClearFields,
 }) => {
   const [recentSearches, setRecentSearches] = useState([]);
+  const { data, error, isValidating, mutate } = useFrappeGetDocList("Seach History",{fields: ['*']})
+  
+
+  dayjs.extend(relativeTime);
+
+  const getTimeAgo = (dateStr) => {
+    // Remove microseconds & format for JS
+    const cleanDate = dateStr.split('.')[0].replace(' ', 'T');
+    return dayjs(cleanDate).fromNow();  // e.g., "a few seconds ago"
+  };
+
+
 
   useEffect(() => {
-    setRecentSearches(recentSearchesRow);
-  }, []);
+    if(data){
+    console.log(data," : data");
+    setRecentSearches(data);
+  }
+  }, [data]);
 
   const clearSearchHistory = () => {
     setRecentSearches([]);
@@ -162,49 +70,41 @@ const RecentSearches = ({
           <p className="text-sm text-gray-500">No recent searches found.</p>
         ) : (
           recentSearches.map((search) => {
-            const isSelected = selectedSearchId === search.id;
+            const isSelected = selectedSearchId === search.name;
             return (
               <div
-                key={search.id}
+                key={search.name}
                 className={`rounded-md p-3 cursor-pointer border transition-colors ${
                   isSelected
                     ? 'border-blue-500 bg-blue-50'
                     : 'border-gray-200 hover:bg-gray-50'
                 }`}
-                onClick={() => applySearch(search.data, search.id)}
+                onClick={() => applySearch(JSON.parse(search.save_form), search.name)}
               >
-                <p
-                  className={`text-sm font-medium ${
-                    isSelected ? 'text-blue-700' : 'text-gray-800'
-                  }`}
-                >
-                  {search.title}
-                </p>
-
-                <div className="flex justify-between items-center mt-1">
+                
+                <div className="flex flex-col justify-between items-start mt-1">
                   <p
                     className={`text-xs ${
                       isSelected ? 'text-blue-600' : 'text-gray-500'
                     }`}
                   >
-                    Skills: {search.data.skills.map((skill) => skill.text).join(', ')}
+                    {/* {JSON.parse(search.save_form).searchKeywords.map((skill) => skill.text).join(', ')} */}
+                    {
+                      (() => {
+                        const skills = JSON.parse(search.save_form).searchKeywords.map(skill => skill.text).join(', ');
+                        return skills.length > 10 ? skills.slice(0, 25) + '...' : skills;
+                      })()
+                    }
                   </p>
                   <p
                     className={`text-xs ${
                       isSelected ? 'text-blue-500' : 'text-gray-400'
                     }`}
                   >
-                    {search.timestamp}
+                    {getTimeAgo(search.creation)}
+
                   </p>
                 </div>
-
-                <p
-                  className={`text-xs mt-1 ${
-                    isSelected ? 'text-blue-600' : 'text-gray-500'
-                  }`}
-                >
-                  Experience: {search.data.minExperience} - {search.data.maxExperience} years
-                </p>
               </div>
             );
           })

@@ -10,6 +10,7 @@ import '../App.css';
 import { useNavigate } from 'react-router-dom';
 import SaveResumesComponent from './SaveResumesComponent';
 import RecentSearches from '../components/search/RecentSearches';
+import { useFrappeCreateDoc } from 'frappe-react-sdk';
 
 const ResumeFindPage = () => {
   const navigate = useNavigate();
@@ -63,6 +64,7 @@ const ResumeFindPage = () => {
   const [formState, setFormState] = useState(initialFormState);
   const [activeTab, setActiveTab] = useState('search');
   const [selectedSearchId, setSelectedSearchId] = useState(null);
+  const { createDoc, isCompleted, error, loading } = useFrappeCreateDoc();
   
 
   // Function to update any field in the form
@@ -84,8 +86,16 @@ const ResumeFindPage = () => {
   };
 
   // Handle search submission
-  const handleSearch = () => {
+  const handleSearch = async() => {
+    try {
+    await createDoc("Seach History", {
+      datetime: new Date().toISOString().slice(0, 19).replace("T", " "),
+      save_form: JSON.stringify(formState)
+    });
     navigate(`/resume_search/results`, { state: { searchData: formState } });
+    } catch (error) {
+      console.log("Error saving search history:", error);
+    }
   };
 
   // Function to apply a recent search
