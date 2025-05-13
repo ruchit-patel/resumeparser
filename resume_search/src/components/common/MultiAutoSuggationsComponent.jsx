@@ -19,7 +19,6 @@ const MultiAutoSuggations = ({placeholder, keywords, setKeywords, setHideSection
 
   const fetchSearchData = async (query) => {
     try {
-      console.log("Search Query : ", query)
       const myHeaders = new Headers();
       myHeaders.append("Cookie", "full_name=Guest; sid=Guest; system_user=no; user_id=Guest; user_lang=en");
   
@@ -57,7 +56,6 @@ const MultiAutoSuggations = ({placeholder, keywords, setKeywords, setHideSection
       fetchSearchData(value).then((response) => {
         if (response && response.message) {
           const filtered = response.message;
-          console.log(filtered, "---------------------->");
           setSuggestions(filtered);
           setShowSuggestions(filtered.length > 0);
         }

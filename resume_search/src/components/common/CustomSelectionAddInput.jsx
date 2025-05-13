@@ -4,7 +4,11 @@ import MultiAutoSuggations from './MultiAutoSuggationsComponent';
 
 const CustomSelectionAddInput = ({ label, placeholder, List, setList,apiEndPoint }) => {
   const [skillSection, setSkillSection] = useState(false);
-
+  useEffect(() => {
+    if(List.length > 0){
+      setSkillSection(true)
+    }
+  }, [List])
   return (
     <div className='space-y-2 w-1/3'>
       {!skillSection && (

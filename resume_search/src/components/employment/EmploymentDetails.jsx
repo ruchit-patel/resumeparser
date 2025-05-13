@@ -18,6 +18,7 @@ const EmploymentDetails = ({ formState, updateFormField }) => {
     designation,
     noticePeriod
   } = formState;
+
   return (
     <Card className="mb-6">
       <Accordion type="single" collapsible>

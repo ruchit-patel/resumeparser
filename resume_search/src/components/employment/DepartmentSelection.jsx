@@ -2,7 +2,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import { Input } from '@/components/ui/input';
 import { X, ChevronRight, Check, Search } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import {config} from '@/config';
+import { config } from '@/config';
 
 const fetchSearchData = async () => {
   try {
@@ -18,17 +18,37 @@ const fetchSearchData = async () => {
 
 export default function DepartmentRoleSelector({ 
   placeholder = "Add Department/Role", 
-  selectedItems,
-  setSelectedItems
+  selectedItems = [], // Provide default value
+  setSelectedItems,
+  onChange // Add an optional onChange for better integration
 }) {
-  // const [selectedItems, setSelectedItems] = useState([]);
+  // Use local state to track items if no prop is provided
+  const [localSelectedItems, setLocalSelectedItems] = useState([]);
+  
+  // Determine if we should use props or local state
+  const items = selectedItems || localSelectedItems;
+  const updateItems = (newItems) => {
+    if (setSelectedItems) {
+      // Use the prop setter if provided
+      setSelectedItems(newItems);
+    } else {
+      // Otherwise use local state
+      setLocalSelectedItems(newItems);
+    }
+    
+    // Call onChange if provided
+    if (onChange) {
+      onChange(newItems);
+    }
+  };
+
   const [isOpen, setIsOpen] = useState(false);
   const [expandedDept, setExpandedDept] = useState(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [departments, setDepartments] = useState([]);
   const dropdownRef = useRef(null);
 
-  // Close dropdown when clicking outside
+  // Load departments on component mount
   useEffect(() => {
     const loadDepartments = async () => {
       const data = await fetchSearchData();
@@ -39,6 +59,7 @@ export default function DepartmentRoleSelector({
     loadDepartments();
   }, []);
 
+  // Close dropdown when clicking outside
   useEffect(() => {
     function handleClickOutside(event) {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
@@ -82,32 +103,27 @@ export default function DepartmentRoleSelector({
   };
 
   const isRoleSelected = (deptName, role) => {
-    return selectedItems.some(item => 
+    return items.some(item => 
       item.department === deptName && item.role === role
     );
   };
 
   const isDepartmentSelected = (deptName) => {
     const departmentRoles = departments.find(d => d.name === deptName)?.roles || [];
-    const selectedRolesInDept = selectedItems.filter(
+    const selectedRolesInDept = items.filter(
       item => item.department === deptName && item.role
     ).length;
     
-    return selectedRolesInDept === departmentRoles.length;
+    return departmentRoles.length > 0 && selectedRolesInDept === departmentRoles.length;
   };
 
   const toggleRole = (deptName, role) => {
     const fullString = role ? `${deptName} - ${role}` : deptName;
     
     if (isRoleSelected(deptName, role)) {
-      setSelectedItems(prev => 
-        prev.filter(item => !(item.department === deptName && item.role === role))
-      );
+      updateItems(items.filter(item => !(item.department === deptName && item.role === role)));
     } else {
-      setSelectedItems(prev => [
-        ...prev, 
-        { department: deptName, role, fullString }
-      ]);
+      updateItems([...items, { department: deptName, role, fullString }]);
     }
   };
 
@@ -117,9 +133,7 @@ export default function DepartmentRoleSelector({
 
     if (isDepartmentSelected(deptName)) {
       // Deselect all roles in this department
-      setSelectedItems(prev => 
-        prev.filter(item => item.department !== deptName)
-      );
+      updateItems(items.filter(item => item.department !== deptName));
     } else {
       // Select all roles in this department
       const deptRoles = dept.roles.map(role => ({
@@ -129,20 +143,18 @@ export default function DepartmentRoleSelector({
       }));
       
       // Remove any existing roles from this department before adding all
-      setSelectedItems(prev => [
-        ...prev.filter(item => item.department !== deptName),
+      updateItems([
+        ...items.filter(item => item.department !== deptName),
         ...deptRoles
       ]);
     }
   };
 
   const removeItem = (itemToRemove) => {
-    setSelectedItems(prev => 
-      prev.filter(item => item.fullString !== itemToRemove.fullString)
-    );
+    updateItems(items.filter(item => item.fullString !== itemToRemove.fullString));
   };
 
-  const clearAll = () => setSelectedItems([]);
+  const clearAll = () => updateItems([]);
 
   const highlightMatches = (text) => {
     if (!searchQuery || !text.toLowerCase().includes(searchQuery.toLowerCase())) {
@@ -165,26 +177,30 @@ export default function DepartmentRoleSelector({
     <div className="w-full scroll-auto" ref={dropdownRef}>   
       <div className="border rounded-md p-2 bg-white min-h-10">
         <div className="flex flex-wrap gap-2 " onClick={() => setIsOpen(!isOpen)}>
-          {selectedItems.map((item, index) => (
-            <span 
-              key={index} 
-              className="px-2 py-1 bg-blue-100 text-blue-700 rounded-lg flex items-center text-sm"
-            >
-              {item.fullString}
-              <X 
-                className="ml-1 cursor-pointer h-4 w-4" 
-                onClick={() => removeItem(item)} 
-              />
-            </span>
-          ))}
-          {selectedItems.length === 0 && (
+          {items.length > 0 ? (
+            items.map((item, index) => (
+              <span 
+                key={index} 
+                className="px-2 py-1 bg-blue-100 text-blue-700 rounded-lg flex items-center text-sm"
+              >
+                {item.fullString}
+                <X 
+                  className="ml-1 cursor-pointer h-4 w-4" 
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    removeItem(item);
+                  }} 
+                />
+              </span>
+            ))
+          ) : (
             <span className="text-gray-400 text-sm">{placeholder}</span>
           )}
         </div>
       </div>
       
       <div className="flex justify-between items-center mt-1">
-        {selectedItems.length > 0 && (
+        {items.length > 0 && (
           <button onClick={clearAll} className="text-sm text-red-500">
             Clear all
           </button>
@@ -240,14 +256,17 @@ export default function DepartmentRoleSelector({
                     type="checkbox" 
                     className="mr-2" 
                     checked={isDepartmentSelected(dept.name)}
-                    onChange={() => toggleSelectAllRoles(dept.name)}
+                    onChange={(e) => {
+                      e.stopPropagation();
+                      toggleSelectAllRoles(dept.name);
+                    }}
                     onClick={(e) => e.stopPropagation()}
                   />
                   <span className="font-medium">
                     {highlightMatches(dept.name)}
                   </span>
                   <span className="ml-2 text-sm text-gray-500">
-                    {selectedItems.filter(item => item.department === dept.name).length} / {dept.roles.length}
+                    {items.filter(item => item.department === dept.name).length} / {dept.roles.length}
                   </span>
                 </div>
               </div>

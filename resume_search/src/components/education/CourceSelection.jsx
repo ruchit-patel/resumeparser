@@ -2,7 +2,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import { Input } from '@/components/ui/input';
 import { X, ChevronRight, Check, Search } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import {config} from '@/config';
+import { config } from '@/config';
 
 const fetchSearchData = async () => {
   try {
@@ -11,71 +11,55 @@ const fetchSearchData = async () => {
     const result = await response.json();
     return result.message || [];
   } catch (error) {
-    console.error('Error fetching departments:', error);
+    console.error('Error fetching courses:', error);
     return [];
   }
 };
-// Sample departments and roles data
-// const departments = [
-//   { 
-//     name: 'Customer Success, Service & Operations', 
-//     roles: ['Customer Support', 'Service Manager', 'Operations Lead', 'Account Manager'] 
-//   },
-//   { 
-//     name: 'Data Science & Analytics', 
-//     roles: ['Data Scientist', 'Data Analyst', 'ML Engineer', 'BI Developer'] 
-//   },
-//   { 
-//     name: 'Engineering - Hardware & Networks', 
-//     roles: ['Hardware Engineer', 'Network Administrator', 'ASIC / RTL / Logic Design Engineer', 'Design Team Lead', 'Design Verification Engineer', 'EDA Tools Engineer', 'Embedded Hardware Engineer'] 
-//   },
-//   { 
-//     name: 'Engineering - Software & QA', 
-//     roles: ['Software Developer', 'QA Engineer', 'DevOps Engineer', 'UI/UX Developer'] 
-//   },
-//   { 
-//     name: 'Finance & Accounting', 
-//     roles: ['Accountant', 'Financial Analyst', 'Tax Specialist', 'Auditor'] 
-//   },
-//   { 
-//     name: 'Human Resources', 
-//     roles: ['HR Manager', 'Recruiter', 'Training Coordinator', 'Compensation Specialist'] 
-//   },
-//   { 
-//     name: 'IT & Information Security', 
-//     roles: ['IT Support', 'Security Analyst', 'System Administrator', 'IT Project Manager'] 
-//   },
-//   { 
-//     name: 'BFSI, Investments & Trading', 
-//     roles: ['Investment Analyst', 'Trading Specialist', 'Risk Manager', 'Compliance Officer'] 
-//   }
-// ];
 
-
-export default function CourceSelector({ 
+export default function CourseSelector({ 
   placeholder = "Add Here", 
-  selectedItems,
-  setSelectedItems
+  selectedItems = [], // डिफॉल्ट मान जोड़ा
+  setSelectedItems,
+  onChange // ऐच्छिक कॉलबैक प्रॉप जोड़ा
 }) {
-  // const [selectedItems, setSelectedItems] = useState([]);
+  // लोकल स्टेट का प्रयोग करें अगर प्रॉप्स नहीं मिलते
+  const [localSelectedItems, setLocalSelectedItems] = useState([]);
+  
+  // तय करें कि प्रॉप्स का उपयोग करना है या लोकल स्टेट का
+  const items = selectedItems || localSelectedItems;
+  const updateItems = (newItems) => {
+    if (setSelectedItems) {
+      // प्रॉप सेटर का उपयोग करें अगर उपलब्ध है
+      setSelectedItems(newItems);
+    } else {
+      // अन्यथा लोकल स्टेट का उपयोग करें
+      setLocalSelectedItems(newItems);
+    }
+    
+    // यदि onChange प्रदान किया गया है तो उसे कॉल करें
+    if (onChange) {
+      onChange(newItems);
+    }
+  };
+
   const [isOpen, setIsOpen] = useState(false);
   const [expandedDept, setExpandedDept] = useState(null);
   const [searchQuery, setSearchQuery] = useState('');
+  const [departments, setDepartments] = useState([]);
   const dropdownRef = useRef(null);
 
-  const [departments, setDepartments] = useState([]);
-
+  // कंपोनेंट माउंट होने पर डेटा लोड करें
   useEffect(() => {
-      const loadDepartments = async () => {
-        const data = await fetchSearchData();
-        if (data && data.length > 0) {
-          setDepartments(data);
-        }
-      };
-      loadDepartments();
-    }, []);
+    const loadDepartments = async () => {
+      const data = await fetchSearchData();
+      if (data && data.length > 0) {
+        setDepartments(data);
+      }
+    };
+    loadDepartments();
+  }, []);
     
-    // Close dropdown when clicking outside
+  // बाहर क्लिक करने पर ड्रॉपडाउन बंद करें
   useEffect(() => {
     function handleClickOutside(event) {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
@@ -89,7 +73,7 @@ export default function CourceSelector({
     };
   }, []);
 
-  // Filter departments and roles based on search query
+  // सर्च क्वेरी के आधार पर विभागों और भूमिकाओं को फ़िल्टर करें
   const filteredDepartments = departments.map(dept => {
     const filteredRoles = dept.roles.filter(role => 
       role.toLowerCase().includes(searchQuery.toLowerCase())
@@ -103,7 +87,7 @@ export default function CourceSelector({
     };
   }).filter(dept => searchQuery ? (dept.matchesDept || dept.matchesRoles) : true);
 
-  // Auto-expand departments with matches when searching
+  // सर्च करते समय मिलने वाले विभागों को स्वचालित रूप से खोलें
   useEffect(() => {
     if (searchQuery) {
       filteredDepartments.forEach(dept => {
@@ -119,32 +103,27 @@ export default function CourceSelector({
   };
 
   const isRoleSelected = (deptName, role) => {
-    return selectedItems.some(item => 
+    return items.some(item => 
       item.department === deptName && item.role === role
     );
   };
 
   const isDepartmentSelected = (deptName) => {
     const departmentRoles = departments.find(d => d.name === deptName)?.roles || [];
-    const selectedRolesInDept = selectedItems.filter(
+    const selectedRolesInDept = items.filter(
       item => item.department === deptName && item.role
     ).length;
     
-    return selectedRolesInDept === departmentRoles.length;
+    return departmentRoles.length > 0 && selectedRolesInDept === departmentRoles.length;
   };
 
   const toggleRole = (deptName, role) => {
     const fullString = role ? `${deptName} - ${role}` : deptName;
     
     if (isRoleSelected(deptName, role)) {
-      setSelectedItems(prev => 
-        prev.filter(item => !(item.department === deptName && item.role === role))
-      );
+      updateItems(items.filter(item => !(item.department === deptName && item.role === role)));
     } else {
-      setSelectedItems(prev => [
-        ...prev, 
-        { department: deptName, role, fullString }
-      ]);
+      updateItems([...items, { department: deptName, role, fullString }]);
     }
   };
 
@@ -153,33 +132,32 @@ export default function CourceSelector({
     if (!dept) return;
 
     if (isDepartmentSelected(deptName)) {
-      // Deselect all roles in this department
-      setSelectedItems(prev => 
-        prev.filter(item => item.department !== deptName)
-      );
+      // इस विभाग की सभी भूमिकाओं को अचयनित करें
+      updateItems(items.filter(item => item.department !== deptName));
     } else {
-      // Select all roles in this department
+      // इस विभाग की सभी भूमिकाओं को चयनित करें
       const deptRoles = dept.roles.map(role => ({
         department: deptName,
         role,
         fullString: `${deptName} - ${role}`
       }));
       
-      // Remove any existing roles from this department before adding all
-      setSelectedItems(prev => [
-        ...prev.filter(item => item.department !== deptName),
+      // इस विभाग की मौजूदा भूमिकाओं को हटाकर सभी जोड़ें
+      updateItems([
+        ...items.filter(item => item.department !== deptName),
         ...deptRoles
       ]);
     }
   };
 
-  const removeItem = (itemToRemove) => {
-    setSelectedItems(prev => 
-      prev.filter(item => item.fullString !== itemToRemove.fullString)
-    );
+  const removeItem = (itemToRemove, event) => {
+    if (event) {
+      event.stopPropagation(); // बाहरी क्लिक से बचने के लिए
+    }
+    updateItems(items.filter(item => item.fullString !== itemToRemove.fullString));
   };
 
-  const clearAll = () => setSelectedItems([]);
+  const clearAll = () => updateItems([]);
 
   const highlightMatches = (text) => {
     if (!searchQuery || !text.toLowerCase().includes(searchQuery.toLowerCase())) {
@@ -202,26 +180,27 @@ export default function CourceSelector({
     <div className="w-full scroll-auto" ref={dropdownRef}>   
       <div className="border rounded-md p-2 bg-white min-h-10">
         <div className="flex flex-wrap gap-2" onClick={() => setIsOpen(!isOpen)}>
-          {selectedItems.map((item, index) => (
-            <span 
-              key={index} 
-              className="px-2 py-1 bg-blue-100 text-blue-700 rounded-lg flex items-center text-sm"
-            >
-              {item.fullString}
-              <X 
-                className="ml-1 cursor-pointer h-4 w-4" 
-                onClick={() => removeItem(item)} 
-              />
-            </span>
-          ))}
-          {selectedItems.length === 0 && (
+          {items.length > 0 ? (
+            items.map((item, index) => (
+              <span 
+                key={index} 
+                className="px-2 py-1 bg-blue-100 text-blue-700 rounded-lg flex items-center text-sm"
+              >
+                {item.fullString}
+                <X 
+                  className="ml-1 cursor-pointer h-4 w-4" 
+                  onClick={(e) => removeItem(item, e)} 
+                />
+              </span>
+            ))
+          ) : (
             <span className="text-gray-400 text-sm">{placeholder}</span>
           )}
         </div>
       </div>
       
       <div className="flex justify-between items-center mt-1">
-        {selectedItems.length > 0 && (
+        {items.length > 0 && (
           <button onClick={clearAll} className="text-sm text-red-500">
             Clear all
           </button>
@@ -242,7 +221,7 @@ export default function CourceSelector({
               <Search className="absolute left-2 top-2.5 h-4 w-4 text-gray-400" />
               <Input 
                 type="text" 
-                placeholder="Search departments or roles..." 
+                placeholder="Search courses..." 
                 className="w-full pl-8"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
@@ -277,24 +256,35 @@ export default function CourceSelector({
                     type="checkbox" 
                     className="mr-2" 
                     checked={isDepartmentSelected(dept.name)}
-                    onChange={() => toggleSelectAllRoles(dept.name)}
+                    onChange={(e) => {
+                      e.stopPropagation();
+                      toggleSelectAllRoles(dept.name);
+                    }}
                     onClick={(e) => e.stopPropagation()}
                   />
                   <span className="font-medium">
                     {highlightMatches(dept.name)}
                   </span>
                   <span className="ml-2 text-sm text-gray-500">
-                    {selectedItems.filter(item => item.department === dept.name).length} / {dept.roles.length}
+                    {items.filter(item => item.department === dept.name).length} / {dept.roles.length}
                   </span>
                 </div>
               </div>
               
               {expandedDept === dept.name && (
                 <div className="bg-gray-50 pl-10 pr-3 py-1">
+                  {/* "Any Roles" चेकबॉक्स जोड़ा */}
                   <div 
                     className="pl-2 py-1 cursor-pointer hover:bg-gray-100 rounded flex items-center"
                     onClick={() => toggleSelectAllRoles(dept.name)}
                   >
+                    <input 
+                      type="checkbox" 
+                      className="mr-2"
+                      checked={isDepartmentSelected(dept.name)}
+                      readOnly
+                    />
+                    <span className="text-gray-800">Any Courses</span>
                   </div>
                   
                   {dept.roles.map((role, roleIndex) => (
