@@ -208,23 +208,6 @@ def seach_candidate_edu_institute(q:str):
     return suggestions
 
 
-@frappe.whitelist(allow_guest=True)
-def seach_candidate_category(q:str):
-    candidate_categories = [
-    "Fresher", "Experienced", "Intern", 
-    "Junior Developer", "Mid-Level Developer", "Senior Developer", 
-    "Team Lead", "Manager", "Executive", 
-    "Consultant", "Contractor", "Freelancer", 
-    "Part-Time", "Full-Time", "Remote Worker", 
-    "On-Site Worker", "Temporary", "Permanent", 
-    "Entry-Level", "Mid-Level", "Senior-Level", 
-    "Technical", "Non-Technical", "Skilled Worker", 
-    "Unskilled Worker", "Supervisor", "Administrator"
-]
-
-    filter_data = list(filter(lambda a: q in a, candidate_categories))
-    return filter_data
-
 import json
 @frappe.whitelist(allow_guest=True)
 def search_results():
@@ -303,11 +286,13 @@ def candidate_detail():
                     "address": source.get("address"),
                     "gender": source.get("gender"),
                     "mobile_number": source.get("mobile_number"),
+                    "annual_salary": source.get("annual_salary"),
+                    "notice_period": source.get("notice_period"),
+                    "marital_status": source.get("marital_status"),
                     "email": source.get("email"),
                     "city": source.get("city"),
                     "maritalStatus": source.get("marital_status", "-"),
-                    "castCategory": source.get("cast_category", "-"),
-                    "physicallyChallenged": source.get("physically_challenged", "-"),
+                    "castCategory": source.get("category", "-"),
                     "total_experience": source.get("total_experience"),
                 },
                 "workSummary": {
@@ -326,8 +311,8 @@ def candidate_detail():
                     "AdditionalSkills": []  # Add logic here if needed
                 },
                 "desiredJob": {
-                    "employmentType": source.get("employment_type", "Permanent"),
-                    "employmentStatus": source.get("employment_status", "Full time")
+                    "currentJobType": source.get("current_job_type"),
+                    "seekingJobType": source.get("seeking_job_type")
                 },
                 "resume": {
                     "link": resume_doc.get("resume_file"),

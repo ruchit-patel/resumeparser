@@ -13,14 +13,11 @@ const DiversityDetails = ({ formState, updateFormField }) => {
   // Destructure values from formState for convenience
   const {
     gender,
-    disabilitiesOnly,
     category,
     candidateMinAge,
     candidateMaxAge,
-    jobType,
-    employmentType,
-    workPermit,
-    showCandidates,
+    currentJobType,
+    seekingJobType,
     verifiedFilters
   } = formState;
 
@@ -55,26 +52,29 @@ const DiversityDetails = ({ formState, updateFormField }) => {
                 </div>
                 
                 {/* Show only candidates who */}
-                <div className="flex items-center space-x-2">
-                  <Checkbox 
-                    id="diversity-checkbox" 
-                    checked={disabilitiesOnly}
-                    onCheckedChange={(value) => updateFormField('disabilitiesOnly', value)}
-                  />
-                  <Label htmlFor="diversity-checkbox" className="font-normal">
-                  Person with Disabilities only
-                  </Label>
-                </div>
+                
                 
                 {/* Candidate Category */}
                 <div className="space-y-2 flex flex-col">
                   <Label htmlFor="candidate-category">Candidate Category</Label>
-                  <AutocompleteInput 
-                  placeholder={"Add candidate category"} 
-                  setInputValue={(value) => updateFormField('category', value)} 
-                  inputValue={category}
-                  apiEndPoint = {"api/method/resumeparser.apis.search_apis.seach_candidate_category"}
-                  />
+                  <Select
+                            value={category}
+                            onValueChange={(value) => updateFormField('category', value)}
+                          >
+                            <SelectTrigger id="category" className="mt-1">
+                              <SelectValue placeholder="Select category" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="SC">SC</SelectItem>
+                              <SelectItem value="ST">ST</SelectItem>
+                              <SelectItem value="OBC">OBC</SelectItem>
+                              <SelectItem value="General">General</SelectItem>
+                              <SelectItem value="EWS">EWS</SelectItem>
+                              <SelectItem value="LGBTQIA+">LGBTQIA+</SelectItem>
+                              <SelectItem value="Veteran">Veteran </SelectItem>
+                            </SelectContent>
+                          </Select>
+                  
                 </div>
                 
                 {/* Candidate Age */}
@@ -100,92 +100,55 @@ const DiversityDetails = ({ formState, updateFormField }) => {
               </div>
               
               {/* Work details */}
-              <div className="space-y-4  flex flex-col">
+              <div className="space-y-4">
                 <h3 className="text-sm font-medium text-gray-700">Work details</h3>
                 
-               {/* Show candidates seeking */}
-              <div className="space-y-2 flex flex-col">
-                <Label>Show candidates seeking</Label>
-                <div className="flex space-x-2">
-                  <Select onValueChange={(value) => updateFormField('jobType', value)}>
-                    <SelectTrigger className="w-1/3">
-                      <SelectValue placeholder="Job type" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="full-time">Full Time</SelectItem>
-                      <SelectItem value="part-time">Part Time</SelectItem>
-                      <SelectItem value="contract">Contract</SelectItem>
-                    </SelectContent>
-                  </Select>
-                  <Select onValueChange={(value) => updateFormField('employmentType', value)}>
-                    <SelectTrigger className="w-1/3">
-                      <SelectValue placeholder="Employment type" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="permanent">Permanent</SelectItem>
-                      <SelectItem value="temporary">Temporary</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-              </div>
-                
-                {/* Work permit for */}
-                <div className="space-y-2 flex flex-col">
-                  <Label htmlFor="work-permit">Work permit for</Label>
-                  <AutocompleteInput 
-                  placeholder={"Choose category"} 
-                  setInputValue={(value) => updateFormField('workPermit', value)} 
-                  inputValue={workPermit}
-                  apiEndPoint = {"api/method/resumeparser.apis.search_apis.seach_candidate_category"}/>
-                  
-                </div>
-              </div>
-              
-              {/* Display details */}
-              <div className="space-y-4 flex flex-col">
-                <h3 className="text-sm font-medium text-gray-700">Display details</h3>
-                
-                {/* Show */}
-                <div className="space-y-2 flex flex-col">
-                  <Label>Show</Label>
-                  <ToggleGroup type="single" value={showCandidates} onValueChange={(value) => value && updateFormField('showCandidates', value)}>
-                    <ToggleGroupItem value="all" variant="pill" size="pill">All candidates</ToggleGroupItem>
-                    <ToggleGroupItem value="new" variant="pill" size="pill">New registrations</ToggleGroupItem>
-                    <ToggleGroupItem value="modified" variant="pill" size="pill">Modified candidates</ToggleGroupItem>
-                  </ToggleGroup>
-                </div>
-                
-                {/* Show only candidates with */}
-                <div className="space-y-2 flex flex-col">
-                  <Label>Show only candidates with</Label>
-                  <div className="flex flex-wrap gap-2">
-                    <Toggle 
-                      variant="pill" 
-                      size="pill" 
-                      pressed={verifiedFilters.includes('mobile')}
-                      onPressedChange={() => handleVerifiedFilterChange('mobile')}
-                    >
-                      Verified mobile number
-                    </Toggle>
-                    <Toggle 
-                      variant="pill" 
-                      size="pill" 
-                      pressed={verifiedFilters.includes('email')}
-                      onPressedChange={() => handleVerifiedFilterChange('email')}
-                    >
-                      Verified email ID
-                    </Toggle>
-                    <Toggle 
-                      variant="pill" 
-                      size="pill" 
-                      pressed={verifiedFilters.includes('resume')}
-                      onPressedChange={() => handleVerifiedFilterChange('resume')}
-                    >
-                      Attached resume
-                    </Toggle>
+                {/* Show candidates seeking */}
+                <div className="grid grid-cols-2 gap-4"> 
+                  <div className="space-y-2 flex flex-col">
+                    <Label>Current Job Type</Label>
+                    <Select onValueChange={(value) => updateFormField('currentJobType', value)}>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select current job type" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="Full Time">Full Time</SelectItem>
+                        <SelectItem value="Part Time">Part Time</SelectItem>
+                        <SelectItem value="Contract">Contract</SelectItem>
+                        <SelectItem value="Temporary">Temporary</SelectItem>
+                        <SelectItem value="Volunteer">Volunteer</SelectItem>
+                        <SelectItem value="Intern">Intern</SelectItem>
+                        <SelectItem value="Freelance">Freelance</SelectItem>
+                        <SelectItem value="Remote">Remote</SelectItem>
+                        <SelectItem value="Hybrid">Hybrid</SelectItem>
+                        <SelectItem value="Other">Other</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+
+                  <div className="space-y-2 flex flex-col">
+                    <Label>Seeking Job Type</Label>
+                    <Select onValueChange={(value) => updateFormField('seekingJobType', value)}>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select desired job type" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="Full Time">Full Time</SelectItem>
+                        <SelectItem value="Part Time">Part Time</SelectItem>
+                        <SelectItem value="Contract">Contract</SelectItem>
+                        <SelectItem value="Temporary">Temporary</SelectItem>
+                        <SelectItem value="Volunteer">Volunteer</SelectItem>
+                        <SelectItem value="Intern">Intern</SelectItem>
+                        <SelectItem value="Freelance">Freelance</SelectItem>
+                        <SelectItem value="Remote">Remote</SelectItem>
+                        <SelectItem value="Hybrid">Hybrid</SelectItem>
+                        <SelectItem value="Other">Other</SelectItem>
+                      </SelectContent>
+                    </Select>
                   </div>
                 </div>
               </div>
+              
             </CardContent>
           </AccordionContent>
         </AccordionItem>

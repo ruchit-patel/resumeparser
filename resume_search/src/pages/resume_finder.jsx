@@ -54,11 +54,8 @@ const ResumeFindPage = () => {
     category: '',
     candidateMinAge: '',
     candidateMaxAge: '',
-    jobType: '',
-    employmentType: '',
-    workPermit: '',
-    showCandidates: 'all',
-    verifiedFilters: []
+    currentJobType: '',
+    seekingJobType: '',
   };
 
   const [formState, setFormState] = useState(initialFormState);
@@ -120,7 +117,7 @@ const ResumeFindPage = () => {
                   value="saved" 
                   className="rounded-none border-b-2 border-transparent data-[state=active]:border-blue-600 data-[state=active]:bg-white px-4 py-2"
                 >
-                  Saved Notes
+                  Saved Candidates
                 </TabsTrigger>
               </TabsList>
               

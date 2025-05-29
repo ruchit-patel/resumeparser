@@ -114,6 +114,10 @@ const ResumeProfileDetailComponent = ({candidate}) => {
                   <div>{candidate.workSummary.role || "-"}</div>
                   <div className="text-gray-500">Total Experience</div>
                   <div>{candidate.basicInfo.total_experience ? `${candidate.basicInfo.total_experience} Years` : "-"}</div>
+                  <div className="text-gray-500">Annual Salary</div>
+                  <div>{candidate.basicInfo.annual_salary ? `${candidate.basicInfo.annual_salary} Lakhs` : "-"}</div>
+                  <div className="text-gray-500">Notice Period</div>
+                  <div>{candidate.basicInfo.notice_period ? `${candidate.basicInfo.notice_period} Days` : "-"}</div>
                 </div>
               </div>
 
@@ -290,10 +294,6 @@ const ResumeProfileDetailComponent = ({candidate}) => {
                     <div className="text-gray-500 mb-1">Category</div>
                     <div>{candidate.basicInfo.castCategory}</div>
                   </div>
-                  <div>
-                    <div className="text-gray-500 mb-1">Physically Challenged</div>
-                    <div>{candidate.basicInfo.physicallyChallenged}</div>
-                  </div>
                 </div>  
               </div>
 
@@ -302,12 +302,12 @@ const ResumeProfileDetailComponent = ({candidate}) => {
                 <h3 className="font-medium text-lg mb-3">Desired job detail</h3>
                 <div className="grid grid-cols-2 gap-4 text-sm">
                   <div>
-                    <div className="text-gray-500 mb-1">Job Type</div>
-                    <div>{candidate.desiredJob.employmentType}</div>
+                    <div className="text-gray-500 mb-1">Current Job Type</div>
+                    <div>{candidate.desiredJob.currentJobType}</div>
                   </div>
                   <div>
-                    <div className="text-gray-500 mb-1">Employment status</div>
-                    <div>{candidate.desiredJob.employmentStatus}</div>
+                    <div className="text-gray-500 mb-1">Seeking Job Type</div>
+                    <div>{candidate.desiredJob.seekingJobType}</div>
                   </div>
                 </div>
               </div>

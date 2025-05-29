@@ -63,7 +63,7 @@ const EducationQualification = ({ ugQualification,
             )}
 
             {ugQualification !== '' && (
-                <div className="space-y-2 flex flex-col">
+                <div className="space-y-2 hidden flex-col">
                     <Label className="block text-sm font-medium pt-1">Education Type</Label>
                     <ToggleGroup type="single" className='flex gap-2 pb-3' value={educationType} onValueChange={(value) => value && setEducationType(value)}>
                         <ToggleGroupItem value="full-time" variant="pill" size="pill">Full Time</ToggleGroupItem>

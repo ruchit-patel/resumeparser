@@ -26,9 +26,15 @@ const UpdateProfile = () => {
     email: "",
     city: "",
     age: null,
+    category: "",
     industry: "",
     total_experience: 0,
+    annual_salary: 0,
+    notice_period: 0,
     role: "",
+    marital_status: "",
+    seeking_job_type: "",
+    current_job_type: "",
     education: [],
     experience: [],
     skills: [],
@@ -228,9 +234,9 @@ const UpdateProfile = () => {
                               <SelectValue placeholder="Select gender" />
                             </SelectTrigger>
                             <SelectContent>
-                              <SelectItem value="male">Male</SelectItem>
-                              <SelectItem value="female">Female</SelectItem>
-                              <SelectItem value="other">Other</SelectItem>
+                              <SelectItem value="Male">Male</SelectItem>
+                              <SelectItem value="Female">Female</SelectItem>
+                              <SelectItem value="Other">Other</SelectItem>
                             </SelectContent>
                           </Select>
                         </div>
@@ -262,6 +268,48 @@ const UpdateProfile = () => {
                             className="mt-1"
                           />
                         </div>
+
+                        <div>
+                          <Label htmlFor="category">Candidate Category</Label>
+                          <Select
+                            value={formData.category}
+                            onValueChange={(value) => setFormData(prev => ({ ...prev, category: value }))}
+                          >
+                            <SelectTrigger id="category" className="mt-1">
+                              <SelectValue placeholder="Select category" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="SC">SC</SelectItem>
+                              <SelectItem value="ST">ST</SelectItem>
+                              <SelectItem value="OBC">OBC</SelectItem>
+                              <SelectItem value="General">General</SelectItem>
+                              <SelectItem value="EWS">EWS</SelectItem>
+                              <SelectItem value="LGBTQIA+">LGBTQIA+</SelectItem>
+                              <SelectItem value="Veteran">Veteran </SelectItem>
+                            </SelectContent>
+                          </Select>
+                        </div>
+
+                        <div>
+                          <Label htmlFor="marital_status">Marital Status</Label>
+                          <Select
+                            value={formData.marital_status}
+                            onValueChange={(value) => setFormData(prev => ({ ...prev, marital_status: value }))}
+                          >
+                            <SelectTrigger id="marital_status" className="mt-1">
+                              <SelectValue placeholder="Select marital status" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="Single">Single</SelectItem>
+                              <SelectItem value="Married">Married</SelectItem>
+                              <SelectItem value="Divorced">Divorced</SelectItem>
+                              <SelectItem value="Widowed">Widowed</SelectItem>
+                              <SelectItem value="Separated">Separated</SelectItem>
+                              <SelectItem value="Other">Other</SelectItem>
+                            </SelectContent>
+                          </Select>
+                        </div>
+
                       </div>
                     </div>
                   )}
@@ -288,6 +336,7 @@ const UpdateProfile = () => {
                               apiEndPoint = {"api/method/resumeparser.apis.search_apis.seach_candidate_role"}
                           />
                         </div>
+                       
                         <div>
                           <Label htmlFor="total_experience">Total Experience (Years)</Label>
                           <Input
@@ -299,6 +348,83 @@ const UpdateProfile = () => {
                             className="mt-1"
                           />
                         </div>
+
+                        <div>
+                          <Label htmlFor="annual_salary">Annual Salary (Lakhs)</Label>
+                          <Input
+                            id="annual_salary"
+                            type="number"
+                            step="0.1"
+                            value={formData.annual_salary}
+                            onChange={(e) => setFormData(prev => ({ ...prev, annual_salary: parseFloat(e.target.value) }))}
+                            className="mt-1"
+                          />
+                        </div>
+
+                        <div>
+                          <Label htmlFor="notice_period">Notice Period / Availability (Days)</Label>
+                          <Input
+                            id="notice_period"
+                            type="number"
+                            step="0.1"
+                            value={formData.notice_period}
+                            onChange={(e) => setFormData(prev => ({ ...prev, notice_period: parseFloat(e.target.value) }))}
+                            className="mt-1"
+                          />
+                        </div>
+
+
+                        <div>
+                          <Label htmlFor="seeking_job_type">Seeking Job Type</Label>
+                          <Select
+                            value={formData.seeking_job_type}
+                            onValueChange={(value) => setFormData(prev => ({ ...prev, seeking_job_type: value }))}
+                          >
+                            <SelectTrigger id="seeking_job_type" className="mt-1">
+                              <SelectValue placeholder="Select seeking job type" />
+                            </SelectTrigger>  
+                            <SelectContent>
+                              <SelectItem value="Full Time">Full Time</SelectItem>
+                              <SelectItem value="Part Time">Part Time</SelectItem>
+                              <SelectItem value="Contract">Contract</SelectItem>
+                              <SelectItem value="Temporary">Temporary</SelectItem>
+                              <SelectItem value="Volunteer">Volunteer</SelectItem>
+                              <SelectItem value="Intern">Intern</SelectItem>
+                              <SelectItem value="Freelance">Freelance</SelectItem>
+                              <SelectItem value="Remote">Remote</SelectItem>
+                              <SelectItem value="Hybrid">Hybrid</SelectItem>
+                              <SelectItem value="Other">Other</SelectItem>
+                            </SelectContent>
+                          </Select>
+                        </div>
+
+
+
+                        <div>
+                          <Label htmlFor="current_job_type">Current Job Type</Label>
+                          <Select
+                            value={formData.current_job_type}
+                            onValueChange={(value) => setFormData(prev => ({ ...prev, current_job_type: value }))}
+                          >
+                              <SelectTrigger id="current_job_type" className="mt-1">
+                              <SelectValue placeholder="Select current job type" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="Full Time">Full Time</SelectItem>
+                              <SelectItem value="Part Time">Part Time</SelectItem>
+                              <SelectItem value="Contract">Contract</SelectItem>
+                              <SelectItem value="Temporary">Temporary</SelectItem>
+                              <SelectItem value="Volunteer">Volunteer</SelectItem>
+                              <SelectItem value="Intern">Intern</SelectItem>
+                              <SelectItem value="Freelance">Freelance</SelectItem>
+                              <SelectItem value="Remote">Remote</SelectItem>
+                              <SelectItem value="Hybrid">Hybrid</SelectItem>
+                              <SelectItem value="Other">Other</SelectItem>
+                            </SelectContent>
+                          </Select>
+                        </div>
+
+
                       </div>
                     </div>
                   )}

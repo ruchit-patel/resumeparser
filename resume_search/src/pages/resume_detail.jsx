@@ -12,7 +12,7 @@ const ResumeDetailPage = () => {
   const fetchCandidateDetail = async () => {
     try {
       setIsLoading(true);
-      const response = await fetch(`${config.backendUrl}/api/method/resumeparser.apis.search_apis.candidate_detail/${id}`);
+      const response = await fetch(`/api/method/resumeparser.apis.search_apis.candidate_detail/${id}`);
       const result = await response.json();
       return result;
     } catch (error) {

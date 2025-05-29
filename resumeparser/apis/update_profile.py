@@ -55,7 +55,7 @@ def candidate_get():
         return {"error": str(e)}
 
 
-@frappe.whitelist()
+@frappe.whitelist(allow_guest=True)
 def approve_resume():
     try:
         path = frappe.request.path
