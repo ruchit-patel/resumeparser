@@ -8,7 +8,6 @@ import CustomSelectionAddInput from '../common/CustomSelectionAddInput';
 import MultiAutoSuggations from '../common/MultiAutoSuggationsComponent';
 import AutocompleteInput from '../common/AutoCompleteInputComponent';
 const SearchForm = ({ formState, updateFormField }) => {
-  const [includeSalary, setIncludeSalary] = useState(false);
   const [isSearchText, setIsSearchText] = useState(false); // Optional when something do when inputfield is
   
   // Destructure values from formState for convenience
@@ -21,7 +20,8 @@ const SearchForm = ({ formState, updateFormField }) => {
     location,
     minSalary,
     maxSalary,
-    currency
+    currency,
+    salaryNotProvided
   } = formState;
 
   return (
@@ -139,11 +139,11 @@ const SearchForm = ({ formState, updateFormField }) => {
           <div className="pt-2">
             <div className="flex items-center space-x-2 ">
               <Checkbox 
-                id="include-salary" 
-                checked={includeSalary}
-                onCheckedChange={setIncludeSalary}
+                id="salary-not-provided" 
+                checked={salaryNotProvided}
+                onCheckedChange={(checked) => updateFormField('salaryNotProvided', checked)}
               />
-              <Label htmlFor="include-salary" className="text-sm font-normal">
+              <Label htmlFor="salary-not-provided" className="text-sm font-normal">
                 Include candidates where salary is not provided.
               </Label>
             </div>

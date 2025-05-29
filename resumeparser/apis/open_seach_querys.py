@@ -363,403 +363,6 @@ def education_institute_search_query(q: str) -> dict:
     }
             
 
-def final_search_query(search_data: dict) -> dict:
-    print("search_data : ---------------",search_data)
-    must_conditions = []
-    should_conditions = []
-    must_not_condotions= []
-    
-    # location
-    if search_data.get("location") != "" and len(search_data.get("location")) >= 1:
-        print("location : ---------------",search_data.get("location"))
-        condition = {
-                "match": {
-                            "city": {
-                                "query": search_data.get("location"),
-                                "max_expansions": 50,
-                                "operator": "or",
-                                "fuzziness": "AUTO",
-                            }
-                        }
-                    }
-        should_conditions.append(condition)
-    # Education PG
-    if search_data.get("pgcourse") != "" and len(search_data.get("pgcourse")) >= 1:
-      for item in search_data.get("pgcourse", []):
-        condition = {
-            "nested": {
-                "path": "education",
-                "query": {
-                    "bool": {
-                        "should": [
-                            # Match for course_name with department
-                            {
-                                "match": {
-                                    "education.course_name": {
-                                        "query": item["department"],
-                                        "operator": "or",
-                                        "fuzziness": "AUTO"
-                                    }
-                                }
-                            },
-                            # Match for specialization with department
-                            {
-                                "match": {
-                                    "education.specialization": {
-                                        "query": item["department"],
-                                        "operator": "or",
-                                        "fuzziness": "AUTO"
-                                    }
-                                }
-                            },
-                            # Match for course_name with role
-                            {
-                                "match": {
-                                    "education.course_name": {
-                                        "query": item["role"],
-                                        "operator": "or",
-                                        "fuzziness": "AUTO"
-                                    }
-                                }
-                            },
-                            # Match for specialization with role
-                            {
-                                "match": {
-                                    "education.specialization": {
-                                        "query": item["role"],
-                                        "operator": "or",
-                                        "fuzziness": "AUTO"
-                                    }
-                                }
-                            },
-                            # Year-based range filter (from and to year)
-                            {
-                                "bool": {
-                                    "must": [
-                                        {
-                                            "range": {
-                                                "education.from": {
-                                                    "gte": f"{search_data.get('pgfromYear')}-01-01",
-                                                    "lte": f"{search_data.get('pgfromYear')}-12-31"
-                                                }
-                                            }
-                                        },
-                                        {
-                                            "range": {
-                                                "education.to": {
-                                                    "gte": f"{search_data.get('pgtoYear')}-01-01",
-                                                    "lte": f"{search_data.get('pgtoYear')}-12-31"
-                                                }
-                                            }
-                                        }
-                                    ]
-                                }
-                            }
-                        ]
-                    }
-                }
-            }
-        }
-        should_conditions.append(condition)
-
-    if search_data.get("pginstitute") != "" and len(search_data.get("pginstitute")) >= 1:
-      condition = {
-                "nested": {
-                    "path": "education",
-                    "query": {
-                        "match": {
-                            "education.school_college_name": {
-                                "query": search_data.get("pginstitute"),
-                                "max_expansions": 50,
-                                "boost": 5.0
-                            }
-                        }
-                    }
-                }
-            }
-      should_conditions.append(condition)
-
-    # Education UG
-    if search_data.get("ugcourse") != "" and len(search_data.get("ugcourse")) >= 1:
-      for item in search_data.get("ugcourse", []):
-        condition =  {
-                "nested": {
-                      "path": "education",
-                      "query": {
-                        "match": {
-                          "education.course_name": {
-                            "query": item["department"],
-                            "operator": "or",
-                            "fuzziness": "AUTO"
-                          }
-                        }
-                      }
-                    },
-                "nested": {
-                      "path": "education",
-                      "query": {
-                        "match": {
-                          "education.specialization": {
-                            "query": item["department"],
-                            "operator": "or",
-                            "fuzziness": "AUTO"
-                          }
-                        }
-                      }
-                    },
-                "nested": {
-                      "path": "education",
-                      "query": {
-                        "match": {
-                          "education.course_name": {
-                            "query": item["role"],
-                            "operator": "or",
-                            "fuzziness": "AUTO"
-                          }
-                        }
-                      }
-                    },
-                "nested": {
-                      "path": "education",
-                      "query": {
-                        "match": {
-                          "education.specialization": {
-                            "query": item["role"],
-                            "operator": "or",
-                            "fuzziness": "AUTO"
-                          }
-                        }
-                      }
-                    }
-                
-            }
-        should_conditions.append(condition)
-
-    if search_data.get("uginstitute") != "" and len(search_data.get("uginstitute")) >= 1:
-      condition = {
-                "nested": {
-                    "path": "education",
-                    "query": {
-                        "match": {
-                            "education.school_college_name": {
-                                "query": search_data.get("uginstitute"),
-                                "max_expansions": 50,
-                                "boost": 5.0
-                            }
-                        }
-                    }
-                }
-            }
-      should_conditions.append(condition)
-
-    
-    # For Employeement company 
-    if search_data.get("company") != "" and len(search_data.get("company")) >= 1:
-      condition = {
-                "nested": {
-                    "path": "experience",
-                    "query": {
-                        "match": {
-                            "experience.company_name": {
-                                "query": search_data.get("company"),
-                                "max_expansions": 50
-                            }
-                        }
-                    }
-                }
-            }
-      should_conditions.append(condition)
-
-      # For Employeement industry 
-      if search_data.get("industry") != "" and len(search_data.get("industry")) >= 1:
-        condition = {
-                  "nested": {
-                      "path": "experience",
-                      "query": {
-                          "match": {
-                              "experience.company_name": {
-                                  "query": search_data.get("industry"),
-                                  "max_expansions": 50
-                              }
-                          }
-                      }
-                  }
-              }
-        should_conditions.append(condition)
-
-    # For Employeement designation
-    if search_data.get("designation") != "" and len(search_data.get("designation")) >= 1:
-      find_in = [("education","education.course_name"),("experience","experience.role_position"),("experience","experience.job_description")]
-      for item in find_in:
-        condition = {
-                "nested": {
-                      "path": item[0],
-                      "query": {
-                        "match": {
-                          item[1]: {
-                            "query": search_data.get("designation"),
-                            "operator": "or",
-                            "fuzziness": "AUTO"
-                          }
-                        }
-                      }
-                    }
-            }
-        should_conditions.append(condition)
-
-    # For Employeement excludeCompanies
-    if search_data.get("excludeCompanies") != "" and len(search_data.get("excludeCompanies")) >= 1:
-      for item in search_data.get("excludeCompanies", []):
-        condition = {
-                  "nested": {
-                      "path": "experience",
-                      "query": {
-                        "match": {
-                          "experience.company_name": {
-                            "query": item["text"],
-                            "operator": "and",
-                            "fuzziness": "AUTO"
-                          }
-                        }
-                  }
-              }}
-        must_not_condotions.append(condition)
-    # departmentes
-    if search_data.get("departmentes") != "" and len(search_data.get("departmentes")) >= 1:
-      for item in search_data.get("departmentes", []):
-        condition =  {
-                "nested": {
-                      "path": "experience",
-                      "query": {
-                        "match": {
-                          "experience.role_position": {
-                            "query": item["department"],
-                            "operator": "or",
-                            "fuzziness": "AUTO"
-                          }
-                        }
-                      }
-                    },
-                "nested": {
-                      "path": "experience",
-                      "query": {
-                        "match": {
-                          "experience.job_description": {
-                            "query": item["department"],
-                            "operator": "or",
-                            "fuzziness": "AUTO"
-                          }
-                        }
-                      }
-                    },
-                "nested": {
-                      "path": "experience",
-                      "query": {
-                        "match": {
-                          "experience.role_position": {
-                            "query": item["role"],
-                            "operator": "or",
-                            "fuzziness": "AUTO"
-                          }
-                        }
-                      }
-                    },
-                "nested": {
-                      "path": "experience",
-                      "query": {
-                        "match": {
-                          "experience.job_description": {
-                            "query": item["role"],
-                            "operator": "or",
-                            "fuzziness": "AUTO"
-                          }
-                        }
-                      }
-                    }
-                
-            }
-        should_conditions.append(condition)
-
-    # Process both skills and searchKeywords
-    for key in ["skills", "searchKeywords"]:
-        for item in search_data.get(key, []):
-            # Determine field path
-            if key == "skills" or item.get("cat") == "skills":
-                path = "skills"
-                field = "skills.skill_name"
-            elif item.get("cat") == "designations":
-                path = "experience"
-                field = "experience.role_position"
-            elif item.get("cat") == "companies":
-                path = "experience"
-                field = "experience.company_name"
-            else:
-                path = "skills"
-                field = "skills.skill_name"
-                
-            # Create condition
-            condition = {
-                "nested": {
-                    "path": path,
-                    "query": {
-                        "match": {
-                            field: {
-                                "query": item["text"],
-                                "max_expansions": 50
-                            }
-                        }
-                    }
-                }
-            }
-            
-            # Add to appropriate list
-            if item.get("isNecessary", False):
-                must_conditions.append(condition)
-            else:
-                should_conditions.append(condition)
-
-    # Base query structure
-    query_part = {
-        "bool": {
-            "must": must_conditions,
-            "should": should_conditions,
-            "must_not":must_not_condotions,
-            "minimum_should_match": 0
-        }
-    }
-    
-    # Add experience filtering if needed
-    min_exp = search_data.get("minExperience")
-    max_exp = search_data.get("maxExperience")
-    
-    if min_exp !="" and max_exp != "":
-        query_part = {
-                "script_score": {
-                    "query": query_part,
-                    "script": {
-                        "source": f"""
-                            long totalMillis = 0;
-                            for (exp in params._source.experience) {{
-                                if (exp.from != null && exp.to != null) {{
-                                    ZonedDateTime from = ZonedDateTime.parse(exp.from + "T00:00:00Z");
-                                    ZonedDateTime to = ZonedDateTime.parse(exp.to + "T00:00:00Z");
-                                    totalMillis += ChronoUnit.MILLIS.between(from, to);
-                                }}
-                            }}
-                            double totalYears = totalMillis / 1000.0 / 60 / 60 / 24 / 365;
-                            return (totalYears >= {min_exp} && totalYears <= {max_exp}) ? 1 : 0;
-                        """
-                    }
-                }
-            }
-
-        
-    # Final structure
-    return {
-        "size": 20,
-        # "_source": ["id"],
-        "query": query_part
-    }
 
 def certificates_search_query(q: str):
     return {
@@ -824,4 +427,136 @@ def get_resume_from_id(resume_ids):
             }
         }
     }
+
+
+
+def final_search_query(search_data: dict) -> dict:
+    keywords = [item["text"] for item in search_data.get("searchKeywords", [])]
+    if not keywords:
+        # No keywords provided, return a query that matches nothing
+        return {
+            "size": 20,
+            "query": {
+                "bool": {
+                    "must": [
+                        {"match_none": {}}
+                    ]
+                }
+            }
+        }
+
+    must_conditions = []
+    should_conditions = []
+    must_not_conditions = []
+
+    # 1. Star-marked keywords (must be in skills, all in a single nested query)
+    necessary_skills = [item["text"] for item in search_data.get("searchKeywords", []) if item.get("isNecessary", False)]
+    if necessary_skills:
+        must_conditions.append({
+            "nested": {
+                "path": "skills",
+                "query": {
+                    "bool": {
+                        "must": [
+                            {"match": {"skills.skill_name": skill}} for skill in necessary_skills
+                        ]
+                    }
+                }
+            }
+        })
+
+    # Non-starred keywords can be in should (optional, can expand as needed)
+    for item in search_data.get("searchKeywords", []):
+        if not item.get("isNecessary", False):
+            should_conditions.append({
+                "nested": {
+                    "path": "skills",
+                    "query": {
+                        "match": {
+                            "skills.skill_name": {
+                                "query": item["text"],
+                                "max_expansions": 50
+                            }
+                        }
+                    }
+                }
+            })
+
+    # 2. Experience (must)
+    min_exp = search_data.get("minExperience")
+    max_exp = search_data.get("maxExperience")
+    if min_exp != "" and max_exp != "":
+        must_conditions.append({
+            "range": {
+                "total_experience": {
+                    "gte": min_exp,
+                    "lte": max_exp
+                }
+            }
+        })
+
+    # 3. Location (must)
+    location = search_data.get("location")
+    if location:
+        must_conditions.append({
+            "match": {
+                "city": {
+                    "query": location,
+                    "max_expansions": 50,
+                    "operator": "or",
+                    "fuzziness": "AUTO",
+                }
+            }
+        })
+
+    # 4. Salary (must, with should for salary not provided)
+    min_salary = search_data.get("minSalary")
+    max_salary = search_data.get("maxSalary")
+    salary_not_provided = search_data.get("salaryNotProvided")
+
+    salary_shoulds = []
+    if min_salary != "" and max_salary != "":
+        salary_shoulds.append({
+            "range": {
+                "annual_salary": {
+                    "gte": float(min_salary),
+                    "lte": float(max_salary)
+                }
+            }
+        })
+    if salary_not_provided:
+        salary_shoulds.append({
+            "bool": {
+                "must_not": {
+                    "exists": {
+                        "field": "annual_salary"
+                    }
+                }
+            }
+        })
+
+    # If either salary range or not provided is specified, use should with min 1
+    if salary_shoulds:
+        must_conditions.append({
+            "bool": {
+                "should": salary_shoulds,
+                "minimum_should_match": 1
+            }
+        })
+
+    # Build the final query
+    query_part = {
+        "bool": {
+            "must": must_conditions,
+            "should": should_conditions,
+            "must_not": must_not_conditions,
+            "minimum_should_match": 1 if should_conditions else 0
+        }
+    }
+
+    return {
+        "size": 20,
+        "query": query_part
+    }
+
 

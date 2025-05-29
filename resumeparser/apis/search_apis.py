@@ -214,7 +214,7 @@ def search_results():
     try:  
         post_form =  frappe.request.get_json()
         row_query = final_search_query(post_form)
-        print("-------------------------------------")
+        print("-----------------[Final Query]--------------------")
         print(row_query)
         print("-------------------------------------")
         response = open_search_query_executor(row_query)

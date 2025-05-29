@@ -28,10 +28,6 @@ const EducationDetails = ({ formState, updateFormField }) => {
     doctorateQualification
   } = formState;
 
-    console.log("formState :",formState)
-    console.log("ugcourse :",ugcourse)
-
-
   return (
     <Card className="mb-6">
       <Accordion type="single" collapsible>

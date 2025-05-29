@@ -25,6 +25,7 @@ const ResumeFindPage = () => {
     maxExperience: '',
     minSalary: '',
     maxSalary: '',
+    salaryNotProvided: false,
     location: '',
     currency: 'INR',
     // Employment Details
