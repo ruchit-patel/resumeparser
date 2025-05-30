@@ -431,19 +431,29 @@ def get_resume_from_id(resume_ids):
 
 
 def final_search_query(search_data: dict) -> dict:
-    keywords = [item["text"] for item in search_data.get("searchKeywords", [])]
-    if not keywords:
-        # No keywords provided, return a query that matches nothing
-        return {
-            "size": 20,
-            "query": {
-                "bool": {
-                    "must": [
-                        {"match_none": {}}
-                    ]
-                }
-            }
-        }
+    print("----------------[Search Data]----------------")
+    print(search_data)
+    for i in search_data.items():
+        print(i[0], " : ", i[1])
+    print("--------------------------------")
+
+
+    # -------------------------------[Section 1]-------------------------------
+    # keywords = [item["text"] for item in search_data.get("searchKeywords", [])]
+    keywords = [item["text"] for item in search_data.get("searchKeywords", []) + search_data.get("skills", [])]
+
+    # if not keywords:
+    #     # No keywords provided, return a query that matches nothing
+    #     return {
+    #         "size": 20,
+    #         "query": {
+    #             "bool": {
+    #                 "must": [
+    #                     {"match_none": {}}
+    #                 ]
+    #             }
+    #         }
+    #     }
 
     must_conditions = []
     should_conditions = []
@@ -543,6 +553,119 @@ def final_search_query(search_data: dict) -> dict:
                 "minimum_should_match": 1
             }
         })
+
+    # -------------------------------[Section 2]-------------------------------
+    departmentes = search_data.get("departmentes", [])
+    industry = search_data.get("industry")
+    company = search_data.get("company")
+    excludeCompanies = search_data.get("excludeCompanies")
+    designation = search_data.get("designation")
+    noticePeriod = search_data.get("noticePeriod")
+
+
+    departmentes.append({"role": designation, "department": ""})
+
+    # For each entry, add should clauses to search for department and role strings
+    for entry in departmentes:
+        department = entry.get("department")
+        role = entry.get("role")
+
+        search_terms = set()
+        if department:
+            search_terms.add(department)
+        if role:
+            search_terms.add(role)
+
+        temp_should_clauses = []
+        for term in search_terms:
+            temp_should_clauses.append({
+                "nested": {
+                    "path": "experience",
+                    "query": {
+                        "match": {
+                            "experience.role_position": {
+                                "query": term,
+                                "operator": "or",
+                                "fuzziness": "AUTO"
+                            }
+                        }
+                    }
+                }
+            })
+            temp_should_clauses.append({
+                "nested": {
+                    "path": "experience",
+                    "query": {
+                        "match": {
+                            "experience.job_description": {
+                                "query": term,
+                                "operator": "or",
+                                "fuzziness": "AUTO"
+                            }
+                        }
+                    }
+                }
+            })
+
+        if temp_should_clauses:
+            must_conditions.append({
+                "bool": {
+                    "should": temp_should_clauses,
+                    "minimum_should_match": 1
+                }
+            })
+        
+    if industry != "":
+        must_conditions.append({
+            "match": {
+                "industry": {"query": industry, "operator": "or", "fuzziness": "AUTO"}
+            }
+        })
+    if company != "":
+        must_conditions.append({
+            "nested": {
+                    "path": "experience",
+                    "query": {
+                        "match": {
+                            "experience.company_name": {
+                                "query": company,
+                                "operator": "or",
+                                "fuzziness": "AUTO"
+                            }
+                        }
+                    }
+                }
+        })
+
+
+    if excludeCompanies != "" and len(excludeCompanies) >= 1:
+        for item in excludeCompanies:
+            condition = {
+                    "nested": {
+                        "path": "experience",
+                        "query": {
+                        "match": {
+                            "experience.company_name": {
+                            "query": item["text"],
+                            "operator": "and",
+                            "fuzziness": "AUTO"
+                            }
+                        }
+                    }
+                }}
+        must_not_conditions.append(condition)
+
+    if noticePeriod != "" and noticePeriod != "any":
+        notice_int = int(noticePeriod)
+        must_conditions.append({
+            "range": {
+                "notice_period": {
+                    "lte": notice_int  # less than or equal to the provided noticePeriod
+                }
+            }
+        })
+
+    # -------------------------------[Response]-------------------------------
 
     # Build the final query
     query_part = {

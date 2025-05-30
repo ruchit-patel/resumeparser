@@ -84,12 +84,11 @@ const EmploymentDetails = ({ formState, updateFormField }) => {
                 <Label>Notice Period / Availability to join</Label>
                 <ToggleGroup type="single" value={noticePeriod} onValueChange={(value) => value && updateFormField('noticePeriod', value)}>
                   <ToggleGroupItem value="any" variant="pill" size="pill">Any</ToggleGroupItem>
-                  <ToggleGroupItem value="0-15" variant="pill" size="pill">0-15 days +</ToggleGroupItem>
-                  <ToggleGroupItem value="1-month" variant="pill" size="pill">1 month +</ToggleGroupItem>
-                  <ToggleGroupItem value="2-months" variant="pill" size="pill">2 months +</ToggleGroupItem>
-                  <ToggleGroupItem value="3-months" variant="pill" size="pill">3 months +</ToggleGroupItem>
-                  <ToggleGroupItem value="more-than-3" variant="pill" size="pill">More than 3 months +</ToggleGroupItem>
-                  <ToggleGroupItem value="more-than-3" variant="pill" size="pill">Current Serving notice period +</ToggleGroupItem>
+                  <ToggleGroupItem value="15" variant="pill" size="pill">15 days</ToggleGroupItem>
+                  <ToggleGroupItem value="30" variant="pill" size="pill">30 days</ToggleGroupItem>
+                  <ToggleGroupItem value="60" variant="pill" size="pill">60 days</ToggleGroupItem>
+                  <ToggleGroupItem value="90" variant="pill" size="pill">90 days</ToggleGroupItem>
+                  <ToggleGroupItem value="120+" variant="pill" size="pill">More than 120 days</ToggleGroupItem>
                 </ToggleGroup>
                 
               </div>

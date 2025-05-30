@@ -229,31 +229,22 @@ def search_results():
                 "id": str(source_row.get("_id")),
                 "basicInfo": {
                 "candidate_name": source.get("candidate_name"),
-                "date_of_birth": None,
-                "address": None,
-                "gender": None,
+                "date_of_birth": source.get("date_of_birth"),
+                "address": source.get("address"),
+                "gender": source.get("gender"),
                 "mobile_number": source.get("mobile_number"),
                 "email": source.get("email"),
                 "city": source.get("city"),
-                "maritalStatus": "-",
-                "castCategory": "-",
-                "physicallyChallenged": "-"
+                "age": source.get("age"),
+                "maritalStatus": source.get("marital_status"),
+                "castCategory": source.get("category"),
             },
-            "workSummary": {
-                "industry": None,
-                "department": None,
-                "role": None
-            },
-            "education": source.get("education", []),
             "experience": source.get("experience", []),
-            "projects": source.get("projects", []),
-            "certificates": source.get("certificates", []),
-            "accomplishments": [],
             "skills": {
                 "TechnicalSkill": technical_skills,
                 "Soft": soft_skills,
                 "AdditionalSkills": []
-            }
+            }   
             })
         return data
     except Exception as e:
