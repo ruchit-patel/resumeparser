@@ -14,7 +14,7 @@ const AutocompleteInput = ({ placeholder, inputValue, setInputValue, apiEndPoint
 
   const fetchSearchData = async (query) => {
     try {
-      const response = await fetch(`${config.backendUrl}/${apiEndPoint}?q=${query}`);
+      const response = await fetch(`/${apiEndPoint}?q=${query}`);
       const result = await response.json();
       return result.message || [];
     } catch (error) {

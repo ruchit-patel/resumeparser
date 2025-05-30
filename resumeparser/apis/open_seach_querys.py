@@ -664,6 +664,60 @@ def final_search_query(search_data: dict) -> dict:
                 }
             }
         })
+    # -------------------------------[Section 3]-------------------------------
+    
+
+
+
+
+
+
+
+
+
+    # -------------------------------[Section 4]-------------------------------
+    gender = search_data.get("gender")
+    category = search_data.get("category")
+    candidateMinAge = search_data.get("candidateMinAge")
+    candidateMaxAge = search_data.get("candidateMaxAge")
+    currentJobType = search_data.get("currentJobType")
+    seekingJobType = search_data.get("seekingJobType")
+    if gender != "":
+        must_conditions.append({
+            "match": {
+                "gender": {"query": gender, "operator": "or", "fuzziness": "AUTO"}
+            }
+        })
+    if candidateMinAge != "" and candidateMaxAge != "":
+        must_conditions.append({
+            "range": {
+                "age": {
+                    "gte": candidateMinAge,
+                    "lte": candidateMaxAge
+                }
+            }
+        })
+
+    if category != "":
+        must_conditions.append({
+            "match": {
+                "category": {"query": category, "operator": "or", "fuzziness": "AUTO"}
+            }
+        })
+    
+    if currentJobType != "":
+        must_conditions.append({
+            "match": {
+                "current_job_type": {"query": currentJobType, "operator": "or", "fuzziness": "AUTO"}
+            }
+        })
+    if seekingJobType != "":
+        must_conditions.append({
+            "match": {
+                "seeking_job_type": {"query": seekingJobType, "operator": "or", "fuzziness": "AUTO"}
+            }
+        })
+        
 
     # -------------------------------[Response]-------------------------------
 

@@ -60,9 +60,10 @@ const ShareComponent = ({
         setUsers([]);
       }
     };
-    
-    fetchUsers();
-  }, []);
+    if (open) {
+      fetchUsers();
+    }
+  }, [open]);
 
   // Handle share submission
   const handleShare = async () => {

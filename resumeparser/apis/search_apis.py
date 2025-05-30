@@ -205,7 +205,7 @@ def seach_candidate_edu_institute(q:str):
         designation_buckets = response['aggregations']['education_institute_suggestions']['matching_institutes']['institutes']['buckets']
         suggestions = [bucket['key'] for bucket in designation_buckets]
 
-    return suggestions
+    return query
 
 
 import json

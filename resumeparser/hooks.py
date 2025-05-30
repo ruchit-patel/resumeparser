@@ -47,7 +47,7 @@ app_license = "mit"
 doctype_list_js = {
     "Save Resume": "public/js/save_resume_list.js",
     "Resume": "public/js/resume_list.js",
-    "DocShare": "public/js/docshare_list.js"
+    "DocShare": "public/js/docshare_list.js",
 }
 
 # doctype_tree_js = {"doctype" : "public/js/doctype_tree.js"}
