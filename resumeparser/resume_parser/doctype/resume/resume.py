@@ -20,11 +20,15 @@ class Resume(Document):
 
 	def get_opensearch_credentials(self):
 		"""Get OpenSearch credentials from site config or environment variables"""
+		# Try to get from site config first
+		host = frappe.conf.get('opensearch_host') or os.environ.get('OPENSEARCH_HOST') or "localhost"
+		port = frappe.conf.get('opensearch_port') or os.environ.get('OPENSEARCH_PORT') or 9200
+		
+		frappe.logger().debug(f"OpenSearch connection details - Host: {host}, Port: {port}")
+		
 		return {
-			'host': frappe.conf.get('opensearch_host') or os.environ.get('OPENSEARCH_HOST'),
-			'port': frappe.conf.get('opensearch_port') or os.environ.get('OPENSEARCH_PORT') or 443,
-			'username': frappe.conf.get('opensearch_username') or os.environ.get('OPENSEARCH_USERNAME'),
-			'password': frappe.conf.get('opensearch_password') or os.environ.get('OPENSEARCH_PASSWORD')
+			'host': host,
+			'port': port,
 		}
 
 	def get_gemini_api_key(self):
@@ -54,12 +58,17 @@ class Resume(Document):
 			Advanced Extraction Rules:
 			Name & Contact Information: Extract the full name, email, and mobile number exactly as they appear. Validate formats where possible.
 			Gender: Predict the gender as "Male", "Female", or "Other" using the full name and contextual resume content.
-			Date of Birth & Age: If the date of birth is available, use it to calculate the age by comparing it with today’s date. If only the age is available, extract it directly. If neither is found, set both as null.
+			Date of Birth & Age: If the date of birth is available, use it to calculate the age by comparing it with today's date. If only the age is available, extract it directly. If neither is found, set both as null.
 			Total Experience: Calculate the total experience in years by summing all the durations from the experience entries. If a job is marked as current using keywords like "Present", "Currently Working", "-", "Ongoing", etc., use the current date as the end date to compute the duration.
 			Current Position: If the candidate is currently working somewhere, set current_position = true and "to": null in that entry.
-			Role: Determine the most recent role or position title from the latest job experience and use it as the candidate’s primary role.
+			Role: Determine the most recent role or position title from the latest job experience and use it as the candidate's primary role.
 			Address & City: If the address is partially mentioned, extract the city from any part of the resume and include it in both the city and address fields where appropriate.
-			Education & Dates: Convert all date ranges to "YYYY-MM-DD" format. If only month and year are present, assume the first of that month. If only year is available, default to "01-01" of that year. If parsing fails, return null.
+			Education & Dates: For all date fields (education dates, experience dates, etc):
+			- If exact date is known, use YYYY-MM-DD format
+			- If only month and year are known, use YYYY-MM-01 format
+			- If only year is known, use YYYY-01-01 format
+			- If date is uncertain or unknown, use null instead of placeholder dates
+			- NEVER use 'X' or other placeholder characters in dates
 			Skills: Extract unique skills and categorize them as either "Technical" or "Soft".
 			Certificates, Projects, Accomplishments: Clean and extract descriptions, include relevant URLs and issue dates where mentioned.
 			Return Format: Return the extracted data strictly in the following JSON format:
@@ -179,9 +188,11 @@ class Resume(Document):
 
 		try:
 			data = json.loads(response_text)  # Convert to dictionary
-			print(data)
-			self.extracted_json = json.dumps(data, indent=4)  # Store as formatted JSON string
+			self.extracted_json = json.dumps(data, indent=4)
 			self.candidate_name = data.get("candidate_name")
+
+		except Exception as e:
+			frappe.throw(f"Error parsing Gemini API response: {str(e)}")
 		except json.JSONDecodeError:
 			frappe.throw("Invalid JSON response from Gemini API.")
 
@@ -196,10 +207,61 @@ class Resume(Document):
 			self.duplicate_info = json.dumps(result, indent=4)
 			self.save(ignore_permissions=True)
 
+	def clean_date_field(self, date_str):
+		"""Clean and validate date strings before sending to OpenSearch"""
+		if not date_str:
+			return None
+		
+		# Remove any 'X' characters and replace with '0'
+		if 'X' in date_str:
+			return None  # Return None for invalid dates with 'X'
+		
+		try:
+			# Basic date format validation (YYYY-MM-DD)
+			parts = date_str.split('-')
+			if len(parts) != 3:
+				return None
+			
+			year, month, day = parts
+			if not (year.isdigit() and month.isdigit() and day.isdigit()):
+				return None
+			
+			if not (len(year) == 4 and len(month) == 2 and len(day) == 2):
+				return None
+			
+			return date_str
+		except:
+			return None
+
 	def update_resume_fields(self, data, id):
 		"""Update fields based on extracted LLM data after checking for duplicates"""
 		client = self.get_opensearch_client()
 		index_name = "resumes"
+
+		# Clean and validate date fields
+		if "education" in data and isinstance(data["education"], list):
+			for edu in data["education"]:
+				if "from" in edu:
+					edu["from"] = self.clean_date_field(edu["from"])
+				if "to" in edu:
+					edu["to"] = self.clean_date_field(edu["to"])
+				
+		if "experience" in data and isinstance(data["experience"], list):
+			for exp in data["experience"]:
+				if "from" in exp:
+					exp["from"] = self.clean_date_field(exp["from"])
+				if "to" in exp:
+					exp["to"] = self.clean_date_field(exp["to"])
+				
+		if "certificates" in data and isinstance(data["certificates"], list):
+			for cert in data["certificates"]:
+				if "issue_date" in cert:
+					cert["issue_date"] = self.clean_date_field(cert["issue_date"])
+				
+		if "accomplishments" in data and isinstance(data["accomplishments"], list):
+			for acc in data["accomplishments"]:
+				if "when" in acc:
+					acc["when"] = self.clean_date_field(acc["when"])
 
 		# Normalize data before checking duplicates and indexing
 		if data.get("email"):
@@ -364,15 +426,25 @@ class Resume(Document):
 	def get_opensearch_client(self):
 		# Get credentials from config or environment
 		creds = self.get_opensearch_credentials()
-
-		client = OpenSearch(
-			hosts=[{"host": creds['host'], "port": creds['port']}],
-			http_auth=(creds['username'], creds['password']),  # Auth credentials
-			use_ssl=True,  # Set to True if using HTTPS
-			verify_certs=True,  # Set to False if using self-signed certs
-			http_compress=True
-		)
-		return client
+		
+		try:
+			client = OpenSearch(
+				hosts=[{"host": creds['host'], "port": creds['port']}],
+				use_ssl=False,  # Set to True if using HTTPS
+				verify_certs=False,  # Set to False if using self-signed certs
+				http_compress=True,
+				timeout=30,  # Add timeout
+				max_retries=3,  # Add retries
+				retry_on_timeout=True  # Retry on timeout
+			)
+			
+			# Test the connection
+			client.info()
+			return client
+			
+		except Exception as e:
+			frappe.logger().error(f"Failed to connect to OpenSearch: {str(e)}")
+			raise
 
 @frappe.whitelist()
 def update_existing_resume(duplicate_id, new_data, name=None):

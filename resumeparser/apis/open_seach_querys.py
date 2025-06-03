@@ -432,7 +432,6 @@ def get_resume_from_id(resume_ids):
 
 def final_search_query(search_data: dict) -> dict:
     print("----------------[Search Data]----------------")
-    print(search_data)
     for i in search_data.items():
         print(i[0], " : ", i[1])
     print("--------------------------------")
@@ -666,11 +665,177 @@ def final_search_query(search_data: dict) -> dict:
         })
     # -------------------------------[Section 3]-------------------------------
     
+    ugcourse = search_data.get("ugcourse",[])
+    uginstitute = search_data.get("uginstitute","")
+    ugeducationType = search_data.get("ugeducationType","")
+    ugfromYear = search_data.get("ugfromYear","")
+    ugtoYear = search_data.get("ugtoYear","")
+
+    if ugcourse != "" and len(ugcourse) >= 1:
+        for course in ugcourse:
+            department = course.get("department")
+            role = course.get("role")
+
+            search_terms = set()
+            if department:
+                search_terms.add(department)
+            if role:
+                search_terms.add(role)
+
+        temp_should_clauses = []
+        for term in search_terms:
+            temp_should_clauses.append({
+                "nested": {
+                    "path": "education",
+                    "query": {
+                        "match": {
+                            "education.course_name": {
+                                "query": term,
+                                "operator": "or",
+                                "fuzziness": "AUTO"
+                            }
+                        }
+                    }
+                }
+            })
+            temp_should_clauses.append({
+                "nested": {
+                    "path": "education",
+                    "query": {
+                        "match": {
+                            "education.specialization": {
+                                "query": term,
+                                "operator": "or",
+                                "fuzziness": "AUTO"
+                            }
+                        }
+                    }
+                }
+            })
+
+        if temp_should_clauses:
+            must_conditions.append({
+                "bool": {
+                    "should": temp_should_clauses,
+                    "minimum_should_match": 1
+                }
+            })
+    
+    if uginstitute != "":
+        must_conditions.append({
+            "match": {
+                "education.school_college_name": {"query": uginstitute, "operator": "or", "fuzziness": "AUTO"}
+            }
+        })
+
+    if ugtoYear != "" and ugfromYear != "":
+        must_conditions.append({
+            "bool": {
+                "must": [
+                    {
+                        "range": {
+                            "education.from": {
+                                "gte": ugfromYear
+                            }
+                        }
+                    },
+                    {
+                        "range": {
+                            "education.to": {
+                                "lte": ugtoYear
+                            }
+                        }
+                    }
+                ]
+            }
+        })
+
+    pgcourse = search_data.get("pgcourse",[])
+    pginstitute = search_data.get("pginstitute","")
+    pgeducationType = search_data.get("pgeducationType","")
+    pgfromYear = search_data.get("pgfromYear","")
+    pgtoYear = search_data.get("pgtoYear","")
+    
 
 
+    if pgcourse != "" and len(pgcourse) >= 1:
+        for course in pgcourse:
+            department = course.get("department")
+            role = course.get("role")
 
+            search_terms = set()
+            if department:
+                search_terms.add(department)
+            if role:
+                search_terms.add(role)
 
+        temp_should_clauses = []
+        for term in search_terms:
+            temp_should_clauses.append({
+                "nested": {
+                    "path": "education",
+                    "query": {
+                        "match": {
+                            "education.course_name": {
+                                "query": term,
+                                "operator": "or",
+                                "fuzziness": "AUTO"
+                            }
+                        }
+                    }
+                }
+            })
+            temp_should_clauses.append({
+                "nested": {
+                    "path": "education",
+                    "query": {
+                        "match": {
+                            "education.specialization": {
+                                "query": term,
+                                "operator": "or",
+                                "fuzziness": "AUTO"
+                            }
+                        }
+                    }
+                }
+            })
 
+        if temp_should_clauses:
+            must_conditions.append({
+                "bool": {
+                    "should": temp_should_clauses,
+                    "minimum_should_match": 1
+                }
+            })
+    
+    if pginstitute != "":
+        must_conditions.append({
+            "match": {
+                "education.school_college_name": {"query": pginstitute, "operator": "or", "fuzziness": "AUTO"}
+            }
+        })
+
+    if pgtoYear != "" and pgfromYear != "":
+        must_conditions.append({
+            "bool": {
+                "must": [
+                    {
+                        "range": {
+                            "education.from": {
+                                "gte": ugfromYear
+                            }
+                        }
+                    },
+                    {
+                        "range": {
+                            "education.to": {
+                                "lte": ugtoYear
+                            }
+                        }
+                    }
+                ]
+            }
+        })
 
 
 
@@ -682,7 +847,7 @@ def final_search_query(search_data: dict) -> dict:
     candidateMaxAge = search_data.get("candidateMaxAge")
     currentJobType = search_data.get("currentJobType")
     seekingJobType = search_data.get("seekingJobType")
-    if gender != "":
+    if gender != "" and gender != "any":
         must_conditions.append({
             "match": {
                 "gender": {"query": gender, "operator": "or", "fuzziness": "AUTO"}
@@ -718,7 +883,6 @@ def final_search_query(search_data: dict) -> dict:
             }
         })
         
-
     # -------------------------------[Response]-------------------------------
 
     # Build the final query

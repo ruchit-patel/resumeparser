@@ -19,11 +19,11 @@ const MultiAutoSuggations = ({placeholder, keywords, setKeywords, setHideSection
 
   const fetchSearchData = async (query) => {
     try {
-      const myHeaders = new Headers();
-      myHeaders.append("Cookie", "full_name=Guest; sid=Guest; system_user=no; user_id=Guest; user_lang=en");
+      // const myHeaders = new Headers();
+      // myHeaders.append("Cookie", "full_name=Guest; sid=Guest; system_user=no; user_id=Guest; user_lang=en");
   
       setIsLoading(true)
-      const response = await fetch(`${config.backendUrl}/${apiEndPoint}?q=${query}`);
+      const response = await fetch(`/${apiEndPoint}?q=${query}`);
       const result = await response.json();
       setIsLoading(false)
       return result;

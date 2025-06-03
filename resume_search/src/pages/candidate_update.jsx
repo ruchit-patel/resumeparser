@@ -46,7 +46,7 @@ const UpdateProfile = () => {
   const updateCandidateDetail = async (data) => {
     try {
       const csrfToken = window.csrf_token;
-      const response = await fetch(`${config.backendUrl}/api/method/resumeparser.apis.update_profile.candidate_update/${id}`, {
+      const response = await fetch(`/api/method/resumeparser.apis.update_profile.candidate_update/${id}`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -65,7 +65,7 @@ const UpdateProfile = () => {
 
   const fetchCandidateDetail = async () => {
     try {
-      const response = await fetch(`${config.backendUrl}/api/method/resumeparser.apis.update_profile.candidate_get/${id}`);
+      const response = await fetch(`/api/method/resumeparser.apis.update_profile.candidate_get/${id}`);
       if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
       return await response.json();
     } catch (error) {
