@@ -330,7 +330,7 @@ const UpdateProfile = () => {
                           />
                         </div>
                         <div>
-                          <Label htmlFor="role">Role</Label>
+                          <Label htmlFor="role">Designation</Label>
                           <AutocompleteInput 
                               placeholder={"Add Role"} 
                               inputValue={formData.role} 
