@@ -43,7 +43,7 @@ def open_search_query_executor(query):
 
     except Exception as e:
         frappe.log_error(f"Error in seach_keywords: {str(e)}")
-        return {}
+        return str(e)
 
 
 @frappe.whitelist(allow_guest=True)
@@ -288,7 +288,7 @@ def candidate_detail():
                 },
                 "workSummary": {
                     "industry": source.get("industry"),
-                    "department": source.get("department"),
+                    "department": set([i.get("department") for i in source.get("department", [])]),
                     "role": source.get("role")
                 },
                 "education": source.get("education", []),

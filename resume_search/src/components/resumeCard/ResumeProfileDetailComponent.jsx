@@ -109,7 +109,7 @@ const ResumeProfileDetailComponent = ({candidate}) => {
                   <div className="text-gray-500">Industry</div>
                   <div>{candidate.workSummary.industry || "-"}</div>
                   <div className="text-gray-500">Department</div>
-                  <div>{"-"}</div>
+                  <div>{candidate.workSummary.department ? `${candidate.workSummary.department}` : "-"}</div>
                   <div className="text-gray-500">Role</div>
                   <div>{candidate.workSummary.role || "-"}</div>
                   <div className="text-gray-500">Total Experience</div>

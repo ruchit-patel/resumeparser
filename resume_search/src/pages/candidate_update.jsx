@@ -11,6 +11,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import AutocompleteInput from '@/components/common/AutoCompleteInputComponent';
 import CustomSelectionAddInput from "@/components/common/CustomSelectionAddInput";
 import MultiAutoSuggations from "@/components/common/MultiAutoSuggationsComponent";
+import DepartmentRoleSelector from "@/components/employment/DepartmentSelection";
 const isFormVisible = true; // Can be moved to a config file or made dynamic
 
 const UpdateProfile = () => {
@@ -31,6 +32,7 @@ const UpdateProfile = () => {
     total_experience: 0,
     annual_salary: 0,
     notice_period: 0,
+    department: "",
     role: "",
     marital_status: "",
     seeking_job_type: "",
@@ -370,6 +372,16 @@ const UpdateProfile = () => {
                             value={formData.notice_period}
                             onChange={(e) => setFormData(prev => ({ ...prev, notice_period: parseFloat(e.target.value) }))}
                             className="mt-1"
+                          />
+                        </div>
+
+                        <div>
+                          <Label htmlFor="department">Department and Role</Label>
+
+                          <DepartmentRoleSelector
+                            placeholder={"Add Department"}
+                            selectedItems={formData.department}
+                            setSelectedItems={(value) => setFormData(prev => ({ ...prev, department: value }))}
                           />
                         </div>
 

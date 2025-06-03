@@ -605,6 +605,20 @@ def final_search_query(search_data: dict) -> dict:
                     }
                 }
             })
+            temp_should_clauses.append({
+                "nested": {
+                    "path": "experience",
+                    "query": {
+                        "match": {
+                            "experience.department": {
+                                "query": term,
+                                "operator": "or",
+                                "fuzziness": "AUTO"
+                            }
+                        }
+                    }
+                }
+            })
 
         if temp_should_clauses:
             must_conditions.append({
@@ -847,10 +861,10 @@ def final_search_query(search_data: dict) -> dict:
     candidateMaxAge = search_data.get("candidateMaxAge")
     currentJobType = search_data.get("currentJobType")
     seekingJobType = search_data.get("seekingJobType")
-    if gender != "" and gender != "any":
+    if gender != "" and gender != "all":
         must_conditions.append({
             "match": {
-                "gender": {"query": gender, "operator": "or", "fuzziness": "AUTO"}
+                "gender": {"query": gender}
             }
         })
     if candidateMinAge != "" and candidateMaxAge != "":
