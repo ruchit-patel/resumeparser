@@ -28,7 +28,7 @@ const Header = () => {
               <button
                 onClick={() => navigate('/resume_search/search')}
                 className="border-b-2 border-blue-500 text-gray-900 px-1 pt-1 text-sm font-medium">
-                Search Job & Respose
+                Search Resumes
               </button>
 
               {/* <button

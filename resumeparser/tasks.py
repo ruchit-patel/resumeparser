@@ -31,7 +31,11 @@ def convert_docx_to_pdf(input_path, output_path):
         print(f"❌ Error during conversion: {e}")
         raise  # Re-raise exception for further handling if necessary
 
+@frappe.whitelist(allow_guest=True)
+def test():
+    return "test"
 
+# @frappe.whitelist(allow_guest=True)
 def resume_scanner():
     processed_count = 0
     skipped_count = 0
