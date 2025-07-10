@@ -2,15 +2,6 @@ console.log("---------------Resume list scripts loaded---------------");
 
 frappe.listview_settings['Resume'] = {
     onload: function (listview) {
-        // Add a button to the top of the list view
-        listview.page.add_inner_button(__('View Selected Resume'), () => {
-            const selected = listview.get_checked_items();
-            if (selected.length === 1) {
-                window.open(`/resume_search/detail/${selected[0].name}`, '_blank');
-            } else {
-                frappe.msgprint(__('Please select a single resume to view'));
-            }
-        });
     },
     button: {
         show: function(doc) {

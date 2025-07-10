@@ -73,7 +73,7 @@ def redirect_to_docshare():
         "route": ["List", "DocShare"]
     }
 
-
+# NUMBER CARD SHARE WITH ME 
 @frappe.whitelist(allow_guest=True)
 def redirect_to_resume_with_filter():
     """Redirect to the Resume list filtered by Resumes shared with current user"""
@@ -99,4 +99,32 @@ def redirect_to_resume_with_filter():
             "name": ["in", resume_ids] if resume_ids else ["=", "none_found_placeholder"]
         },
         "route": ["List", "Resume"]
+    }
+
+# NUMBER CARD SAVED RESUMES
+@frappe.whitelist()
+def get_saved_resumes_by_user():
+    """
+    Return count and route to Resume list, based on resumes saved by the current user
+    through Save Resume doctype.
+    """
+    current_user = frappe.session.user
+
+    # Get all 'resume' IDs from Save Resume where user is current user
+    saved_resumes = frappe.get_all(
+        "Save Resume",
+        filters={"user": current_user},
+        fields=["resume"]
+    )
+
+    # Extract just the Resume IDs
+    resume_ids = [r.resume for r in saved_resumes if r.resume]
+
+    return {
+        "value": len(resume_ids),  # Total resumes saved by user
+        "fieldtype": "Int",
+        "route": ["List", "Resume"],
+        "route_options": {
+            "name": ["in", resume_ids] if resume_ids else ["=", "none_found"]
+        }
     }
