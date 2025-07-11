@@ -48,6 +48,7 @@ def candidate_get():
         response = client.get(index=index_name, id=candidate_id)
         source = response['_source']
         source["resume_url"] = doc_data.get("resume_file")
+        source["department"] = []
         return source
 
     except Exception as e:

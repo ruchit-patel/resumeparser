@@ -300,11 +300,8 @@ class Resume(Document):
 			search_response = client.search(index="my-vector-index", body=search_query)
 			hits = search_response.get("hits", {}).get("hits", [])
 			vector_department = hits[0]["_source"]["title"] if hits else None
-			print("---------------------------------------------------------------")
-			print(f"Department: {department}")
-			print(f"Vector Department: {vector_department}")
-			print("---------------------------------------------------------------")
-			data["department"] = vector_department if vector_department else data["department"]
+			vector_content = hits[0]["_source"]["content"] if hits else None
+			data["department"] = [{"department" :vector_department,"role" :vector_content , "fullString": f"{vector_content} - {vector_department}"}]
 			frappe.logger().info(f"Department to be indexed: {department}")
 
 		# If no duplicate found, proceed with indexing
