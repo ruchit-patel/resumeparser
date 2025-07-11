@@ -30,7 +30,7 @@ const EmploymentDetails = ({ formState, updateFormField }) => {
             <CardContent className="space-y-4">
               {/* Department and Role */}
               <div className="space-y-2 flex flex-col">
-                <Label htmlFor="department-role">Department and Role</Label>
+                <Label htmlFor="department-role">Department</Label>
                 <DepartmentRoleSelector  selectedItems={departmentes} setSelectedItems={(value) => updateFormField('departmentes', value)}/>
               </div>
               

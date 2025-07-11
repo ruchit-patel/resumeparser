@@ -93,12 +93,19 @@ def seach_candidate_location(q:str):
         return [f"{item["name"]}, {item["parent_locations"]}" for item in data]
     else:
         return ["No data found"] 
-
+    
+from collections import defaultdict
 @frappe.whitelist(allow_guest=True)
 def candidate_departments():
-    file_path = frappe.get_app_path('resumeparser', 'apis', 'education_departments.json')
-    course_data = read_courses_from_json(file_path)
-    return course_data
+    data = frappe.get_all("Department", fields=["title","category"])
+    grouped = defaultdict(list)
+    for item in data:
+        grouped[item["category"]].append(item["title"])
+    result =[{"name": category,"roles": titles}for category, titles in grouped.items()]
+    return result
+    # file_path = frappe.get_app_path('resumeparser', 'apis', 'education_departments.json')
+    # course_data = read_courses_from_json(file_path)
+    # return course_data
 
 
 @frappe.whitelist(allow_guest=True)

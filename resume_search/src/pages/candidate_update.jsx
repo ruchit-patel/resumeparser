@@ -376,7 +376,7 @@ const UpdateProfile = () => {
                         </div>
 
                         <div>
-                          <Label htmlFor="department">Department and Role</Label>
+                          <Label htmlFor="department">Department</Label>
 
                           <DepartmentRoleSelector
                             placeholder={"Add Department"}
