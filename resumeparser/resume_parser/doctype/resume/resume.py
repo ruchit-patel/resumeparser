@@ -59,6 +59,7 @@ class Resume(Document):
 			Name & Contact Information: Extract the full name, email, and mobile number exactly as they appear. Validate formats where possible.
 			Gender: Predict the gender as "Male", "Female", or "Other" using the full name and contextual resume content.
 			Date of Birth & Age: If the date of birth is available, use it to calculate the age by comparing it with today's date. If only the age is available, extract it directly. If neither is found, set both as null.
+			Department : Look into the given resume content carefully and based on the candidate’s role, experience, skills, and context, return one most relevant department. The department must always be provided — it is mandatory. Do not leave it blank, null, or respond with 'unsure'. Even if uncertain, choose the closest reasonable department based on available information.
 			Total Experience: Calculate the total experience in years by summing all the durations from the experience entries. If a job is marked as current using keywords like "Present", "Currently Working", "-", "Ongoing", etc., use the current date as the end date to compute the duration.
 			Current Position: If the candidate is currently working somewhere, set current_position = true and "to": null in that entry.
 			Role: Determine the most recent role or position title from the latest job experience and use it as the candidate's primary role.
@@ -82,6 +83,7 @@ class Resume(Document):
 				"city": "string",
 				"age": numeric,
 				"industry": "Information Technology (IT)" | "Finance & Banking" | "Healthcare & Pharmaceuticals" | "Manufacturing & Industrial Production" | "Retail & E-commerce" | "Education & E-Learning" | "Telecommunications & Media" | "Hospitality & Tourism" | "Energy & Utilities" | "Transportation & Logistics" | "Real Estate & Construction" | "Agriculture & Agribusiness" | "Automotive & Aerospace" | "Consumer Goods & Services" | "Entertainment & Leisure" | "Legal & Compliance" | "Insurance & Risk Management" | "Mining & Natural Resources" | "Professional Services" | "Public Sector & Government" | "Technology Hardware & Equipment" | "Semiconductors & Electronics" | "Renewable Energy & Sustainability" | "Cybersecurity & Data Privacy" | "Artificial Intelligence & Machine Learning" | "Blockchain & Fintech" | "Sports & Recreation" | "Art & Culture" | "Nonprofit & Social Impact"
+				"department": "string",
 				"total_experience": numeric,
 				"role": "string",
 				"education": [
@@ -270,14 +272,40 @@ class Resume(Document):
 			data["mobile_number"] = self.normalize_mobile_number(data["mobile_number"])
 
 		# Check for potential duplicates
-		duplicate = self.check_duplicate_resume(client, data)
-		if duplicate:
-			# Instead of throwing error, return the duplicate info
-			return {
-				"status": "duplicate_found",
-				"duplicate_id": duplicate,
-				"data": data
+		# duplicate = self.check_duplicate_resume(client, data)
+		# if duplicate:
+		# 	# Instead of throwing error, return the duplicate info
+		# 	return {
+		# 		"status": "duplicate_found",
+		# 		"duplicate_id": duplicate,
+		# 		"data": data
+		# 	}
+		
+		# Update Department on vector index
+		if "department" in data and data["department"]:
+			department = data["department"]
+			search_query = {
+				"size": 1,
+				"_source": ["title", "content"],
+				"query": {
+					"bool": {
+						"should": [
+							{ "match": { "title": department } },
+							{ "match": { "content": department } }
+						]
+					}
+				}
 			}
+
+			search_response = client.search(index="my-vector-index", body=search_query)
+			hits = search_response.get("hits", {}).get("hits", [])
+			vector_department = hits[0]["_source"]["title"] if hits else None
+			print("---------------------------------------------------------------")
+			print(f"Department: {department}")
+			print(f"Vector Department: {vector_department}")
+			print("---------------------------------------------------------------")
+			data["department"] = vector_department if vector_department else data["department"]
+			frappe.logger().info(f"Department to be indexed: {department}")
 
 		# If no duplicate found, proceed with indexing
 		response = client.index(index=index_name, body=data, id=id)

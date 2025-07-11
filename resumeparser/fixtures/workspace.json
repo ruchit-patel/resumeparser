@@ -1,0 +1,79 @@
+[
+ {
+  "app": "resumeparser",
+  "charts": [],
+  "content": "[{\"id\":\"--QmxgyNTK\",\"type\":\"custom_block\",\"data\":{\"custom_block_name\":\"Redirect To Profile Search Page\",\"col\":12}},{\"id\":\"jzNYkVXadI\",\"type\":\"number_card\",\"data\":{\"number_card_name\":\"Total Resumes \",\"col\":4}},{\"id\":\"16S0IF6F3j\",\"type\":\"number_card\",\"data\":{\"number_card_name\":\"Manual Upload\",\"col\":4}},{\"id\":\"bQo7ZtES5F\",\"type\":\"number_card\",\"data\":{\"number_card_name\":\"Auto Upload\",\"col\":4}},{\"id\":\"qkdKQTctrP\",\"type\":\"number_card\",\"data\":{\"number_card_name\":\"Approved Resumes\",\"col\":4}},{\"id\":\"4VQ_RzuDpG\",\"type\":\"number_card\",\"data\":{\"number_card_name\":\"Saved Resume\",\"col\":4}},{\"id\":\"HVMX5i9bjl\",\"type\":\"number_card\",\"data\":{\"number_card_name\":\"Share With Me\",\"col\":4}},{\"id\":\"GqKjOQSym9\",\"type\":\"quick_list\",\"data\":{\"quick_list_name\":\"All Resumes\",\"col\":6}},{\"id\":\"9go-JireCs\",\"type\":\"quick_list\",\"data\":{\"quick_list_name\":\"Approved Resumes\",\"col\":6}},{\"id\":\"hXavPQyqPu\",\"type\":\"quick_list\",\"data\":{\"quick_list_name\":\"Resume Scanning Logs\",\"col\":12}}]",
+  "custom_blocks": [
+   {
+    "custom_block_name": "Redirect To Profile Search Page",
+    "label": "Redirect To Profile Search Page"
+   }
+  ],
+  "docstatus": 0,
+  "doctype": "Workspace",
+  "external_link": null,
+  "for_user": "",
+  "hide_custom": 0,
+  "icon": "number-card",
+  "indicator_color": "green",
+  "is_hidden": 0,
+  "label": "Resume List",
+  "link_to": null,
+  "link_type": "DocType",
+  "links": [],
+  "modified": "2025-07-09 17:46:31.338682",
+  "module": "Resume Parser",
+  "name": "Resume List",
+  "number_cards": [
+   {
+    "label": "Share With Me",
+    "number_card_name": "Share With Me"
+   },
+   {
+    "label": "Total Resumes ",
+    "number_card_name": "Total Resume"
+   },
+   {
+    "label": "Approved Resumes",
+    "number_card_name": "Approved Resumes"
+   },
+   {
+    "label": "Auto Upload",
+    "number_card_name": "Auto Upload"
+   },
+   {
+    "label": "Manual Upload",
+    "number_card_name": "Manual Upload"
+   },
+   {
+    "label": "Saved Resume",
+    "number_card_name": "Saved Resume"
+   }
+  ],
+  "parent_page": "",
+  "public": 1,
+  "quick_lists": [
+   {
+    "document_type": "Resume",
+    "label": "All Resumes",
+    "quick_list_filter": "[]"
+   },
+   {
+    "document_type": "Error Log",
+    "label": "Resume Scanning Logs",
+    "quick_list_filter": "[[\"Error Log\",\"reference_doctype\",\"=\",\"Resume\",false]]"
+   },
+   {
+    "document_type": "Resume",
+    "label": "Approved Resumes",
+    "quick_list_filter": "[[\"Resume\",\"approve_status\",\"=\",1,false]]"
+   }
+  ],
+  "restrict_to_domain": null,
+  "roles": [],
+  "sequence_id": 23.0,
+  "shortcuts": [],
+  "title": "Resume List",
+  "type": "Workspace"
+ }
+]

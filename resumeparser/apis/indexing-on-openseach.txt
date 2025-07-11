@@ -1,0 +1,340 @@
+# Create the resumes index with custom analyzers and mappings
+PUT /resumes
+{
+  "settings": {
+    "analysis": {
+      "analyzer": {
+        "resume_analyzer": {
+          "type": "custom",
+          "tokenizer": "standard",
+          "filter": [
+            "lowercase",
+            "resume_synonyms",
+            "edge_ngram_filter"
+          ]
+        },
+        "search_analyzer": {
+          "type": "custom",
+          "tokenizer": "standard",
+          "filter": [
+            "lowercase",
+            "resume_synonyms"
+          ]
+        }
+      },
+      "filter": {
+        "resume_synonyms": {
+          "type": "synonym",
+          "synonyms": [
+            "ai => artificial intelligence",
+            "ml => machine learning",
+            "nlp => natural language processing",
+            "ui => user interface",
+            "ux => user experience",
+            "pm => project management, product management",
+            "hr => human resources",
+            "js => javascript",
+            "py => python",
+            "aws => amazon web services",
+            "gcp => google cloud platform",
+            "azure => microsoft azure",
+            "cs => computer science",
+            "it => information technology",
+            "db => database",
+            "dba => database administrator",
+            "sde => software development engineer",
+            "dev => developer, development",
+            "qa => quality assurance",
+            "ba => business analyst",
+            "da => data analyst",
+            "ds => data science, data scientist"
+          ]
+        },
+        "edge_ngram_filter": {
+          "type": "edge_ngram",
+          "min_gram": 2,
+          "max_gram": 20
+        }
+      }
+    },
+    "number_of_shards": 5,
+    "number_of_replicas": 1
+  },
+  "mappings": {
+    "properties": {
+      "candidate_name": {
+        "type": "text",
+        "fields": {
+          "keyword": {
+            "type": "keyword",
+            "ignore_above": 256
+          }
+        }
+      },
+      "address": {
+        "type": "text",
+        "fields": {
+          "keyword": {
+            "type": "keyword",
+            "ignore_above": 256
+          }
+        }
+      },
+      "city": {
+        "type": "text",
+        "fields": {
+          "keyword": {
+            "type": "keyword",
+            "ignore_above": 256
+          }
+        }
+      },
+      "date_of_birth": {
+        "type": "date",
+        "ignore_malformed": true
+      },
+      "email": {
+        "type": "text",
+        "fields": {
+          "keyword": {
+            "type": "keyword",
+            "ignore_above": 256
+          }
+        }
+      },
+      "gender": {
+        "type": "text",
+        "fields": {
+          "keyword": {
+            "type": "keyword",
+            "ignore_above": 256
+          }
+        }
+      },
+      "mobile_number": {
+        "type": "text",
+        "fields": {
+          "keyword": {
+            "type": "keyword",
+            "ignore_above": 256
+          }
+        }
+      },
+      "skills": {
+        "type": "nested",
+        "properties": {
+          "skill_name": {
+            "type": "text",
+            "analyzer": "resume_analyzer",
+            "search_analyzer": "search_analyzer",
+            "fields": {
+              "keyword": {
+                "type": "keyword",
+                "ignore_above": 256
+              },
+              "suggest": {
+                "type": "completion",
+                "analyzer": "simple",
+                "preserve_separators": true,
+                "preserve_position_increments": true,
+                "max_input_length": 50
+              },
+              "searchable": {
+                "type": "search_as_you_type",
+                "doc_values": false,
+                "max_shingle_size": 3
+              }
+            }
+          },
+          "skill_type": {
+            "type": "text"
+          }
+        }
+      },
+      "certificates": {
+        "type": "nested",
+        "properties": {
+          "certificate_name": {
+            "type": "text",
+            "analyzer": "resume_analyzer",
+            "search_analyzer": "search_analyzer",
+            "fields": {
+              "keyword": {
+                "type": "keyword",
+                "ignore_above": 256
+              },
+              "suggest": {
+                "type": "completion",
+                "analyzer": "simple",
+                "preserve_separators": true,
+                "preserve_position_increments": true,
+                "max_input_length": 50
+              }
+            }
+          },
+          "issue_date": {
+            "type": "date",
+            "ignore_malformed": true
+          },
+          "provider": {
+            "type": "text",
+            "analyzer": "resume_analyzer",
+            "search_analyzer": "search_analyzer",
+            "fields": {
+              "keyword": {
+                "type": "keyword",
+                "ignore_above": 256
+              }
+            }
+          }
+        }
+      },
+      "education": {
+        "type": "nested",
+        "properties": {
+          "course_name": {
+            "type": "text",
+            "analyzer": "resume_analyzer",
+            "search_analyzer": "search_analyzer",
+            "fields": {
+              "keyword": {
+                "type": "keyword",
+                "ignore_above": 256
+              },
+              "suggest": {
+                "type": "completion",
+                "analyzer": "simple"
+              }
+            }
+          },
+          "from": {
+            "type": "date",
+            "ignore_malformed": true
+          },
+          "to": {
+            "type": "date",
+            "ignore_malformed": true
+          },
+          "school_college_name": {
+            "type": "text",
+            "analyzer": "resume_analyzer",
+            "search_analyzer": "search_analyzer",
+            "fields": {
+              "keyword": {
+                "type": "keyword",
+                "ignore_above": 256
+              },
+              "suggest": {
+                "type": "completion",
+                "analyzer": "simple"
+              }
+            }
+          },
+          "school_college_city": {
+            "type": "text",
+            "fields": {
+              "keyword": {
+                "type": "keyword",
+                "ignore_above": 256
+              }
+            }
+          },
+          "specialization": {
+            "type": "text",
+            "analyzer": "resume_analyzer",
+            "search_analyzer": "search_analyzer",
+            "fields": {
+              "keyword": {
+                "type": "keyword",
+                "ignore_above": 256
+              }
+            }
+          }
+        }
+      },
+      "experience": {
+        "type": "nested",
+        "properties": {
+          "company_name": {
+            "type": "text",
+            "analyzer": "resume_analyzer",
+            "search_analyzer": "search_analyzer",
+            "fields": {
+              "keyword": {
+                "type": "keyword",
+                "ignore_above": 256
+              },
+              "suggest": {
+                "type": "completion",
+                "analyzer": "simple",
+                "preserve_separators": true,
+                "preserve_position_increments": true,
+                "max_input_length": 50
+              }
+            }
+          },
+          "role_position": {
+            "type": "text",
+            "analyzer": "resume_analyzer",
+            "search_analyzer": "search_analyzer",
+            "fields": {
+              "keyword": {
+                "type": "keyword",
+                "ignore_above": 256
+              },
+              "suggest": {
+                "type": "completion",
+                "analyzer": "simple",
+                "preserve_separators": true,
+                "preserve_position_increments": true,
+                "max_input_length": 50
+              }
+            }
+          },
+          "from": {
+            "type": "date",
+            "ignore_malformed": true
+          },
+          "to": {
+            "type": "date",
+            "ignore_malformed": true
+          },
+          "current_position": {
+            "type": "boolean"
+          },
+          "location": {
+            "type": "text",
+            "fields": {
+              "keyword": {
+                "type": "keyword",
+                "ignore_above": 256
+              }
+            }
+          },
+          "project_department": {
+            "type": "text",
+            "analyzer": "resume_analyzer",
+            "search_analyzer": "search_analyzer",
+            "fields": {
+              "keyword": {
+                "type": "keyword",
+                "ignore_above": 256
+              }
+            }
+          },
+          "job_description": {
+            "type": "text",
+            "analyzer": "resume_analyzer",
+            "search_analyzer": "search_analyzer",
+            "fields": {
+              "keyword": {
+                "type": "keyword",
+                "ignore_above": 256
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

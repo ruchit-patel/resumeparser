@@ -5,6 +5,15 @@ app_description = "Parse and search on resumes"
 app_email = "office@sayajiinfotech.com"
 app_license = "mit"
 
+
+
+fixtures = [
+    {"dt": "Workspace", "filters": [["module", "=", "Resume Parser"]]},
+    {"dt": "Number Card", "filters": [["module", "=", "Resume Parser"]]},
+]
+
+
+
 # Apps
 # ------------------
 

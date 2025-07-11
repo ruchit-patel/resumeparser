@@ -288,7 +288,7 @@ def candidate_detail():
                 },
                 "workSummary": {
                     "industry": source.get("industry"),
-                    "department": set([f"{i.get("department")} - {i.get("role")}" for i in source.get("department", [])]),
+                    "department": source.get("department","-"),
                     "role": source.get("role")
                 },
                 "education": source.get("education", []),
