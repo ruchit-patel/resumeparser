@@ -154,7 +154,7 @@ class Resume(Document):
 		while attempt < max_retries and not success:
 			try:
 				response = client.models.generate_content(
-					model="gemini-1.5-flash-8b",
+					model="gemini-2.5-flash",
 					contents=[
 						types.Part.from_bytes(
 							data=filepath.read_bytes(),

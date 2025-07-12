@@ -1,3 +1,73 @@
+GET /_plugins/_ml/models/_search
+{
+  "query": {
+    "match": {
+      "name": "sentence-transformers/all-distilroberta-v1"
+    }
+  }
+}
+GET /_plugins/_ml/models/q_Tr95cBQPFJ1gAwRddA
+GET /_plugins/_ml/tasks/qFpR85cBKQN0YEYz0ieb
+
+
+
+POST /my-vector-index/_doc?pipeline=text-embedding-pipeline
+{
+  "title": "Oil & Gas"
+}
+
+
+
+GET /my-vector-index/_search
+{
+  "_source": ["title","content"],
+  "query": {
+    "match_all": {}
+  }
+}
+
+GET /my-vector-index/_doc/2
+DELETE /my-vector-index/_doc/sfRS-JcBQPFJ1gAwMdfQ
+
+GET /my-vector-index/_search
+{
+  "query": {
+    "neural": {
+      "title_vector": {
+        "query_text": "Oil",
+        "model_id": "q_Tr95cBQPFJ1gAwRddA",
+        "k": 5
+      }
+    }
+  }
+}
+
+
+GET _ingest/pipeline/text-embedding-pipeline
+
+GET /my-vector-index/_mapping
+
+
+GET /resumes/_mapping
+
+GET /resumes/_search
+{
+  "query": {
+    "match_all": {}
+  }
+}
+
+
+POST /resumes/_delete_by_query
+{
+  "query": {
+    "match_all": {}
+  }
+}
+
+DELETE /resumes
+
+
 # Create the resumes index with custom analyzers and mappings
 PUT /resumes
 {
@@ -150,7 +220,7 @@ PUT /resumes
             "type": "text"
           }
         }
-      },
+      },  
       "certificates": {
         "type": "nested",
         "properties": {

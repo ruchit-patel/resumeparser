@@ -6,7 +6,8 @@
  "engine": "InnoDB",
  "field_order": [
   "title",
-  "category"
+  "category",
+  "vector_id"
  ],
  "fields": [
   {
@@ -18,13 +19,18 @@
    "fieldname": "category",
    "fieldtype": "Data",
    "label": "Category"
+  },
+  {
+   "fieldname": "vector_id",
+   "fieldtype": "Data",
+   "label": "Vector Id"
   }
  ],
  "grid_page_length": 50,
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2025-07-11 14:31:51.127964",
- "modified_by": "Administrator",
+ "modified": "2025-07-12 12:40:23.592507",
+ "modified_by": "ajay@gmail.com",
  "module": "Resume Parser",
  "name": "Department",
  "owner": "Administrator",
