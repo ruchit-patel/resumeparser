@@ -11,6 +11,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import AutocompleteInput from '@/components/common/AutoCompleteInputComponent';
 import CustomSelectionAddInput from "@/components/common/CustomSelectionAddInput";
 import MultiAutoSuggations from "@/components/common/MultiAutoSuggationsComponent";
+import MultiLocationInput from "@/components/common/MultiLocationInput";
 import DepartmentRoleSelector from "@/components/employment/DepartmentSelection";
 const isFormVisible = true;
 
@@ -413,15 +414,13 @@ const UpdateProfile = () => {
 
                         <div>
                           <Label htmlFor="seeking_job_locations">Seeking Job Locations</Label>
-                          <MultiAutoSuggations
-                            placeholder="Add Job Locations"
-                            selectedItems={formData.seeking_job_locations || []}
-                            setSelectedItems={(value) => setFormData(prev => ({ ...prev, seeking_job_locations: value }))}
+                          <MultiLocationInput
+                            placeholder="Type city name and select from dropdown"
+                            selectedLocations={formData.seeking_job_locations || []}
+                            setSelectedLocations={(value) => setFormData(prev => ({ ...prev, seeking_job_locations: value }))}
                             apiEndpoint="api/method/resumeparser.apis.search_apis.seach_candidate_location"
                           />
                         </div>
-
-
 
                         <div>
                           <Label htmlFor="current_job_type">Current Job Type</Label>

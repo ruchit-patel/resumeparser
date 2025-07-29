@@ -508,15 +508,33 @@ def final_search_query(search_data: dict) -> dict:
     location = search_data.get("location")
     if location:
         must_conditions.append({
-            "match": {
-                "city": {
-                    "query": location,
-                    "max_expansions": 50,
-                    "operator": "or",
-                    "fuzziness": "AUTO",
-                }
+            "bool": {
+                "should": [
+                    {
+                        "match": {
+                            "city": {
+                                "query": location,
+                                "max_expansions": 50,
+                                "operator": "or",
+                                "fuzziness": "AUTO"
+                            }
+                        }
+                    },
+                    {
+                        "match": {
+                            "seeking_job_locations": {
+                                "query": location,
+                                "max_expansions": 50,
+                                "operator": "or",
+                                "fuzziness": "AUTO"
+                            }
+                        }
+                    }
+                ],
+                "minimum_should_match": 1
             }
         })
+
 
     # 4. Salary (must, with should for salary not provided)
     min_salary = search_data.get("minSalary")

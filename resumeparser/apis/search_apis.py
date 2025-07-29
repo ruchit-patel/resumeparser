@@ -310,7 +310,8 @@ def candidate_detail():
                 },
                 "desiredJob": {
                     "currentJobType": source.get("current_job_type"),
-                    "seekingJobType": source.get("seeking_job_type")
+                    "seekingJobType": source.get("seeking_job_type"),
+                    "seekingJobLocations" : [source.get("seeking_job_locations")]
                 },
                 "resume": {
                     "link": resume_doc.get("resume_file"),

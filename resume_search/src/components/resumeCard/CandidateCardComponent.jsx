@@ -14,7 +14,8 @@ import {
   AlertCircle, 
   MapPin, 
   Wallet, 
-  BriefcaseBusiness 
+  BriefcaseBusiness, 
+  Mail
 } from "lucide-react";
 
 import { cn } from "@/lib/utils";
@@ -218,17 +219,24 @@ const CandidateCard = ({ candidate, onSelect, selected = false }) => {
                     variant="outline"
                     size="sm"
                     className="text-blue-600 border-blue-600 hover:bg-blue-50 h-9"
-                    onClick={(e) => e.stopPropagation()}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      window.open(`https://wa.me/${candidate.basicInfo.mobile_number}`, "_blank");
+                    }}
                   >
+                    <Phone className="h-4 w-4 mr-2" />
                     {candidate.basicInfo.mobile_number}
                   </Button>
                   <Button
                     variant="outline"
                     size="sm"
                     className="text-gray-700 border-gray-300 h-9 flex items-center justify-center"
-                    onClick={(e) => e.stopPropagation()}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      window.open(`mailto:${candidate.basicInfo.email}`, "_blank");
+                    }}
                   >
-                    <Phone className="h-4 w-4 mr-2" />
+                    <Mail className="h-4 w-4 mr-2" />
                     {candidate.basicInfo.email}
                   </Button>
                   <div className="text-xs text-gray-500 mt-1">{candidate.basicInfo.city}</div>
