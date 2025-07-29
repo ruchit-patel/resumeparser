@@ -13,7 +13,7 @@
  "is_standard": 1,
  "label": "Share With Me",
  "method": "resumeparser.apis.custom_apis.redirect_to_resume_with_filter",
- "modified": "2025-07-10 15:50:15.500387",
+ "modified": "2025-07-24 13:23:47.624115",
  "modified_by": "Administrator",
  "module": "Resume Parser",
  "name": "Share With Me",

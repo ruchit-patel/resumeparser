@@ -6,12 +6,11 @@ app_email = "office@sayajiinfotech.com"
 app_license = "mit"
 
 
-
 fixtures = [
-    {"dt": "Workspace", "filters": [["module", "=", "Resume Parser"]]},
-    {"dt": "Number Card", "filters": [["module", "=", "Resume Parser"]]},
+    {"doctype": "Workspace", "filters": [["module", "=", "Resume Parser"]]},
+    {"doctype": "Number Card", "filters": [["module", "=", "Resume Parser"]]},
+    {"doctype": "Locations"}
 ]
-
 
 
 # Apps

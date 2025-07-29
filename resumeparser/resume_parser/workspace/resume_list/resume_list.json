@@ -20,7 +20,7 @@
  "label": "Resume List",
  "link_type": "DocType",
  "links": [],
- "modified": "2025-07-09 18:46:08.559902",
+ "modified": "2025-07-24 13:31:01.546537",
  "modified_by": "Administrator",
  "module": "Resume Parser",
  "name": "Resume List",
@@ -57,7 +57,7 @@
   {
    "document_type": "Resume",
    "label": "All Resumes",
-   "quick_list_filter": "[]"
+   "quick_list_filter": "[[\"Resume\",\"upload_by\",\"like\",\"%{frappe.session.user}%\",false]]"
   },
   {
    "document_type": "Error Log",
@@ -70,14 +70,7 @@
    "quick_list_filter": "[[\"Resume\",\"approve_status\",\"=\",1,false]]"
   }
  ],
- "roles": [
-  {
-   "role": "All"
-  },
-  {
-   "role": "Guest"
-  }
- ],
+ "roles": [],
  "sequence_id": 23.0,
  "shortcuts": [],
  "title": "Resume List",

@@ -303,11 +303,31 @@ const ResumeProfileDetailComponent = ({candidate}) => {
                 <div className="grid grid-cols-2 gap-4 text-sm">
                   <div>
                     <div className="text-gray-500 mb-1">Current Job Type</div>
-                    <div>{candidate.desiredJob.currentJobType}</div>
+                    <div>{candidate.desiredJob.currentJobType || "-"}</div>
                   </div>
                   <div>
                     <div className="text-gray-500 mb-1">Seeking Job Type</div>
-                    <div>{candidate.desiredJob.seekingJobType}</div>
+                    <div>{candidate.desiredJob.seekingJobType || "-"}</div>
+                  </div>
+                  <div className="col-span-2">
+                    <div className="text-gray-500 mb-1">Seeking Job Locations</div>
+                    <div>
+                      {candidate.desiredJob.seekingJobLocations && candidate.desiredJob.seekingJobLocations.length > 0 ? (
+                        <div className="flex flex-wrap gap-2">
+                          {candidate.desiredJob.seekingJobLocations.map((location, index) => (
+                            <Badge
+                              key={index}
+                              variant="outline"
+                              className="bg-blue-50 hover:bg-blue-50 text-blue-600 rounded-md font-normal py-1 px-2"
+                            >
+                              {location}
+                            </Badge>
+                          ))}
+                        </div>
+                      ) : (
+                        "-"
+                      )}
+                    </div>
                   </div>
                 </div>
               </div>

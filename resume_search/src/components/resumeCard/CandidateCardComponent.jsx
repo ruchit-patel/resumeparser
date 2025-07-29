@@ -7,6 +7,7 @@ import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Card, CardContent } from "@/components/ui/card";
 import ShareComponent from "@/components/common/ShareComponent";
+import NotesDialog from "@/components/common/NotesDialog";
 import { 
   Bookmark, 
   Phone, 
@@ -24,6 +25,7 @@ const CandidateCard = ({ candidate, onSelect, selected = false }) => {
   const navigate = useNavigate();
   const location = useLocation();
   const [shareDialogOpen, setShareDialogOpen] = useState(false);
+  const [notesDialogOpen, setNotesDialogOpen] = useState(false);
   
   // Function to fetch resume save status
   const fetchResumeStatus = async (resumeId) => {
@@ -234,7 +236,15 @@ const CandidateCard = ({ candidate, onSelect, selected = false }) => {
 
                 {/* Bottom options */}
                 <div className="flex items-center justify-center gap-3 text-xs text-blue-600 mt-4">
-                  <span className="cursor-pointer hover:underline" onClick={(e) => e.stopPropagation()}>Comment</span>
+                  <span 
+                    className="cursor-pointer hover:underline" 
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setNotesDialogOpen(true);
+                    }}
+                  >
+                    Comment
+                  </span>
                   <span className="text-gray-300">|</span>
                   <span 
                     className={`cursor-pointer hover:underline ${saved ? 'text-red-600' : 'text-blue-600'}`}
@@ -283,6 +293,14 @@ const CandidateCard = ({ candidate, onSelect, selected = false }) => {
         itemType="candidate"
         open={shareDialogOpen}
         onOpenChange={setShareDialogOpen}
+      />
+      
+      {/* Notes Dialog */}
+      <NotesDialog
+        open={notesDialogOpen}
+        onOpenChange={setNotesDialogOpen}
+        candidateId={candidate.id}
+        candidateName={candidate.basicInfo.candidate_name}
       />
     </>
   );

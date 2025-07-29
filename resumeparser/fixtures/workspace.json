@@ -21,7 +21,7 @@
   "link_to": null,
   "link_type": "DocType",
   "links": [],
-  "modified": "2025-07-09 17:46:31.338682",
+  "modified": "2025-07-24 13:31:01.546537",
   "module": "Resume Parser",
   "name": "Resume List",
   "number_cards": [
@@ -56,7 +56,7 @@
    {
     "document_type": "Resume",
     "label": "All Resumes",
-    "quick_list_filter": "[]"
+    "quick_list_filter": "[[\"Resume\",\"upload_by\",\"like\",\"%{frappe.session.user}%\",false]]"
    },
    {
     "document_type": "Error Log",

@@ -12,7 +12,7 @@ import AutocompleteInput from '@/components/common/AutoCompleteInputComponent';
 import CustomSelectionAddInput from "@/components/common/CustomSelectionAddInput";
 import MultiAutoSuggations from "@/components/common/MultiAutoSuggationsComponent";
 import DepartmentRoleSelector from "@/components/employment/DepartmentSelection";
-const isFormVisible = true; // Can be moved to a config file or made dynamic
+const isFormVisible = true;
 
 const UpdateProfile = () => {
   const { id } = useParams();
@@ -36,6 +36,7 @@ const UpdateProfile = () => {
     role: "",
     marital_status: "",
     seeking_job_type: "",
+    seeking_job_locations: [],
     current_job_type: "",
     education: [],
     experience: [],
@@ -255,10 +256,10 @@ const UpdateProfile = () => {
                         <div>
                           <Label htmlFor="city">City</Label>
                           <AutocompleteInput 
-                              placeholder={"Add City"} 
-                              inputValue={formData.city} 
-                              setInputValue={(value) => setFormData(prev => ({ ...prev, city: value }))}
-                              apiEndPoint = {"api/method/resumeparser.apis.search_apis.seach_candidate_location"}
+                            placeholder="Add City" 
+                            inputValue={formData.city} 
+                            setInputValue={(value) => setFormData(prev => ({ ...prev, city: value }))}
+                            apiEndPoint="api/method/resumeparser.apis.search_apis.seach_candidate_location"
                           />
                         </div>
                         <div className="md:col-span-2">
@@ -323,19 +324,19 @@ const UpdateProfile = () => {
                         <div>
                           <Label htmlFor="industry">Industry</Label>
                           <AutocompleteInput 
-                              placeholder={"Add Industry"} 
-                              inputValue={formData.industry} 
-                              setInputValue={(value) => setFormData(prev => ({ ...prev, industry: value }))}
-                              apiEndPoint = {"api/method/resumeparser.apis.search_apis.seach_candidate_industry"}
+                            placeholder="Add Industry" 
+                            inputValue={formData.industry} 
+                            setInputValue={(value) => setFormData(prev => ({ ...prev, industry: value }))}
+                            apiEndPoint="api/method/resumeparser.apis.search_apis.seach_candidate_industry"
                           />
                         </div>
                         <div>
                           <Label htmlFor="role">Designation</Label>
                           <AutocompleteInput 
-                              placeholder={"Add Role"} 
-                              inputValue={formData.role} 
-                              setInputValue={(value) => setFormData(prev => ({ ...prev, role: value }))}
-                              apiEndPoint = {"api/method/resumeparser.apis.search_apis.seach_candidate_role"}
+                            placeholder="Add Role" 
+                            inputValue={formData.role} 
+                            setInputValue={(value) => setFormData(prev => ({ ...prev, role: value }))}
+                            apiEndPoint="api/method/resumeparser.apis.search_apis.seach_candidate_role"
                           />
                         </div>
                        
@@ -379,7 +380,7 @@ const UpdateProfile = () => {
                           <Label htmlFor="department">Department</Label>
 
                           <DepartmentRoleSelector
-                            placeholder={"Add Department"}
+                            placeholder="Add Department"
                             selectedItems={formData.department}
                             setSelectedItems={(value) => setFormData(prev => ({ ...prev, department: value }))}
                           />
@@ -408,6 +409,16 @@ const UpdateProfile = () => {
                               <SelectItem value="Other">Other</SelectItem>
                             </SelectContent>
                           </Select>
+                        </div>
+
+                        <div>
+                          <Label htmlFor="seeking_job_locations">Seeking Job Locations</Label>
+                          <MultiAutoSuggations
+                            placeholder="Add Job Locations"
+                            selectedItems={formData.seeking_job_locations || []}
+                            setSelectedItems={(value) => setFormData(prev => ({ ...prev, seeking_job_locations: value }))}
+                            apiEndpoint="api/method/resumeparser.apis.search_apis.seach_candidate_location"
+                          />
                         </div>
 
 
