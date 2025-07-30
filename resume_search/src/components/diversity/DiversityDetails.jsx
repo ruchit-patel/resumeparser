@@ -46,8 +46,11 @@ const DiversityDetails = ({ formState, updateFormField }) => {
                   <Label>Gender</Label>
                   <ToggleGroup type="single" value={gender} onValueChange={(value) => value && updateFormField('gender', value)}>
                     <ToggleGroupItem value="all" variant="pill" size="pill">All candidates</ToggleGroupItem>
-                    <ToggleGroupItem value="male" variant="pill" size="pill">Male candidates</ToggleGroupItem>
-                    <ToggleGroupItem value="female" variant="pill" size="pill">Female candidates</ToggleGroupItem>
+                    <ToggleGroupItem value="male" variant="pill" size="pill">Male</ToggleGroupItem>
+                    <ToggleGroupItem value="female" variant="pill" size="pill">Female</ToggleGroupItem>
+                    <ToggleGroupItem value="lgbtqiap" variant="pill" size="pill">LGBTQIA+</ToggleGroupItem>
+                    <ToggleGroupItem value="veterans" variant="pill" size="pill">Veterans</ToggleGroupItem>
+                    <ToggleGroupItem value="ews" variant="pill" size="pill">EWS</ToggleGroupItem>
                   </ToggleGroup>
                 </div>
                 
@@ -69,9 +72,6 @@ const DiversityDetails = ({ formState, updateFormField }) => {
                               <SelectItem value="ST">ST</SelectItem>
                               <SelectItem value="OBC">OBC</SelectItem>
                               <SelectItem value="General">General</SelectItem>
-                              <SelectItem value="EWS">EWS</SelectItem>
-                              <SelectItem value="LGBTQIA+">LGBTQIA+</SelectItem>
-                              <SelectItem value="Veteran">Veteran </SelectItem>
                             </SelectContent>
                           </Select>
                   

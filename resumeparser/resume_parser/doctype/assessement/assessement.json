@@ -1,0 +1,292 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "creation": "2025-07-30 12:18:16.719532",
+ "doctype": "DocType",
+ "engine": "InnoDB",
+ "field_order": [
+  "form_section",
+  "earlier_interviewed_with_the_client",
+  "candidate",
+  "candidate_name",
+  "time_line_of_earlier_interview",
+  "current_organization",
+  "stability_comments",
+  "reporting_to",
+  "team_size_managed",
+  "structure_of_the_team",
+  "reason_for_change",
+  "gender",
+  "diversity_flag",
+  "total_experience",
+  "relevant_experience",
+  "location",
+  "willingness_to_relocate",
+  "education_highest",
+  "gap_in_education_if_any_reason",
+  "gap_in_jobs_if_any",
+  "any_disabilities",
+  "awards_recognitions_and_certifications",
+  "revenue_or_manpower_or_budget_managed_as_is_the_case_in_role",
+  "notice_period",
+  "current_compensation",
+  "expected_compensation",
+  "confirmation",
+  "fitment_to_the_role",
+  "numbers_to_be_provided",
+  "budget_managed",
+  "call_outs",
+  "must_haves_as_defined_by_client",
+  "executive_presence_and_ability_to_think_and_act_strategically",
+  "updated_by"
+ ],
+ "fields": [
+  {
+   "fieldname": "candidate",
+   "fieldtype": "Link",
+   "label": "Candidate",
+   "options": "Resume",
+   "placeholder": "Select Candidate"
+  },
+  {
+   "fieldname": "current_organization",
+   "fieldtype": "Data",
+   "label": "Current Organization",
+   "placeholder": "Enter Text"
+  },
+  {
+   "fieldname": "location",
+   "fieldtype": "Link",
+   "label": "Location",
+   "options": "Locations",
+   "placeholder": "Select Location"
+  },
+  {
+   "default": "0",
+   "fieldname": "willingness_to_relocate",
+   "fieldtype": "Check",
+   "label": "Willingness to Relocate"
+  },
+  {
+   "default": "0",
+   "fieldname": "earlier_interviewed_with_the_client",
+   "fieldtype": "Check",
+   "label": "Earlier Interviewed with the Client"
+  },
+  {
+   "fieldname": "time_line_of_earlier_interview",
+   "fieldtype": "Select",
+   "label": " Time line of Earlier Interview",
+   "options": "LAST 1 MONTHS\nLAST 3 MONTHS\nLAST 6 MONTHS\nLAST 9 MONTHS\nLAST 12+ MONTHS",
+   "placeholder": "Select Timeline"
+  },
+  {
+   "fieldname": "gender",
+   "fieldtype": "Select",
+   "label": "Gender",
+   "options": "Male\nFemale\nOther",
+   "placeholder": "Select Gender"
+  },
+  {
+   "depends_on": "eval:doc.gender==\"Other\"",
+   "fieldname": "diversity_flag",
+   "fieldtype": "Select",
+   "label": "Diversity Flag",
+   "options": "PwD\nVeteran\nLGBTQ",
+   "placeholder": "Select Diversity"
+  },
+  {
+   "default": "0",
+   "fieldname": "any_disabilities",
+   "fieldtype": "Check",
+   "label": "Any Disabilities"
+  },
+  {
+   "fieldname": "total_experience",
+   "fieldtype": "Int",
+   "label": "Total Experience",
+   "placeholder": "Enter Experience"
+  },
+  {
+   "fieldname": "relevant_experience",
+   "fieldtype": "Table",
+   "in_standard_filter": 1,
+   "label": "Relevant Experience",
+   "options": "Relevant Experience Child"
+  },
+  {
+   "fieldname": "reporting_to",
+   "fieldtype": "Data",
+   "label": "Reporting To",
+   "placeholder": "Enter Text"
+  },
+  {
+   "description": "Direct managed , not buddy , means appraisal done by candidate for his juniors - that count",
+   "fieldname": "team_size_managed",
+   "fieldtype": "Data",
+   "label": "Team Size Managed",
+   "placeholder": "Enter Text"
+  },
+  {
+   "description": "How many exec , manager , sr mgr , dgm etc",
+   "fieldname": "structure_of_the_team",
+   "fieldtype": "Small Text",
+   "label": "Structure of the Team",
+   "placeholder": "Enter Text"
+  },
+  {
+   "description": "Mention no of years in current organisation and highest tenure in entire cv.",
+   "fieldname": "stability_comments",
+   "fieldtype": "Data",
+   "label": "Stability Comments",
+   "placeholder": "Enter Text"
+  },
+  {
+   "fieldname": "reason_for_change",
+   "fieldtype": "Small Text",
+   "label": " Reason for Change",
+   "placeholder": "Enter Text"
+  },
+  {
+   "fieldname": "notice_period",
+   "fieldtype": "Data",
+   "label": "Notice Period",
+   "placeholder": "Enter Notice Period"
+  },
+  {
+   "fieldname": "education_highest",
+   "fieldtype": "Data",
+   "label": "Education Highest",
+   "placeholder": "Enter Text"
+  },
+  {
+   "fieldname": "gap_in_education_if_any_reason",
+   "fieldtype": "Small Text",
+   "label": "Gap in Education if Any Reason",
+   "placeholder": "Enter Text"
+  },
+  {
+   "fieldname": "gap_in_jobs_if_any",
+   "fieldtype": "Small Text",
+   "label": "Gap in Jobs if Any",
+   "placeholder": "Enter Text"
+  },
+  {
+   "description": " (Fixed + Variable)",
+   "fieldname": "current_compensation",
+   "fieldtype": "Data",
+   "label": "Current Compensation",
+   "placeholder": "Enter Text"
+  },
+  {
+   "description": "If more than 25% - with reason",
+   "fieldname": "expected_compensation",
+   "fieldtype": "Data",
+   "label": "Expected Compensation",
+   "placeholder": "Enter Text"
+  },
+  {
+   "fieldname": "awards_recognitions_and_certifications",
+   "fieldtype": "Table",
+   "label": "Awards Recognitions And Certifications",
+   "options": "Awards and Certifications Child"
+  },
+  {
+   "fieldname": "revenue_or_manpower_or_budget_managed_as_is_the_case_in_role",
+   "fieldtype": "Data",
+   "label": "Revenue or Manpower or Budget Managed As is the case in Role",
+   "placeholder": "Enter Text"
+  },
+  {
+   "description": "if HR then Head Count, If TA then Annual Number if\nSCM/Production/Procurement Budget and Volume, IF Sales/BD etc Revenue Managed, If\nFinance and Accounts Balance Sheet Size.",
+   "fieldname": "numbers_to_be_provided",
+   "fieldtype": "Int",
+   "label": "Numbers to be provided",
+   "placeholder": "Enter Text"
+  },
+  {
+   "fieldname": "budget_managed",
+   "fieldtype": "Data",
+   "label": "Budget Managed",
+   "placeholder": "Enter Text"
+  },
+  {
+   "fieldname": "fitment_to_the_role",
+   "fieldtype": "Data",
+   "label": "Fitment to the Role",
+   "placeholder": "Enter Text"
+  },
+  {
+   "description": "for both Category 2 and Category 3.",
+   "fieldname": "must_haves_as_defined_by_client",
+   "fieldtype": "Data",
+   "label": "Must Haves As defined by Client",
+   "placeholder": "Enter Text"
+  },
+  {
+   "fieldname": "executive_presence_and_ability_to_think_and_act_strategically",
+   "fieldtype": "Small Text",
+   "label": "Executive Presence and Ability to think and Act Strategically",
+   "placeholder": "Enter Text"
+  },
+  {
+   "description": "Anything Good Or Negative ",
+   "fieldname": "call_outs",
+   "fieldtype": "Small Text",
+   "label": "Call Outs",
+   "placeholder": "Enter Text"
+  },
+  {
+   "default": "0",
+   "description": " All Relevant Joining documents available - Experience / Proof of employment of all companies mentioned in CV",
+   "fieldname": "confirmation",
+   "fieldtype": "Check",
+   "label": "Confirmation"
+  },
+  {
+   "bold": 1,
+   "fieldname": "updated_by",
+   "fieldtype": "Link",
+   "label": "Updated By",
+   "options": "User",
+   "read_only": 1
+  },
+  {
+   "fieldname": "form_section",
+   "fieldtype": "Section Break",
+   "label": "Form"
+  },
+  {
+   "fetch_from": "candidate.candidate_name",
+   "fieldname": "candidate_name",
+   "fieldtype": "Data",
+   "label": "Candidate Name"
+  }
+ ],
+ "grid_page_length": 50,
+ "index_web_pages_for_search": 1,
+ "links": [],
+ "modified": "2025-07-30 16:05:58.854308",
+ "modified_by": "Administrator",
+ "module": "Resume Parser",
+ "name": "Assessement",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  }
+ ],
+ "row_format": "Dynamic",
+ "sort_field": "creation",
+ "sort_order": "DESC",
+ "states": []
+}

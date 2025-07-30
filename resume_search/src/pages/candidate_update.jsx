@@ -240,7 +240,10 @@ const UpdateProfile = () => {
                             <SelectContent>
                               <SelectItem value="Male">Male</SelectItem>
                               <SelectItem value="Female">Female</SelectItem>
-                              <SelectItem value="Other">Other</SelectItem>
+                              <SelectItem value="lgbtqiap">LGBTQIA+</SelectItem>
+                              <SelectItem value="ews">EWS</SelectItem>
+                              <SelectItem value="veterans">Veterans</SelectItem>
+                              <SelectItem value="other">Other</SelectItem>
                             </SelectContent>
                           </Select>
                         </div>
