@@ -109,7 +109,7 @@ def candidate_departments():
 
 
 @frappe.whitelist(allow_guest=True)
-def seach_candidate_industry(q:str):
+def seach_candidate_industry():
     industries = [
     "Information Technology (IT)",
     "Finance & Banking",
@@ -141,8 +141,7 @@ def seach_candidate_industry(q:str):
     "Art & Culture",
     "Nonprofit & Social Impact"
     ]
-    filter_data = list(filter(lambda a: q in a, industries))
-    return filter_data
+    return industries
 
 
 @frappe.whitelist(allow_guest=True)

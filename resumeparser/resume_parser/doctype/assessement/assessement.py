@@ -48,10 +48,13 @@ class Assessement(Document):
 							"url": None
 						}
 						candidate_data['accomplishments'].append(accomplishment)
-			
+			print("-----------------------")
+			print(self.gender,self.diversity_flag)
 			if self.gender:
 				candidate_data["gender"] =  self.gender
 
+			if self.gender == "Other" or  self.diversity_flag:
+				candidate_data["category"] =  self.diversity_flag
 
 			if self.total_experience:
 				candidate_data["total_experience"] =  self.total_experience
@@ -60,9 +63,9 @@ class Assessement(Document):
 			if self.location:
 				candidate_data["city"] =  self.location
 
-			# if self.notice_period:
-			# 	candidate_data["city"] =  self.notice_period
-
+			if self.notice_period:
+				candidate_data["notice_period"] =  self.notice_period
+			
 			self.updated_by = frappe.session.user
 			candidate_data["updated_by"] = frappe.session.user 
 			candidate_data["updated_at"] = frappe.utils.now()

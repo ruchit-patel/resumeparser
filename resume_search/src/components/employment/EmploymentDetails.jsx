@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Card, CardHeader, CardContent } from '../ui/card';
 import { Label } from '../ui/label';
 import { Input } from '../ui/input';
@@ -7,6 +7,7 @@ import { ToggleGroup, ToggleGroupItem } from '../ui/toggle-group';
 import CustomSelectionAddInput from '../common/CustomSelectionAddInput';
 import DepartmentRoleSelector from './DepartmentSelection';
 import AutocompleteInput from '../common/AutoCompleteInputComponent';
+import { Select, SelectGroup, SelectValue, SelectTrigger, SelectContent, SelectLabel, SelectItem } from '../ui/select';
 
 const EmploymentDetails = ({ formState, updateFormField }) => {
   // Destructure values from formState for convenience
@@ -18,6 +19,21 @@ const EmploymentDetails = ({ formState, updateFormField }) => {
     designation,
     noticePeriod
   } = formState;
+
+  // State for industry options
+  const [industryOptions, setIndustryOptions] = useState([]);
+
+  useEffect(() => {
+    // Fetch industry options from API
+    fetch('/api/method/resumeparser.apis.search_apis.seach_candidate_industry')
+      .then(res => res.json())
+      .then(data => {
+        // Adjust this according to your API response structure
+        if (data && data.message) {
+          setIndustryOptions(data.message);
+        }
+      });
+  }, []);
 
   return (
     <Card className="mb-6">
@@ -34,17 +50,32 @@ const EmploymentDetails = ({ formState, updateFormField }) => {
                 <DepartmentRoleSelector  selectedItems={departmentes} setSelectedItems={(value) => updateFormField('departmentes', value)}/>
               </div>
               
-              {/* Industry */}
-              <div className="space-y-2 flex flex-col">
-                <Label htmlFor="industry">Industry</Label>
-                <AutocompleteInput 
-                placeholder={"Add Industry"} 
-                inputValue={industry} 
-                setInputValue={(value) => updateFormField('industry', value)}
-                apiEndPoint = {"api/method/resumeparser.apis.search_apis.seach_candidate_industry"}
-                />
-               
-              </div>
+            {/* Industry */}
+            <div className="space-y-2 flex flex-col w-full">
+              <Label htmlFor="industry">Industry</Label>
+              <Select
+                value={industry || ''}
+                onValueChange={(value) => updateFormField('industry', value)}
+              >
+                <SelectTrigger className="w-full"> {/* Full width trigger */}
+                  <SelectValue placeholder="Select Industry" />
+                </SelectTrigger>
+                <SelectContent className="w-full"> {/* Full width dropdown content */}
+                  <SelectGroup>
+                    <SelectLabel>Industries</SelectLabel>
+                    {industryOptions.map((option, idx) => (
+                      <SelectItem
+                        key={option.value || option.name || idx}
+                        value={option.value || option.name || option}
+                      >
+                        {option.label || option.name || option}
+                      </SelectItem>
+                    ))}
+                  </SelectGroup>
+                </SelectContent>
+              </Select>
+            </div>
+
               
               {/* Company */}
               <div className="space-y-2 flex flex-col">
