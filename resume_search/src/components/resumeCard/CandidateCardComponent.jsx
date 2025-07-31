@@ -15,7 +15,8 @@ import {
   MapPin, 
   Wallet, 
   BriefcaseBusiness, 
-  Mail
+  Mail,
+  BookPlus 
 } from "lucide-react";
 
 import { cn } from "@/lib/utils";
@@ -181,7 +182,7 @@ const CandidateCard = ({ candidate, onSelect, selected = false }) => {
                 {/* Avatar + Bookmark */}
                 <div className="relative">
                   <Avatar className="h-20 w-20 rounded-full border">
-                    <AvatarImage src={candidate.basicInfo.photo} alt={candidate.basicInfo.name} />
+                    <AvatarImage src={candidate.basicInfo.photo} alt={candidate.basicInfo.candidate_name} />
                     <AvatarFallback className="bg-gray-100 text-gray-400">
                       {candidate.basicInfo.candidate_name.charAt(0)}
                     </AvatarFallback>
@@ -238,6 +239,19 @@ const CandidateCard = ({ candidate, onSelect, selected = false }) => {
                   >
                     <Mail className="h-4 w-4 mr-2" />
                     {candidate.basicInfo.email}
+                  </Button>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="text-gray-700 border-gray-300 h-9 flex items-center justify-center"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      window.open(`/assessement-questions/new?candidate=${candidate.id}&candidate_name=${candidate.basicInfo.candidate_name}`, "_blank");
+                    }}
+                    
+                  >
+                    <BookPlus  className="h-4 w-4 mr-2" />
+                    Assessement Form
                   </Button>
                   <div className="text-xs text-gray-500 mt-1">{candidate.basicInfo.city}</div>
                 </div>
