@@ -11,7 +11,7 @@ const ResumeProfileDetailComponent = ({candidate}) => {
     setIsApproved(checked)
     try {
       const apiEndPoint = `api/method/resumeparser.apis.update_profile.approve_resume/${checked}/${candidate.id}`
-      const response = await fetch(`${config.backendUrl}/${apiEndPoint}`)
+      const response = await fetch(`/${apiEndPoint}`)
 
       if (!response.ok) {
         throw new Error('Failed to update approval status')

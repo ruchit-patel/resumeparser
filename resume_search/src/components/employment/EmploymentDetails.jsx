@@ -60,7 +60,7 @@ const EmploymentDetails = ({ formState, updateFormField }) => {
                 <SelectTrigger className="w-full"> {/* Full width trigger */}
                   <SelectValue placeholder="Select Industry" />
                 </SelectTrigger>
-                <SelectContent className="w-full"> {/* Full width dropdown content */}
+                <SelectContent className="w-full max-h-60 overflow-y-auto">
                   <SelectGroup>
                     <SelectLabel>Industries</SelectLabel>
                     {industryOptions.map((option, idx) => (

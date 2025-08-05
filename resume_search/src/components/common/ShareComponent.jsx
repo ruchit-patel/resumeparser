@@ -79,7 +79,7 @@ const ShareComponent = ({
         const csrfToken = window.csrf_token;
         
         // Ensure all cookies are sent with the request
-        const response = await fetch(`${config.backendUrl}/api/method/frappe.share.add`, {
+        const response = await fetch(`/api/method/frappe.share.add`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',

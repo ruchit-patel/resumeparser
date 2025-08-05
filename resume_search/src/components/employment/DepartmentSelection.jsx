@@ -7,7 +7,7 @@ import { config } from '@/config';
 const fetchSearchData = async () => {
   try {
     const apiEndPoint = "api/method/resumeparser.apis.search_apis.candidate_departments"
-    const response = await fetch(`${config.backendUrl}/${apiEndPoint}`);
+    const response = await fetch(`/${apiEndPoint}`);
     const result = await response.json();
     return result.message || [];
   } catch (error) {

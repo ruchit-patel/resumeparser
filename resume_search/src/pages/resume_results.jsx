@@ -13,7 +13,7 @@ const fetchSearchData = async (data) => {
 
     console.log("CSRF Token:", csrfToken);
 
-    const response = await fetch(`${config.backendUrl}/api/method/resumeparser.apis.search_apis.search_results`, {
+    const response = await fetch(`/api/method/resumeparser.apis.search_apis.search_results`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
