@@ -103,6 +103,13 @@ const ResumeFindPage = () => {
     setSelectedSearchId(id);
   };
 
+  // Function to handle search candidates from job post
+  const handleSearchCandidatesFromJobPost = (populatedFormState) => {
+    setFormState(populatedFormState);
+    setActiveTab('search'); // Switch to search tab
+    setSelectedSearchId(null);
+  };
+
   return (
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
           {/* Left column - Search forms */}
@@ -180,7 +187,7 @@ const ResumeFindPage = () => {
 
 
               <TabsContent value="jobpost">
-                <JobPostsComponent />
+                <JobPostsComponent onSearchCandidatesWithJobPost={handleSearchCandidatesFromJobPost} />
               </TabsContent>
 
 

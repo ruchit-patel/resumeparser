@@ -117,7 +117,7 @@ const JobPostCard = ({ jobPost, onSearchCandidates }) => {
   );
 };
 
-const JobPostsComponent = () => {
+const JobPostsComponent = ({ onSearchCandidatesWithJobPost }) => {
   // State management
   const [jobPosts, setJobPosts] = useState([]);
   const [filteredJobPosts, setFilteredJobPosts] = useState([]);
@@ -208,8 +208,83 @@ const JobPostsComponent = () => {
   };
 
   const handleSearchCandidates = (jobPost) => {
-    alert('Search functionality is in progress...');
-    console.log('Searching candidates for job post:', jobPost);
+    // Parse skills from key_skill
+    let skillsArray = [];
+    if (jobPost.key_skill) {
+      try {
+        // Try to parse as JSON first
+        const parsedSkills = JSON.parse(jobPost.key_skill);
+        skillsArray = Array.isArray(parsedSkills) 
+          ? parsedSkills.map(skill => ({ text: skill, isNassary: false }))
+          : [{ text: jobPost.key_skill, isNassary: false }];
+      } catch (e) {
+        // If JSON parsing fails, treat as comma-separated string
+        skillsArray = jobPost.key_skill
+          .split(',')
+          .map(s => s.trim())
+          .filter(s => s)
+          .map(skill => ({ text: skill, isNassary: false }));
+      }
+    }
+
+    // Create search keywords from role, designation, department
+    let searchKeywordsArray = [];
+    if (jobPost.role) {
+      searchKeywordsArray.push({ text: jobPost.role, isNassary: false });
+    }
+    if (jobPost.designation) {
+      searchKeywordsArray.push({ text: jobPost.designation, isNassary: false });
+    }
+    if (jobPost.department) {
+      searchKeywordsArray.push({ text: jobPost.department, isNassary: false });
+    }
+
+    // Create the form state object
+    const populatedFormState = {
+      searchKeywords: searchKeywordsArray,
+      skills: skillsArray,
+      searchIn: 'Entire resume',
+      minExperience: '',
+      maxExperience: '',
+      minSalary: '',
+      maxSalary: '',
+      salaryNotProvided: false,
+      location: '',
+      currency: 'INR',
+      departmentes: [],
+      industry: jobPost.industry || '',
+      company: '',
+      excludeCompanies: [],
+      designation: '',
+      noticePeriod: 'any',
+      ugQualification: '',
+      pgQualification: '',
+      doctorateQualification: [],
+      ugcourse: [],
+      uginstitute: '',
+      ugeducationType: 'full-time',
+      ugfromYear: '',
+      ugtoYear: '',
+      pgcourse: [],
+      pginstitute: '',
+      pgeducationType: 'full-time',
+      pgfromYear: '',
+      pgtoYear: '',
+      gender: 'all',
+      disabilitiesOnly: false,
+      category: '',
+      candidateMinAge: '',
+      candidateMaxAge: '',
+      currentJobType: '',
+      seekingJobType: '',
+    };
+
+    // Pass the populated form state to parent component
+    if (typeof onSearchCandidatesWithJobPost === 'function') {
+      onSearchCandidatesWithJobPost(populatedFormState);
+    } else {
+      console.log('Populated form state for job post search:', populatedFormState);
+    }
   };
 
   return (
