@@ -1,0 +1,95 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "creation": "2025-08-12 16:15:29.422262",
+ "doctype": "DocType",
+ "engine": "InnoDB",
+ "field_order": [
+  "job_details_section",
+  "job_title",
+  "job_description",
+  "role",
+  "industry",
+  "department",
+  "employment_type",
+  "designation",
+  "key_skill"
+ ],
+ "fields": [
+  {
+   "fieldname": "job_title",
+   "fieldtype": "Data",
+   "label": "Job Title"
+  },
+  {
+   "fieldname": "job_description",
+   "fieldtype": "Markdown Editor",
+   "label": "Job Description"
+  },
+  {
+   "fieldname": "role",
+   "fieldtype": "Data",
+   "label": "Role"
+  },
+  {
+   "fieldname": "industry",
+   "fieldtype": "Select",
+   "label": "Industry",
+   "options": "Information Technology (IT)\nFinance & Banking\nHealthcare & Pharmaceuticals\nManufacturing & Industrial Production\nRetail & E-commerce\nEducation & E-Learning\nTelecommunications & Media\nHospitality & Tourism\nEnergy & Utilities\nTransportation & Logistics\nReal Estate & Construction\nAgriculture & Agribusiness\nAutomotive & Aerospace\nConsumer Goods & Services\nEntertainment & Leisure\nLegal & Compliance\nInsurance & Risk Management\nMining & Natural Resources\nProfessional Services\nPublic Sector & Government\nTechnology Hardware & Equipment\nSemiconductors & Electronics\nRenewable Energy & Sustainability\nCybersecurity & Data Privacy\nArtificial Intelligence & Machine Learning\nBlockchain & Fintech\nSports & Recreation\nArt & Culture\nNonprofit & Social Impact"
+  },
+  {
+   "fieldname": "department",
+   "fieldtype": "Link",
+   "label": "Department",
+   "options": "Department"
+  },
+  {
+   "fieldname": "employment_type",
+   "fieldtype": "Select",
+   "label": "Employment Type",
+   "options": "Full Time\nPart Time\nContract\nTemporary\nVolunteer\nIntern\nFreelance\nRemote\nHybrid\nOther"
+  },
+  {
+   "fieldname": "designation",
+   "fieldtype": "Data",
+   "label": "Designation"
+  },
+  {
+   "fieldname": "job_details_section",
+   "fieldtype": "Section Break",
+   "label": "Job Details"
+  },
+  {
+   "fieldname": "key_skill",
+   "fieldtype": "Table MultiSelect",
+   "label": "Key Skill",
+   "options": "Key Skill"
+  }
+ ],
+ "grid_page_length": 50,
+ "index_web_pages_for_search": 1,
+ "links": [],
+ "modified": "2025-08-12 17:52:36.928260",
+ "modified_by": "Administrator",
+ "module": "Resume Parser",
+ "name": "Job Posts",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  }
+ ],
+ "row_format": "Dynamic",
+ "sort_field": "creation",
+ "sort_order": "DESC",
+ "states": []
+}
