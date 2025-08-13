@@ -1,8 +1,8 @@
 {
  "app": "resumeparser",
  "charts": [],
- "content": "[{\"id\":\"--QmxgyNTK\",\"type\":\"custom_block\",\"data\":{\"custom_block_name\":\"Redirect To Profile Search Page\",\"col\":12}},{\"id\":\"jzNYkVXadI\",\"type\":\"number_card\",\"data\":{\"number_card_name\":\"Total Resumes \",\"col\":4}},{\"id\":\"16S0IF6F3j\",\"type\":\"number_card\",\"data\":{\"number_card_name\":\"Manual Upload\",\"col\":4}},{\"id\":\"bQo7ZtES5F\",\"type\":\"number_card\",\"data\":{\"number_card_name\":\"Auto Upload\",\"col\":4}},{\"id\":\"qkdKQTctrP\",\"type\":\"number_card\",\"data\":{\"number_card_name\":\"Approved Resumes\",\"col\":4}},{\"id\":\"4VQ_RzuDpG\",\"type\":\"number_card\",\"data\":{\"number_card_name\":\"Saved Resume\",\"col\":4}},{\"id\":\"HVMX5i9bjl\",\"type\":\"number_card\",\"data\":{\"number_card_name\":\"Share With Me\",\"col\":4}},{\"id\":\"GqKjOQSym9\",\"type\":\"quick_list\",\"data\":{\"quick_list_name\":\"All Resumes\",\"col\":6}},{\"id\":\"9go-JireCs\",\"type\":\"quick_list\",\"data\":{\"quick_list_name\":\"Approved Resumes\",\"col\":6}},{\"id\":\"MAe3TZ5xkM\",\"type\":\"quick_list\",\"data\":{\"quick_list_name\":\"Assessment Forms\",\"col\":12}},{\"id\":\"hXavPQyqPu\",\"type\":\"quick_list\",\"data\":{\"quick_list_name\":\"Resume Scanning Logs\",\"col\":12}}]",
- "creation": "2025-04-10 16:04:35.073500",
+ "content": "[{\"id\":\"--QmxgyNTK\",\"type\":\"custom_block\",\"data\":{\"custom_block_name\":\"Redirect To Profile Search Page\",\"col\":12}},{\"id\":\"jzNYkVXadI\",\"type\":\"number_card\",\"data\":{\"number_card_name\":\"Total Resumes \",\"col\":4}},{\"id\":\"16S0IF6F3j\",\"type\":\"number_card\",\"data\":{\"number_card_name\":\"Manual Upload\",\"col\":4}},{\"id\":\"bQo7ZtES5F\",\"type\":\"number_card\",\"data\":{\"number_card_name\":\"Auto Upload\",\"col\":4}},{\"id\":\"qkdKQTctrP\",\"type\":\"number_card\",\"data\":{\"number_card_name\":\"Approved Resumes\",\"col\":4}},{\"id\":\"4VQ_RzuDpG\",\"type\":\"number_card\",\"data\":{\"number_card_name\":\"Saved Resume\",\"col\":4}},{\"id\":\"HVMX5i9bjl\",\"type\":\"number_card\",\"data\":{\"number_card_name\":\"Share With Me\",\"col\":4}},{\"id\":\"GqKjOQSym9\",\"type\":\"quick_list\",\"data\":{\"quick_list_name\":\"All Resumes\",\"col\":6}},{\"id\":\"9go-JireCs\",\"type\":\"quick_list\",\"data\":{\"quick_list_name\":\"Approved Resumes\",\"col\":6}},{\"id\":\"5VWacw_PLF\",\"type\":\"quick_list\",\"data\":{\"quick_list_name\":\"Job Posts\",\"col\":12}},{\"id\":\"hXavPQyqPu\",\"type\":\"quick_list\",\"data\":{\"quick_list_name\":\"Resume Scanning Logs\",\"col\":12}}]",
+ "creation": "2025-08-05 18:47:23.546217",
  "custom_blocks": [
   {
    "custom_block_name": "Redirect To Profile Search Page",
@@ -20,7 +20,7 @@
  "label": "Resume List",
  "link_type": "DocType",
  "links": [],
- "modified": "2025-07-31 13:27:13.830554",
+ "modified": "2025-08-13 13:52:06.210307",
  "modified_by": "Administrator",
  "module": "Resume Parser",
  "name": "Resume List",
@@ -50,7 +50,7 @@
    "number_card_name": "Saved Resume"
   }
  ],
- "owner": "jaypatelsayaji@gmail.com",
+ "owner": "Administrator",
  "parent_page": "",
  "public": 1,
  "quick_lists": [
@@ -60,8 +60,8 @@
    "quick_list_filter": "[[\"Resume\",\"upload_by\",\"like\",\"%{frappe.session.user}%\",false]]"
   },
   {
-   "document_type": "Assessement",
-   "label": "Assessment Forms",
+   "document_type": "Job Posts",
+   "label": "Job Posts",
    "quick_list_filter": "[]"
   },
   {

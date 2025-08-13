@@ -128,3 +128,50 @@ def get_saved_resumes_by_user():
             "name": ["in", resume_ids] if resume_ids else ["=", "none_found"]
         }
     }
+
+
+# JOB POSTS API
+@frappe.whitelist(allow_guest=True)
+def create_job_post(job_title, job_description, role=None, industry=None, department=None, employment_type=None, designation=None, key_skill=None):
+    """
+    Create a new job post with the provided details
+    """
+    try:
+        # Create new Job Posts document
+        job_post = frappe.new_doc("Job Posts")
+        job_post.job_title = job_title
+        job_post.job_description = job_description
+        
+        # Set optional fields
+        if role:
+            job_post.role = role
+        if industry:
+            job_post.industry = industry
+        if department:
+            job_post.department = department
+        if employment_type:
+            job_post.employment_type = employment_type
+        if designation:
+            job_post.designation = designation
+        
+        # Handle key skills - store as JSON string
+        if key_skill:
+            job_post.key_skill = key_skill
+    
+        
+        # Save the document
+        job_post.insert()
+        frappe.db.commit()
+        
+        return {
+            "status": "success",
+            "message": "Job post created successfully",
+            "job_post_id": job_post.name
+        }
+        
+    except Exception as e:
+        frappe.log_error(f"Error creating job post: {str(e)}")
+        return {
+            "status": "error", 
+            "message": f"Failed to create job post: {str(e)}"
+        }

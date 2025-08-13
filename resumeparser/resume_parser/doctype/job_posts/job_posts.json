@@ -1,6 +1,7 @@
 {
  "actions": [],
  "allow_rename": 1,
+ "autoname": "format:JD-{####}-{job_title}",
  "creation": "2025-08-12 16:15:29.422262",
  "doctype": "DocType",
  "engine": "InnoDB",
@@ -23,7 +24,7 @@
   },
   {
    "fieldname": "job_description",
-   "fieldtype": "Markdown Editor",
+   "fieldtype": "Long Text",
    "label": "Job Description"
   },
   {
@@ -33,19 +34,19 @@
   },
   {
    "fieldname": "industry",
-   "fieldtype": "Select",
+   "fieldtype": "Data",
    "label": "Industry",
    "options": "Information Technology (IT)\nFinance & Banking\nHealthcare & Pharmaceuticals\nManufacturing & Industrial Production\nRetail & E-commerce\nEducation & E-Learning\nTelecommunications & Media\nHospitality & Tourism\nEnergy & Utilities\nTransportation & Logistics\nReal Estate & Construction\nAgriculture & Agribusiness\nAutomotive & Aerospace\nConsumer Goods & Services\nEntertainment & Leisure\nLegal & Compliance\nInsurance & Risk Management\nMining & Natural Resources\nProfessional Services\nPublic Sector & Government\nTechnology Hardware & Equipment\nSemiconductors & Electronics\nRenewable Energy & Sustainability\nCybersecurity & Data Privacy\nArtificial Intelligence & Machine Learning\nBlockchain & Fintech\nSports & Recreation\nArt & Culture\nNonprofit & Social Impact"
   },
   {
    "fieldname": "department",
-   "fieldtype": "Link",
+   "fieldtype": "Data",
    "label": "Department",
    "options": "Department"
   },
   {
    "fieldname": "employment_type",
-   "fieldtype": "Select",
+   "fieldtype": "Data",
    "label": "Employment Type",
    "options": "Full Time\nPart Time\nContract\nTemporary\nVolunteer\nIntern\nFreelance\nRemote\nHybrid\nOther"
   },
@@ -61,7 +62,7 @@
   },
   {
    "fieldname": "key_skill",
-   "fieldtype": "Table MultiSelect",
+   "fieldtype": "Data",
    "label": "Key Skill",
    "options": "Key Skill"
   }
@@ -69,10 +70,11 @@
  "grid_page_length": 50,
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2025-08-12 17:52:36.928260",
+ "modified": "2025-08-13 13:44:26.249946",
  "modified_by": "Administrator",
  "module": "Resume Parser",
  "name": "Job Posts",
+ "naming_rule": "Expression",
  "owner": "Administrator",
  "permissions": [
   {
@@ -91,5 +93,6 @@
  "row_format": "Dynamic",
  "sort_field": "creation",
  "sort_order": "DESC",
- "states": []
+ "states": [],
+ "title_field": "job_title"
 }
