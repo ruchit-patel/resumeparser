@@ -441,57 +441,196 @@ def final_search_query(search_data: dict) -> dict:
     # keywords = [item["text"] for item in search_data.get("searchKeywords", [])]
     keywords = [item["text"] for item in search_data.get("searchKeywords", []) + search_data.get("skills", [])]
 
-    # if not keywords:
-    #     # No keywords provided, return a query that matches nothing
-    #     return {
-    #         "size": 20,
-    #         "query": {
-    #             "bool": {
-    #                 "must": [
-    #                     {"match_none": {}}
-    #                 ]
-    #             }
-    #         }
-    #     }
-
     must_conditions = []
     should_conditions = []
     must_not_conditions = []
 
-    # 1. Star-marked keywords (must be in skills, all in a single nested query)
-    necessary_skills = [item["text"] for item in search_data.get("searchKeywords", []) if item.get("isNecessary", False)]
-    if necessary_skills:
-        must_conditions.append({
-            "nested": {
-                "path": "skills",
-                "query": {
-                    "bool": {
-                        "must": [
-                            {"match": {"skills.skill_name": skill}} for skill in necessary_skills
-                        ]
-                    }
-                }
-            }
-        })
+    # 1. Handle skills from "skills" parameter (dedicated skill search)
+    skills_list = search_data.get("skills", [])
+    if skills_list:
+        # Create skill conditions for direct skill search
+        skill_should_conditions = []
+        for skill_item in skills_list:
+            if isinstance(skill_item, dict) and "text" in skill_item:
+                skill_name = skill_item["text"]
+                if skill_item.get("isNecessary", False):
+                    # Necessary skills go to must conditions
+                    must_conditions.append({
+                        "nested": {
+                            "path": "skills",
+                            "query": {
+                                "match": {
+                                    "skills.skill_name": {
+                                        "query": skill_name,
+                                        "operator": "and",
+                                        "fuzziness": "AUTO"
+                                    }
+                                }
+                            }
+                        }
+                    })
+                else:
+                    # Optional skills go to should conditions
+                    skill_should_conditions.append({
+                        "nested": {
+                            "path": "skills",
+                            "query": {
+                                "match": {
+                                    "skills.skill_name": {
+                                        "query": skill_name,
+                                        "operator": "or",
+                                        "fuzziness": "AUTO"
+                                    }
+                                }
+                            }
+                        }
+                    })
+        
+        # Add optional skills to should conditions
+        if skill_should_conditions:
+            should_conditions.extend(skill_should_conditions)
 
-    # Non-starred keywords can be in should (optional, can expand as needed)
+    # 2. Handle searchKeywords (search across multiple fields - skills, experience, etc.)
     for item in search_data.get("searchKeywords", []):
-        if not item.get("isNecessary", False):
-            should_conditions.append({
+        keyword_text = item["text"]
+        is_necessary = item.get("isNecessary", False)
+        
+        # Create multi-field search conditions for each keyword
+        keyword_conditions = [
+            # Search in skills
+            {
                 "nested": {
                     "path": "skills",
                     "query": {
                         "match": {
                             "skills.skill_name": {
-                                "query": item["text"],
-                                "max_expansions": 50
+                                "query": keyword_text,
+                                "operator": "or",
+                                "fuzziness": "AUTO"
                             }
                         }
                     }
                 }
+            },
+            # Search in experience role/position
+            {
+                "nested": {
+                    "path": "experience",
+                    "query": {
+                        "match": {
+                            "experience.role_position": {
+                                "query": keyword_text,
+                                "operator": "or",
+                                "fuzziness": "AUTO"
+                            }
+                        }
+                    }
+                }
+            },
+            # Search in experience job description
+            {
+                "nested": {
+                    "path": "experience",
+                    "query": {
+                        "match": {
+                            "experience.job_description": {
+                                "query": keyword_text,
+                                "operator": "or",
+                                "fuzziness": "AUTO"
+                            }
+                        }
+                    }
+                }
+            },
+            # Search in experience company name
+            {
+                "nested": {
+                    "path": "experience",
+                    "query": {
+                        "match": {
+                            "experience.company_name": {
+                                "query": keyword_text,
+                                "operator": "or",
+                                "fuzziness": "AUTO"
+                            }
+                        }
+                    }
+                }
+            },
+            # Search in education course name
+            {
+                "nested": {
+                    "path": "education",
+                    "query": {
+                        "match": {
+                            "education.course_name": {
+                                "query": keyword_text,
+                                "operator": "or",
+                                "fuzziness": "AUTO"
+                            }
+                        }
+                    }
+                }
+            },
+            # Search in education specialization
+            {
+                "nested": {
+                    "path": "education",
+                    "query": {
+                        "match": {
+                            "education.specialization": {
+                                "query": keyword_text,
+                                "operator": "or",
+                                "fuzziness": "AUTO"
+                            }
+                        }
+                    }
+                }
+            },
+            # Search in certificates
+            {
+                "nested": {
+                    "path": "certificates",
+                    "query": {
+                        "match": {
+                            "certificates.certificate_name": {
+                                "query": keyword_text,
+                                "operator": "or",
+                                "fuzziness": "AUTO"
+                            }
+                        }
+                    }
+                }
+            },
+            # Search in basic fields
+            {
+                "multi_match": {
+                    "query": keyword_text,
+                    "fields": ["candidate_name", "role", "industry", "department"],
+                    "operator": "or",
+                    "fuzziness": "AUTO"
+                }
+            }
+        ]
+        
+        if is_necessary:
+            # Necessary keywords: must match at least one field
+            must_conditions.append({
+                "bool": {
+                    "should": keyword_conditions,
+                    "minimum_should_match": 1
+                }
+            })
+        else:
+            # Optional keywords: boost relevance if matched
+            should_conditions.append({
+                "bool": {
+                    "should": keyword_conditions,
+                    "minimum_should_match": 1
+                }
             })
 
-    # 2. Experience (must)
+    # 3. Experience (must)
     min_exp = search_data.get("minExperience")
     max_exp = search_data.get("maxExperience")
     if min_exp != "" and max_exp != "":
@@ -504,7 +643,7 @@ def final_search_query(search_data: dict) -> dict:
             }
         })
 
-    # 3. Location (must)
+    # 4. Location (must)
     location = search_data.get("location")
     if location:
         must_conditions.append({
@@ -536,7 +675,7 @@ def final_search_query(search_data: dict) -> dict:
         })
 
 
-    # 4. Salary (must, with should for salary not provided)
+    # 5. Salary (must, with should for salary not provided)
     min_salary = search_data.get("minSalary")
     max_salary = search_data.get("maxSalary")
     salary_not_provided = search_data.get("salaryNotProvided")

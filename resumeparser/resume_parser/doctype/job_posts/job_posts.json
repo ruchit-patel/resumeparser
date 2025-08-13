@@ -1,12 +1,13 @@
 {
  "actions": [],
  "allow_rename": 1,
- "autoname": "format:JD-{####}-{job_title}",
+ "autoname": "format:JD-{####}-{client}-{job_title}",
  "creation": "2025-08-12 16:15:29.422262",
  "doctype": "DocType",
  "engine": "InnoDB",
  "field_order": [
   "job_details_section",
+  "client",
   "job_title",
   "job_description",
   "role",
@@ -20,7 +21,9 @@
   {
    "fieldname": "job_title",
    "fieldtype": "Data",
-   "label": "Job Title"
+   "in_list_view": 1,
+   "label": "Job Title",
+   "reqd": 1
   },
   {
    "fieldname": "job_description",
@@ -65,12 +68,19 @@
    "fieldtype": "Data",
    "label": "Key Skill",
    "options": "Key Skill"
+  },
+  {
+   "fieldname": "client",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "Client",
+   "reqd": 1
   }
  ],
  "grid_page_length": 50,
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2025-08-13 13:44:26.249946",
+ "modified": "2025-08-13 14:37:12.131506",
  "modified_by": "Administrator",
  "module": "Resume Parser",
  "name": "Job Posts",

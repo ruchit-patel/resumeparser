@@ -132,13 +132,14 @@ def get_saved_resumes_by_user():
 
 # JOB POSTS API
 @frappe.whitelist(allow_guest=True)
-def create_job_post(job_title, job_description, role=None, industry=None, department=None, employment_type=None, designation=None, key_skill=None):
+def create_job_post(client, job_title, job_description, role=None, industry=None, department=None, employment_type=None, designation=None, key_skill=None):
     """
     Create a new job post with the provided details
     """
     try:
         # Create new Job Posts document
         job_post = frappe.new_doc("Job Posts")
+        job_post.client = client
         job_post.job_title = job_title
         job_post.job_description = job_description
         

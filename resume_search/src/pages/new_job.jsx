@@ -13,6 +13,7 @@ const NewJobPost = () => {
   const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(false);
   const [formData, setFormData] = useState({
+    client: "",
     job_title: "",
     job_description: "",
     role: "",
@@ -20,7 +21,7 @@ const NewJobPost = () => {
     department: "",
     employment_type: "",
     designation: "",
-    key_skill: []
+    key_skill: ""
   });
 
   const industryOptions = [
@@ -88,28 +89,6 @@ const NewJobPost = () => {
     }
   };
 
-  const addSkill = () => {
-    setFormData(prev => ({
-      ...prev,
-      key_skill: [...prev.key_skill, ""]
-    }));
-  };
-
-  const removeSkill = (index) => {
-    setFormData(prev => ({
-      ...prev,
-      key_skill: prev.key_skill.filter((_, i) => i !== index)
-    }));
-  };
-
-  const updateSkill = (index, skillName) => {
-    setFormData(prev => ({
-      ...prev,
-      key_skill: prev.key_skill.map((skill, i) => 
-        i === index ? skillName : skill
-      )
-    }));
-  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -117,6 +96,11 @@ const NewJobPost = () => {
     
     try {
       // Validate required fields
+      if (!formData.client.trim()) {
+        alert('Please enter client name');
+        return;
+      }
+      
       if (!formData.job_title.trim()) {
         alert('Please enter a job title');
         return;
@@ -127,11 +111,8 @@ const NewJobPost = () => {
         return;
       }
 
-      // Prepare data for API - stringify key_skill array and filter out empty skills
-      const dataToSend = {
-        ...formData,
-        key_skill: JSON.stringify(formData.key_skill.filter(skill => skill.trim() !== ""))
-      };
+      // Send data as is - key_skill is already a string
+      const dataToSend = formData;
       
       const response = await createJobPost(dataToSend);
       if (response && response.message) {
@@ -170,6 +151,18 @@ const NewJobPost = () => {
                 <h2 className="text-xl font-semibold border-b pb-2">Job Information</h2>
                 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div>
+                    <Label htmlFor="client">Client *</Label>
+                    <Input
+                      id="client"
+                      value={formData.client}
+                      onChange={(e) => setFormData(prev => ({ ...prev, client: e.target.value }))}
+                      className="mt-1"
+                      placeholder="Enter client name"
+                      required
+                    />
+                  </div>
+
                   <div>
                     <Label htmlFor="job_title">Job Title *</Label>
                     <Input
@@ -266,35 +259,20 @@ const NewJobPost = () => {
 
               {/* Key Skills Section */}
               <div className="space-y-4">
-                <div className="flex justify-between items-center border-b pb-2">
+                <div className="border-b pb-2">
                   <h2 className="text-xl font-semibold">Key Skills</h2>
-                  <Button type="button" variant="outline" size="sm" onClick={addSkill}>
-                    <Plus className="w-4 h-4 mr-1" /> Add Skill
-                  </Button>
                 </div>
                 
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                  {formData.key_skill.map((skill, index) => (
-                    <div key={index} className="flex gap-2 items-center">
-                      <Input
-                        placeholder="Enter skill name"
-                        value={skill}
-                        onChange={(e) => updateSkill(index, e.target.value)}
-                        className="flex-1"
-                      />
-                      <Button
-                        type="button"
-                        variant="destructive"
-                        size="icon"
-                        onClick={() => removeSkill(index)}
-                      >
-                        <Trash2 className="w-4 h-4" />
-                      </Button>
-                    </div>
-                  ))}
-                  {formData.key_skill.length === 0 && (
-                    <p className="text-gray-500 italic">No skills added yet. Click "Add Skill" to add key skills for this position.</p>
-                  )}
+                <div>
+                  <Input
+                    placeholder="Enter skills separated by commas (e.g., Python, JavaScript, React, Node.js)"
+                    value={formData.key_skill}
+                    onChange={(e) => setFormData(prev => ({ ...prev, key_skill: e.target.value }))}
+                    className="w-full"
+                  />
+                  <p className="text-sm text-gray-500 mt-2">
+                    <strong>Note:</strong> Please enter skills separated by commas (comma separated format)
+                  </p>
                 </div>
               </div>
 

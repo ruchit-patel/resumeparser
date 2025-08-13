@@ -7,6 +7,8 @@
  "field_order": [
   "form_section",
   "earlier_interviewed_with_the_client",
+  "job_post",
+  "job_title",
   "candidate",
   "candidate_name",
   "time_line_of_earlier_interview",
@@ -261,12 +263,24 @@
    "fieldname": "candidate_name",
    "fieldtype": "Data",
    "label": "Candidate Name"
+  },
+  {
+   "fieldname": "job_post",
+   "fieldtype": "Link",
+   "label": "Job Post",
+   "options": "Job Posts"
+  },
+  {
+   "fetch_from": "job_post.job_title",
+   "fieldname": "job_title",
+   "fieldtype": "Data",
+   "label": "Job Title"
   }
  ],
  "grid_page_length": 50,
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2025-07-30 16:05:58.854308",
+ "modified": "2025-08-13 14:55:40.237765",
  "modified_by": "Administrator",
  "module": "Resume Parser",
  "name": "Assessement",
@@ -288,5 +302,6 @@
  "row_format": "Dynamic",
  "sort_field": "creation",
  "sort_order": "DESC",
- "states": []
+ "states": [],
+ "title_field": "candidate_name"
 }
