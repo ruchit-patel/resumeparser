@@ -176,3 +176,93 @@ def create_job_post(client, job_title, job_description, role=None, industry=None
             "status": "error", 
             "message": f"Failed to create job post: {str(e)}"
         }
+
+
+@frappe.whitelist(allow_guest=True)
+def get_job_posts():
+    """
+    Get all job posts for display
+    """
+    try:
+        # Fetch all job posts
+        job_posts = frappe.get_all(
+            "Job Posts",
+            fields=[
+                "name", 
+                "client", 
+                "job_title", 
+                "job_description", 
+                "role", 
+                "industry", 
+                "department", 
+                "employment_type", 
+                "designation", 
+                "key_skill",
+                "creation",
+                "modified"
+            ],
+            order_by="creation desc"
+        )
+        
+        return job_posts
+        
+    except Exception as e:
+        frappe.log_error(f"Error fetching job posts: {str(e)}")
+        return {
+            "status": "error",
+            "message": f"Failed to fetch job posts: {str(e)}"
+        }
+
+
+@frappe.whitelist(allow_guest=True)
+def get_filtered_job_posts(filters=None):
+    """
+    Get filtered job posts based on search criteria
+    """
+    try:
+        # Parse filters if passed as string
+        if isinstance(filters, str):
+            filters = frappe.parse_json(filters)
+        
+        # Build Frappe filters
+        frappe_filters = []
+        
+        # Add title filter if provided
+        if filters and filters.get('title'):
+            title_filter = filters['title']
+            frappe_filters.append(['job_title', 'like', f'%{title_filter}%'])
+        
+        # Add client filter if provided  
+        if filters and filters.get('client'):
+            client_filter = filters['client']
+            frappe_filters.append(['client', 'like', f'%{client_filter}%'])
+        
+        # Fetch job posts with filters
+        job_posts = frappe.get_all(
+            "Job Posts",
+            fields=[
+                "name", 
+                "client", 
+                "job_title", 
+                "job_description", 
+                "role", 
+                "industry", 
+                "department", 
+                "employment_type", 
+                "designation", 
+                "key_skill",
+                "creation",
+                "modified"
+            ],
+            filters=frappe_filters,
+            order_by="creation desc"
+        )
+        
+        return job_posts
+        
+    except Exception as e:
+        frappe.log_error(f"Error fetching filtered job posts: {str(e)}")
+        return {
+            "status": "error",
+            "message": f"Failed to fetch filtered job posts: {str(e)}"
+        }

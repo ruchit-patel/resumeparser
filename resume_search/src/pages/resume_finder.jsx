@@ -9,6 +9,7 @@ import DiversityDetails from '../components/diversity/DiversityDetails';
 import '../App.css';
 import { useNavigate } from 'react-router-dom';
 import SaveResumesComponent from './SaveResumesComponent';
+import JobPostsComponent from './JobPostsComponent';
 import RecentSearches from '../components/search/RecentSearches';
 import { useFrappeCreateDoc } from 'frappe-react-sdk';
 
@@ -115,6 +116,12 @@ const ResumeFindPage = () => {
                   Search candidates
                 </TabsTrigger>
                 <TabsTrigger 
+                  value="jobpost" 
+                  className="rounded-none border-b-2 border-transparent data-[state=active]:border-blue-600 data-[state=active]:bg-white px-4 py-2"
+                >
+                  Job Posts
+                </TabsTrigger>
+                <TabsTrigger 
                   value="saved" 
                   className="rounded-none border-b-2 border-transparent data-[state=active]:border-blue-600 data-[state=active]:bg-white px-4 py-2"
                 >
@@ -170,6 +177,14 @@ const ResumeFindPage = () => {
 
               </TabsContent>
               
+
+
+              <TabsContent value="jobpost">
+                <JobPostsComponent />
+              </TabsContent>
+
+
+
               <TabsContent value="saved">
                 <SaveResumesComponent />
               </TabsContent>

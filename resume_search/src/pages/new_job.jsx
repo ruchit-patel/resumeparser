@@ -118,7 +118,7 @@ const NewJobPost = () => {
       if (response && response.message) {
         console.log('Job post created successfully:', response);
         alert('Job post created successfully!');
-        navigate('/app/resume-list');
+        navigate('/resume_search/search');
       } else {
         alert('Failed to create job post. Please try again.');
       }
