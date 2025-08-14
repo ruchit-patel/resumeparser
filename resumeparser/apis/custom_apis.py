@@ -407,9 +407,9 @@ def get_assessment_details(assessment_name):
 
 
 @frappe.whitelist(allow_guest=True)
-def generate_assessment_pdf(assessment_name):
+def generate_assessment_pdf(assessment_name, fields=None):
     """
-    Generate and download PDF for a specific assessment
+    Generate and download PDF for a specific assessment with selected fields
     """
     try:
         from frappe.utils.pdf import get_pdf
@@ -418,8 +418,13 @@ def generate_assessment_pdf(assessment_name):
         # Get assessment document with all fields
         assessment = frappe.get_doc("Assessement", assessment_name)
         
+        # Parse selected fields if provided
+        selected_fields = []
+        if fields:
+            selected_fields = [f.strip() for f in fields.split(',') if f.strip()]
+        
         # Generate HTML content for PDF
-        html_content = generate_assessment_html(assessment)
+        html_content = generate_assessment_html(assessment, selected_fields)
         
         # Generate PDF with custom options
         pdf = get_pdf(html_content, {
@@ -450,19 +455,70 @@ def generate_assessment_pdf(assessment_name):
         }
 
 
-def generate_assessment_html(assessment):
+def generate_assessment_html(assessment, selected_fields=None):
     """
     Generate HTML content for assessment PDF with Seachend Search Advisors Private Limited watermark
     """
+    # Field mapping with short codes for URL optimization
+    field_mapping = {
+        "1": "candidate_name",
+        "2": "job_post", 
+        "3": "earlier_interviewed_with_the_client",
+        "4": "time_line_of_earlier_interview",
+        "5": "updated_by",
+        "6": "current_organization",
+        "7": "gender",
+        "8": "diversity_flag", 
+        "9": "total_experience",
+        "10": "location",
+        "11": "willingness_to_relocate",
+        "12": "education_highest",
+        "13": "any_disabilities",
+        "14": "reporting_to",
+        "15": "team_size_managed",
+        "16": "structure_of_the_team",
+        "17": "budget_managed",
+        "18": "revenue_or_manpower_or_budget_managed_as_is_the_case_in_role",
+        "19": "numbers_to_be_provided",
+        "20": "relevant_experience",
+        "21": "current_compensation",
+        "22": "expected_compensation",
+        "23": "notice_period",
+        "24": "stability_comments",
+        "25": "reason_for_change",
+        "26": "fitment_to_the_role",
+        "27": "must_haves_as_defined_by_client",
+        "28": "executive_presence_and_ability_to_think_and_act_strategically",
+        "29": "call_outs",
+        "30": "gap_in_education_if_any_reason",
+        "31": "gap_in_jobs_if_any",
+        "32": "confirmation",
+        "33": "awards_recognitions_and_certifications"
+    }
+
+    # Convert selected field codes to field names
+    included_fields = set()
+    if selected_fields:
+        for code in selected_fields:
+            if code in field_mapping:
+                included_fields.add(field_mapping[code])
+    else:
+        # If no fields selected, include all fields
+        included_fields = set(field_mapping.values())
+
     # Helper function to display value or "-" if empty
     def display_value(value):
         if value is None or value == "" or value == 0:
             return "-"
         return str(value)
+
+    # Helper function to check if field should be included
+    def should_include_field(field_name):
+        return field_name in included_fields
     
-    # Format relevant experience
+    # Format relevant experience (only if included)
     relevant_exp_html = ""
-    if assessment.relevant_experience:
+    if should_include_field("relevant_experience") and assessment.relevant_experience:
         relevant_exp_html = """
         <tr>
             <td style="font-weight: bold; padding: 8px; border: 1px solid #ddd; background-color: #f5f5f5;">Relevant Experience:</td>
@@ -482,9 +538,9 @@ def generate_assessment_html(assessment):
             </td>
         </tr>"""
     
-    # Format awards and certifications
+    # Format awards and certifications (only if included)  
     awards_html = ""
-    if assessment.awards_recognitions_and_certifications:
+    if should_include_field("awards_recognitions_and_certifications") and assessment.awards_recognitions_and_certifications:
         awards_html = """
         <tr>
             <td style="font-weight: bold; padding: 8px; border: 1px solid #ddd; background-color: #f5f5f5;">Awards & Certifications:</td>
@@ -501,7 +557,151 @@ def generate_assessment_html(assessment):
                 </table>
             </td>
         </tr>"""
+
+    # Build sections dynamically based on selected fields
+    basic_info_html = ""
+    personal_prof_html = ""
+    work_exp_html = ""
+    compensation_html = ""
+    assessment_comments_html = ""
+
+    # Basic Information Section
+    basic_fields = []
+    if should_include_field("candidate_name"):
+        basic_fields.append(f'<tr><td class="field-label">Candidate Name:</td><td>{display_value(assessment.candidate_name)}</td></tr>')
+    if should_include_field("job_post"):
+        basic_fields.append(f'<tr><td class="field-label">Job Post:</td><td>{display_value(assessment.job_post)}</td></tr>')
+    if should_include_field("earlier_interviewed_with_the_client"):
+        basic_fields.append(f'<tr><td class="field-label">Earlier Interviewed:</td><td>{"Yes" if assessment.earlier_interviewed_with_the_client else "No"}</td></tr>')
+    if should_include_field("time_line_of_earlier_interview"):
+        basic_fields.append(f'<tr><td class="field-label">Interview Timeline:</td><td>{display_value(assessment.time_line_of_earlier_interview)}</td></tr>')
+    if should_include_field("updated_by"):
+        basic_fields.append(f'<tr><td class="field-label">Updated By:</td><td>{display_value(assessment.updated_by)}</td></tr>')
+
+    if basic_fields:
+        basic_info_html = f'''
+        <table>
+            <tr class="section-header">
+                <th colspan="2">BASIC INFORMATION</th>
+            </tr>
+            {"".join(basic_fields)}
+        </table>'''
+
+    # Personal & Professional Details Section
+    personal_fields = []
+    if should_include_field("current_organization"):
+        personal_fields.append(f'<tr><td class="field-label">Current Organization:</td><td>{display_value(assessment.current_organization)}</td></tr>')
+    if should_include_field("gender"):
+        personal_fields.append(f'<tr><td class="field-label">Gender:</td><td>{display_value(assessment.gender)}</td></tr>')
+    if should_include_field("diversity_flag"):
+        personal_fields.append(f'<tr><td class="field-label">Diversity Flag:</td><td>{display_value(assessment.diversity_flag)}</td></tr>')
+    if should_include_field("total_experience"):
+        personal_fields.append(f'<tr><td class="field-label">Total Experience:</td><td>{display_value(assessment.total_experience)} years</td></tr>')
+    if should_include_field("location"):
+        personal_fields.append(f'<tr><td class="field-label">Location:</td><td>{display_value(assessment.location)}</td></tr>')
+    if should_include_field("willingness_to_relocate"):
+        personal_fields.append(f'<tr><td class="field-label">Willing to Relocate:</td><td>{"Yes" if assessment.willingness_to_relocate else "No"}</td></tr>')
+    if should_include_field("education_highest"):
+        personal_fields.append(f'<tr><td class="field-label">Education (Highest):</td><td>{display_value(assessment.education_highest)}</td></tr>')
+    if should_include_field("any_disabilities"):
+        personal_fields.append(f'<tr><td class="field-label">Any Disabilities:</td><td>{"Yes" if assessment.any_disabilities else "No"}</td></tr>')
+
+    if personal_fields:
+        personal_prof_html = f'''
+        <table>
+            <tr class="section-header">
+                <th colspan="2">PERSONAL & PROFESSIONAL DETAILS</th>
+            </tr>
+            {"".join(personal_fields)}
+        </table>'''
+
+    # Work Experience & Management Section
+    work_fields = []
+    if should_include_field("reporting_to"):
+        work_fields.append(f'<tr><td class="field-label">Reporting To:</td><td>{display_value(assessment.reporting_to)}</td></tr>')
+    if should_include_field("team_size_managed"):
+        work_fields.append(f'<tr><td class="field-label">Team Size Managed:</td><td>{display_value(assessment.team_size_managed)}</td></tr>')
+    if should_include_field("structure_of_the_team"):
+        work_fields.append(f'<tr><td class="field-label">Team Structure:</td><td class="long-text">{display_value(assessment.structure_of_the_team)}</td></tr>')
+    if should_include_field("budget_managed"):
+        work_fields.append(f'<tr><td class="field-label">Budget Managed:</td><td>{display_value(assessment.budget_managed)}</td></tr>')
+    if should_include_field("revenue_or_manpower_or_budget_managed_as_is_the_case_in_role"):
+        work_fields.append(f'<tr><td class="field-label">Revenue/Manpower Managed:</td><td>{display_value(assessment.revenue_or_manpower_or_budget_managed_as_is_the_case_in_role)}</td></tr>')
+    if should_include_field("numbers_to_be_provided"):
+        work_fields.append(f'<tr><td class="field-label">Numbers to Provide:</td><td>{display_value(assessment.numbers_to_be_provided)}</td></tr>')
     
+    # Add relevant experience to work section if included
+    if relevant_exp_html:
+        work_fields.append(relevant_exp_html)
+
+    if work_fields:
+        work_exp_html = f'''
+        <table>
+            <tr class="section-header">
+                <th colspan="2">WORK EXPERIENCE & MANAGEMENT</th>
+            </tr>
+            {"".join(work_fields)}
+        </table>'''
+
+    # Compensation & Notice Period Section
+    comp_fields = []
+    if should_include_field("current_compensation"):
+        comp_fields.append(f'<tr><td class="field-label">Current Compensation:</td><td>{display_value(assessment.current_compensation)}</td></tr>')
+    if should_include_field("expected_compensation"):
+        comp_fields.append(f'<tr><td class="field-label">Expected Compensation:</td><td>{display_value(assessment.expected_compensation)}</td></tr>')
+    if should_include_field("notice_period"):
+        comp_fields.append(f'<tr><td class="field-label">Notice Period:</td><td>{display_value(assessment.notice_period)}</td></tr>')
+
+    if comp_fields:
+        compensation_html = f'''
+        <table>
+            <tr class="section-header">
+                <th colspan="2">COMPENSATION & NOTICE PERIOD</th>
+            </tr>
+            {"".join(comp_fields)}
+        </table>'''
+
+    # Assessment & Comments Section
+    comment_fields = []
+    if should_include_field("stability_comments"):
+        comment_fields.append(f'<tr><td class="field-label">Stability Comments:</td><td class="long-text">{display_value(assessment.stability_comments)}</td></tr>')
+    if should_include_field("reason_for_change"):
+        comment_fields.append(f'<tr><td class="field-label">Reason for Change:</td><td class="long-text">{display_value(assessment.reason_for_change)}</td></tr>')
+    if should_include_field("fitment_to_the_role"):
+        comment_fields.append(f'<tr><td class="field-label">Fitment to Role:</td><td class="long-text">{display_value(assessment.fitment_to_the_role)}</td></tr>')
+    if should_include_field("must_haves_as_defined_by_client"):
+        comment_fields.append(f'<tr><td class="field-label">Must Haves (Client Defined):</td><td class="long-text">{display_value(assessment.must_haves_as_defined_by_client)}</td></tr>')
+    if should_include_field("executive_presence_and_ability_to_think_and_act_strategically"):
+        comment_fields.append(f'<tr><td class="field-label">Executive Presence:</td><td class="long-text">{display_value(assessment.executive_presence_and_ability_to_think_and_act_strategically)}</td></tr>')
+    if should_include_field("call_outs"):
+        comment_fields.append(f'<tr><td class="field-label">Call Outs:</td><td class="long-text">{display_value(assessment.call_outs)}</td></tr>')
+    if should_include_field("gap_in_education_if_any_reason"):
+        comment_fields.append(f'<tr><td class="field-label">Education Gap Reason:</td><td class="long-text">{display_value(assessment.gap_in_education_if_any_reason)}</td></tr>')
+    if should_include_field("gap_in_jobs_if_any"):
+        comment_fields.append(f'<tr><td class="field-label">Job Gap Reason:</td><td class="long-text">{display_value(assessment.gap_in_jobs_if_any)}</td></tr>')
+    if should_include_field("confirmation"):
+        comment_fields.append(f'<tr><td class="field-label">Confirmation:</td><td>{"Yes" if assessment.confirmation else "No"}</td></tr>')
+
+    if comment_fields:
+        assessment_comments_html = f'''
+        <table>
+            <tr class="section-header">
+                <th colspan="2">ASSESSMENT & COMMENTS</th>
+            </tr>
+            {"".join(comment_fields)}
+        </table>'''
+
+    # Awards section (if included)
+    awards_section_html = ""
+    if awards_html:
+        awards_section_html = f'''
+        <table>
+            <tr class="section-header">
+                <th colspan="2">AWARDS & CERTIFICATIONS</th>
+            </tr>
+            {awards_html}
+        </table>'''
+
     html_content = f"""
     <!DOCTYPE html>
     <html>
@@ -606,165 +806,15 @@ def generate_assessment_html(assessment):
         <div class="header">
             <div class="company-name">Seachend Search Advisors Private Limited</div>
             <div class="report-title">CANDIDATE ASSESSMENT REPORT</div>
-            <div class="candidate-name">{display_value(assessment.candidate_name)}</div>
+            <div class="candidate-name">{display_value(assessment.candidate_name) if should_include_field("candidate_name") else "Assessment Report"}</div>
         </div>
         
-        <table>
-            <tr class="section-header">
-                <th colspan="2">BASIC INFORMATION</th>
-            </tr>
-            <tr>
-                <td class="field-label">Candidate Name:</td>
-                <td>{display_value(assessment.candidate_name)}</td>
-            </tr>
-            <tr>
-                <td class="field-label">Job Post:</td>
-                <td>{display_value(assessment.job_post)}</td>
-            </tr>
-            <tr>
-                <td class="field-label">Earlier Interviewed:</td>
-                <td>{"Yes" if assessment.earlier_interviewed_with_the_client else "No"}</td>
-            </tr>
-            <tr>
-                <td class="field-label">Interview Timeline:</td>
-                <td>{display_value(assessment.time_line_of_earlier_interview)}</td>
-            </tr>
-            <tr>
-                <td class="field-label">Updated By:</td>
-                <td>{display_value(assessment.updated_by)}</td>
-            </tr>
-        </table>
-        
-        <table>
-            <tr class="section-header">
-                <th colspan="2">PERSONAL & PROFESSIONAL DETAILS</th>
-            </tr>
-            <tr>
-                <td class="field-label">Current Organization:</td>
-                <td>{display_value(assessment.current_organization)}</td>
-            </tr>
-            <tr>
-                <td class="field-label">Gender:</td>
-                <td>{display_value(assessment.gender)}</td>
-            </tr>
-            <tr>
-                <td class="field-label">Diversity Flag:</td>
-                <td>{display_value(assessment.diversity_flag)}</td>
-            </tr>
-            <tr>
-                <td class="field-label">Total Experience:</td>
-                <td>{display_value(assessment.total_experience)} years</td>
-            </tr>
-            <tr>
-                <td class="field-label">Location:</td>
-                <td>{display_value(assessment.location)}</td>
-            </tr>
-            <tr>
-                <td class="field-label">Willing to Relocate:</td>
-                <td>{"Yes" if assessment.willingness_to_relocate else "No"}</td>
-            </tr>
-            <tr>
-                <td class="field-label">Education (Highest):</td>
-                <td>{display_value(assessment.education_highest)}</td>
-            </tr>
-            <tr>
-                <td class="field-label">Any Disabilities:</td>
-                <td>{"Yes" if assessment.any_disabilities else "No"}</td>
-            </tr>
-        </table>
-        
-        <table>
-            <tr class="section-header">
-                <th colspan="2">WORK EXPERIENCE & MANAGEMENT</th>
-            </tr>
-            <tr>
-                <td class="field-label">Reporting To:</td>
-                <td>{display_value(assessment.reporting_to)}</td>
-            </tr>
-            <tr>
-                <td class="field-label">Team Size Managed:</td>
-                <td>{display_value(assessment.team_size_managed)}</td>
-            </tr>
-            <tr>
-                <td class="field-label">Team Structure:</td>
-                <td class="long-text">{display_value(assessment.structure_of_the_team)}</td>
-            </tr>
-            <tr>
-                <td class="field-label">Budget Managed:</td>
-                <td>{display_value(assessment.budget_managed)}</td>
-            </tr>
-            <tr>
-                <td class="field-label">Revenue/Manpower Managed:</td>
-                <td>{display_value(assessment.revenue_or_manpower_or_budget_managed_as_is_the_case_in_role)}</td>
-            </tr>
-            <tr>
-                <td class="field-label">Numbers to Provide:</td>
-                <td>{display_value(assessment.numbers_to_be_provided)}</td>
-            </tr>
-            {relevant_exp_html}
-        </table>
-        
-        <table>
-            <tr class="section-header">
-                <th colspan="2">COMPENSATION & NOTICE PERIOD</th>
-            </tr>
-            <tr>
-                <td class="field-label">Current Compensation:</td>
-                <td>{display_value(assessment.current_compensation)}</td>
-            </tr>
-            <tr>
-                <td class="field-label">Expected Compensation:</td>
-                <td>{display_value(assessment.expected_compensation)}</td>
-            </tr>
-            <tr>
-                <td class="field-label">Notice Period:</td>
-                <td>{display_value(assessment.notice_period)}</td>
-            </tr>
-        </table>
-        
-        <table>
-            <tr class="section-header">
-                <th colspan="2">ASSESSMENT & COMMENTS</th>
-            </tr>
-            <tr>
-                <td class="field-label">Stability Comments:</td>
-                <td class="long-text">{display_value(assessment.stability_comments)}</td>
-            </tr>
-            <tr>
-                <td class="field-label">Reason for Change:</td>
-                <td class="long-text">{display_value(assessment.reason_for_change)}</td>
-            </tr>
-            <tr>
-                <td class="field-label">Fitment to Role:</td>
-                <td class="long-text">{display_value(assessment.fitment_to_the_role)}</td>
-            </tr>
-            <tr>
-                <td class="field-label">Must Haves (Client Defined):</td>
-                <td class="long-text">{display_value(assessment.must_haves_as_defined_by_client)}</td>
-            </tr>
-            <tr>
-                <td class="field-label">Executive Presence:</td>
-                <td class="long-text">{display_value(assessment.executive_presence_and_ability_to_think_and_act_strategically)}</td>
-            </tr>
-            <tr>
-                <td class="field-label">Call Outs:</td>
-                <td class="long-text">{display_value(assessment.call_outs)}</td>
-            </tr>
-            <tr>
-                <td class="field-label">Education Gap Reason:</td>
-                <td class="long-text">{display_value(assessment.gap_in_education_if_any_reason)}</td>
-            </tr>
-            <tr>
-                <td class="field-label">Job Gap Reason:</td>
-                <td class="long-text">{display_value(assessment.gap_in_jobs_if_any)}</td>
-            </tr>
-            <tr>
-                <td class="field-label">Confirmation:</td>
-                <td>{"Yes" if assessment.confirmation else "No"}</td>
-            </tr>
-        </table>
-        
-        {awards_html}
+        {basic_info_html}
+        {personal_prof_html}
+        {work_exp_html}
+        {compensation_html}
+        {assessment_comments_html}
+        {awards_section_html}
         
         <div class="footer">
             <p>Generated on: {frappe.utils.now()}</p>
