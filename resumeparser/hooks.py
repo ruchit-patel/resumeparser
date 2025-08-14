@@ -184,13 +184,13 @@ doctype_list_js = {
 # }
 
 
-# scheduler_events = {
-#     "cron": {
-#         "0 0 * * *": [  # Every day at 12:00 AM
-#             "resumeparser.tasks.resume_scanner"
-#         ]
-#     }
-# }
+scheduler_events = {
+    "cron": {
+        "0 0 * * *": [  # Every day at 12:00 AM
+            "resumeparser.tasks.resume_scanner"
+        ]
+    }
+}
 # scheduler_events = {
 #     "cron": {
 #         "33 10 * * *": [  # Every day at 10:25 AM

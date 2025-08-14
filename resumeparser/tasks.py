@@ -35,7 +35,7 @@ def convert_docx_to_pdf(input_path, output_path):
 def test():
     return "test"
 
-@frappe.whitelist(allow_guest=True)
+# @frappe.whitelist(allow_guest=True)
 def resume_scanner():
     processed_count = 0
     skipped_count = 0
