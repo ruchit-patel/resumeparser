@@ -249,9 +249,9 @@ const CandidateCard = ({ candidate, onSelect, selected = false, jobPostId }) => 
                     className="text-gray-700 border-gray-300 h-9 flex items-center justify-center"
                     onClick={(e) => {
                       e.stopPropagation();
-                      const isDetailPage = location.pathname.includes('/detail/');
+                      const isDetailOrResultsPage = location.pathname.includes('/detail/') || location.pathname.includes('/results');
                       const baseUrl = `/assessement-questions/new?candidate=${candidate.id}&candidate_name=${candidate.basicInfo.candidate_name}`;
-                      const url = (isDetailPage && jobPostId) 
+                      const url = (isDetailOrResultsPage && jobPostId) 
                         ? `${baseUrl}&job_post=${jobPostId}`
                         : baseUrl;
                       window.open(url, "_blank");
