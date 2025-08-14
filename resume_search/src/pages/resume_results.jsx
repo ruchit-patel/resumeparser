@@ -39,6 +39,7 @@ const fetchSearchData = async (data) => {
 const ResumeFindPage = () => {
   const location = useLocation();
   const searchData = location.state?.searchData;
+  const jobPostId = searchData?.jobPostId;
   const [selectedCandidates, setSelectedCandidates] = useState([]);
   const [allCandidatesData, setAllCandidatesData] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
@@ -160,6 +161,7 @@ const ResumeFindPage = () => {
                       candidate={candidate}
                       onSelect={handleSelectCandidate}
                       selected={selectedCandidates.includes(candidate.id)}
+                      jobPostId={jobPostId}
                     />
                 ))}
               </div>

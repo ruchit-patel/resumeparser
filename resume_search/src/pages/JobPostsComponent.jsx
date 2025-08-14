@@ -233,7 +233,7 @@ const JobPostsComponent = ({ onSearchCandidatesWithJobPost }) => {
       searchKeywordsArray.push({ text: jobPost.department, isNassary: false });
     }
 
-    // Create the form state object
+    // Create the form state object with job post ID
     const populatedFormState = {
       searchKeywords: searchKeywordsArray,
       skills: skillsArray,
@@ -271,6 +271,8 @@ const JobPostsComponent = ({ onSearchCandidatesWithJobPost }) => {
       candidateMaxAge: '',
       currentJobType: '',
       seekingJobType: '',
+      // Add job post ID to the form state
+      jobPostId: jobPost.name,
     };
 
     // Pass the populated form state to parent component

@@ -22,7 +22,7 @@ import {
 import { cn } from "@/lib/utils";
 import { useNavigate, useLocation } from "react-router-dom";
 
-const CandidateCard = ({ candidate, onSelect, selected = false }) => {
+const CandidateCard = ({ candidate, onSelect, selected = false, jobPostId }) => {
   const [saved, setSaved] = useState(false);
   const navigate = useNavigate();
   const location = useLocation();
@@ -91,7 +91,10 @@ const CandidateCard = ({ candidate, onSelect, selected = false }) => {
     <>
       <Card className="w-full overflow-hidden border-gray-200" onClick={() => {
         if (!location.pathname.includes(`/resume_search/detail/`)) {
-          window.open(`/resume_search/detail/${candidate.id}`, '_blank');
+          const url = jobPostId 
+            ? `/resume_search/detail/${candidate.id}?jobPostId=${jobPostId}` 
+            : `/resume_search/detail/${candidate.id}`;
+          window.open(url, '_blank');
         }
       }}>
         <CardContent className="p-0">
@@ -246,7 +249,12 @@ const CandidateCard = ({ candidate, onSelect, selected = false }) => {
                     className="text-gray-700 border-gray-300 h-9 flex items-center justify-center"
                     onClick={(e) => {
                       e.stopPropagation();
-                      window.open(`/assessement-questions/new?candidate=${candidate.id}&candidate_name=${candidate.basicInfo.candidate_name}`, "_blank");
+                      const isDetailPage = location.pathname.includes('/detail/');
+                      const baseUrl = `/assessement-questions/new?candidate=${candidate.id}&candidate_name=${candidate.basicInfo.candidate_name}`;
+                      const url = (isDetailPage && jobPostId) 
+                        ? `${baseUrl}&job_post=${jobPostId}`
+                        : baseUrl;
+                      window.open(url, "_blank");
                     }}
                     
                   >

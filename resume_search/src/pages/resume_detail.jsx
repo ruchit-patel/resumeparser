@@ -2,12 +2,14 @@ import React, { useEffect, useState } from 'react'
 import ResumeProfileDetailComponent from '../components/resumeCard/ResumeProfileDetailComponent'
 import CandidateCard from '../components/resumeCard/CandidateCardComponent'
 import { config } from "@/config"
-import { useParams } from 'react-router-dom'; 
+import { useParams, useSearchParams } from 'react-router-dom'; 
 
 const ResumeDetailPage = () => {
   const [candidateData, setCandidateData] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
   const { id } = useParams();
+  const [searchParams] = useSearchParams();
+  const jobPostId = searchParams.get('jobPostId');
 
   const fetchCandidateDetail = async () => {
     try {
@@ -63,8 +65,9 @@ const ResumeDetailPage = () => {
             candidate={candidateData}
             onSelect={handleSelectCandidate}
             selected={false}
+            jobPostId={jobPostId}
           />
-          <ResumeProfileDetailComponent candidate={candidateData}/>
+          <ResumeProfileDetailComponent candidate={candidateData} jobPostId={jobPostId}/>
         </>
       ) : (
         <div className="text-center py-10 text-gray-800">

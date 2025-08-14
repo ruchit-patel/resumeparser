@@ -92,7 +92,14 @@ const ResumeFindPage = () => {
       datetime: new Date().toISOString().slice(0, 19).replace("T", " "),
       save_form: JSON.stringify(formState)
     });
-    navigate(`/resume_search/results`, { state: { searchData: formState } });
+    
+    // Build navigation URL with job parameter if present
+    let navigationUrl = '/resume_search/results';
+    if (formState.jobPostId) {
+      navigationUrl += `?job=${formState.jobPostId}`;
+    }
+    
+    navigate(navigationUrl, { state: { searchData: formState } });
     } catch (error) {
       console.log("Error saving search history:", error);
     }
@@ -109,6 +116,13 @@ const ResumeFindPage = () => {
     setFormState(populatedFormState);
     setActiveTab('search'); // Switch to search tab
     setSelectedSearchId(null);
+    
+    // Add job ID to URL parameters if present
+    if (populatedFormState.jobPostId) {
+      const currentUrl = new URL(window.location);
+      currentUrl.searchParams.set('job', populatedFormState.jobPostId);
+      window.history.pushState({}, '', currentUrl);
+    }
   };
 
   return (
