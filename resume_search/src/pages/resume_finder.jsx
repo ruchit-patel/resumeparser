@@ -10,6 +10,7 @@ import '../App.css';
 import { useNavigate } from 'react-router-dom';
 import SaveResumesComponent from './SaveResumesComponent';
 import JobPostsComponent from './JobPostsComponent';
+import AssessmentsComponent from './AssessmentsComponent';
 import RecentSearches from '../components/search/RecentSearches';
 import { useFrappeCreateDoc } from 'frappe-react-sdk';
 
@@ -134,6 +135,12 @@ const ResumeFindPage = () => {
                 >
                   Saved Candidates
                 </TabsTrigger>
+                <TabsTrigger 
+                  value="assessments" 
+                  className="rounded-none border-b-2 border-transparent data-[state=active]:border-blue-600 data-[state=active]:bg-white px-4 py-2"
+                >
+                  Assessments
+                </TabsTrigger>
               </TabsList>
               
               <TabsContent value="search" className="mt-6 flex flex-col md:flex-row space-y-6 md:space-y-0 md:space-x-6">
@@ -194,6 +201,10 @@ const ResumeFindPage = () => {
 
               <TabsContent value="saved">
                 <SaveResumesComponent />
+              </TabsContent>
+
+              <TabsContent value="assessments">
+                <AssessmentsComponent />
               </TabsContent>
             </Tabs>
 

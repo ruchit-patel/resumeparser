@@ -5,6 +5,7 @@ import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Building2, MapPin, Briefcase, Users, Search, Filter, X } from "lucide-react";
+import CustomPagination from "../components/ui/custom-pagination";
 
 const JobPostCard = ({ jobPost, onSearchCandidates }) => {
   return (
@@ -120,8 +121,9 @@ const JobPostCard = ({ jobPost, onSearchCandidates }) => {
 const JobPostsComponent = ({ onSearchCandidatesWithJobPost }) => {
   // State management
   const [jobPosts, setJobPosts] = useState([]);
-  const [filteredJobPosts, setFilteredJobPosts] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [pagination, setPagination] = useState({});
   const [filters, setFilters] = useState({
     title: "",
     client: ""
@@ -134,8 +136,8 @@ const JobPostsComponent = ({ onSearchCandidatesWithJobPost }) => {
     </div>
   );
 
-  // Fetch job posts data with filtering
-  const fetchJobPosts = async (filterParams = {}) => {
+  // Fetch job posts data with filtering and pagination
+  const fetchJobPosts = async (page = 1, filterParams = {}) => {
     setIsLoading(true);
     try {
       const response = await fetch('/api/method/resumeparser.apis.custom_apis.get_filtered_job_posts', {
@@ -146,7 +148,9 @@ const JobPostsComponent = ({ onSearchCandidatesWithJobPost }) => {
         },
         credentials: 'include',
         body: JSON.stringify({
-          filters: filterParams
+          filters: filterParams,
+          page: page,
+          per_page: 10
         }),
       });
       
@@ -155,41 +159,25 @@ const JobPostsComponent = ({ onSearchCandidatesWithJobPost }) => {
       }
       
       const result = await response.json();
-      const jobPostsData = result.message || [];
-      setJobPosts(jobPostsData);
-      setFilteredJobPosts(jobPostsData);
+      const data = result.message || {};
+      setJobPosts(data.data || []);
+      setPagination(data.pagination || {});
     } catch (error) {
       console.error('Error fetching job posts:', error);
       setJobPosts([]);
-      setFilteredJobPosts([]);
+      setPagination({});
     } finally {
       setIsLoading(false);
     }
   };
 
-  // Initial load
+  // Initial load and fetch on page/filter changes
   useEffect(() => {
-    fetchJobPosts();
-  }, []);
-
-  // Filter job posts based on search criteria
-  useEffect(() => {
-    let filtered = jobPosts;
-
-    if (filters.title.trim()) {
-      filtered = filtered.filter(job =>
-        job.job_title.toLowerCase().includes(filters.title.toLowerCase())
-      );
-    }
-
-    if (filters.client.trim()) {
-      filtered = filtered.filter(job =>
-        job.client.toLowerCase().includes(filters.client.toLowerCase())
-      );
-    }
-
-    setFilteredJobPosts(filtered);
-  }, [filters, jobPosts]);
+    fetchJobPosts(currentPage, {
+      title: filters.title || undefined,
+      client: filters.client || undefined
+    });
+  }, [currentPage, filters]);
 
   // Handle filter changes
   const handleFilterChange = (field, value) => {
@@ -197,6 +185,7 @@ const JobPostsComponent = ({ onSearchCandidatesWithJobPost }) => {
       ...prev,
       [field]: value
     }));
+    setCurrentPage(1); // Reset to first page when filter changes
   };
 
   // Clear all filters
@@ -205,6 +194,11 @@ const JobPostsComponent = ({ onSearchCandidatesWithJobPost }) => {
       title: "",
       client: ""
     });
+    setCurrentPage(1);
+  };
+
+  const handlePageChange = (page) => {
+    setCurrentPage(page);
   };
 
   const handleSearchCandidates = (jobPost) => {
@@ -358,18 +352,18 @@ const JobPostsComponent = ({ onSearchCandidatesWithJobPost }) => {
       {/* Results Section */}
       {isLoading ? (
         <LoadingSpinner />
-      ) : filteredJobPosts.length > 0 ? (
+      ) : jobPosts.length > 0 ? (
         <div className="bg-white rounded-lg shadow-lg p-6">
           {/* Results Header */}
           <div className="mb-4 flex justify-between items-center">
             <div className="text-sm text-gray-600">
-              Showing {filteredJobPosts.length} of {jobPosts.length} job posts
+              Showing {jobPosts.length} job posts (Page {pagination.current_page || 1} of {pagination.total_pages || 1})
             </div>
           </div>
           
           {/* Job Post cards */}
           <div className="space-y-6 max-h-[700px] overflow-y-auto pr-2">
-            {filteredJobPosts.map((jobPost) => (
+            {jobPosts.map((jobPost) => (
               <JobPostCard
                 key={jobPost.name}
                 jobPost={jobPost}
@@ -377,12 +371,25 @@ const JobPostsComponent = ({ onSearchCandidatesWithJobPost }) => {
               />
             ))}
           </div>
+          
+          {/* Pagination */}
+          {pagination.total_pages > 1 && (
+            <div className="mt-6 pt-6 border-t">
+              <CustomPagination
+                currentPage={pagination.current_page || 1}
+                totalPages={pagination.total_pages || 1}
+                onPageChange={handlePageChange}
+                hasNext={pagination.has_next}
+                hasPrev={pagination.has_prev}
+              />
+            </div>
+          )}
         </div>
       ) : (
         <div className="bg-white rounded-lg shadow-lg p-6 text-center">
           <div className="py-12">
             <Briefcase className="mx-auto h-12 w-12 text-gray-400 mb-4" />
-            {jobPosts.length === 0 ? (
+            {pagination.total_count === 0 ? (
               <>
                 <p className="text-gray-600 text-lg mb-2">No job posts found</p>
                 <p className="text-gray-500 text-sm">Create your first job post to get started</p>
