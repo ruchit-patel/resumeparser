@@ -59193,16 +59193,6 @@
   "docstatus": 0,
   "doctype": "Locations",
   "is_group": 0,
-  "location": "Ahmadabad",
-  "modified": "2025-07-29 16:07:36.360408",
-  "name": "Ahmadabad",
-  "old_parent": "Uttar Pradesh",
-  "parent_locations": "Uttar Pradesh"
- },
- {
-  "docstatus": 0,
-  "doctype": "Locations",
-  "is_group": 0,
   "location": "Tanda",
   "modified": "2025-07-29 16:07:36.387581",
   "name": "Tanda",
@@ -66763,9 +66753,9 @@
   "docstatus": 0,
   "doctype": "Locations",
   "is_group": 0,
-  "location": "Uttarpara Kotrung",
-  "modified": "2025-07-29 16:08:00.943855",
-  "name": "Uttarpara Kotrung",
+  "location": "WBIIDC Growth Centre",
+  "modified": "2025-07-29 16:08:00.977296",
+  "name": "WBIIDC Growth Centre",
   "old_parent": "West Bengal",
   "parent_locations": "West Bengal"
  },
@@ -66773,9 +66763,19 @@
   "docstatus": 0,
   "doctype": "Locations",
   "is_group": 0,
-  "location": "WBIIDC Growth Centre",
-  "modified": "2025-07-29 16:08:00.977296",
-  "name": "WBIIDC Growth Centre",
+  "location": "Ahmadabad",
+  "modified": "2025-07-29 16:07:36.360408",
+  "name": "Ahmadabad",
+  "old_parent": "Uttar Pradesh",
+  "parent_locations": "Uttar Pradesh"
+ },
+ {
+  "docstatus": 0,
+  "doctype": "Locations",
+  "is_group": 0,
+  "location": "Uttarpara Kotrung",
+  "modified": "2025-07-29 16:08:00.943855",
+  "name": "Uttarpara Kotrung",
   "old_parent": "West Bengal",
   "parent_locations": "West Bengal"
  }

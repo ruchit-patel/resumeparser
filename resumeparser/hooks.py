@@ -9,7 +9,8 @@ app_license = "mit"
 fixtures = [
     {"doctype": "Workspace", "filters": [["module", "=", "Resume Parser"]]},
     {"doctype": "Number Card", "filters": [["module", "=", "Resume Parser"]]},
-    {"doctype": "Locations"}
+    {"doctype": "Locations"},
+    {"doctype":"Custom HTML Block"}
 ]
 
 
