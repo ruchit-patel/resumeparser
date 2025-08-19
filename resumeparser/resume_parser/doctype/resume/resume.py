@@ -454,15 +454,13 @@ class Resume(Document):
 		
 		try:
 			client = OpenSearch(
-				hosts=[{"host": creds['host'], "port": creds['port']}],
-				use_ssl=False,  # Set to True if using HTTPS
-				verify_certs=False,  # Set to False if using self-signed certs
-				http_compress=True,
-				timeout=30,  # Add timeout
-				max_retries=3,  # Add retries
-				retry_on_timeout=True  # Retry on timeout
+				hosts=[{"host": "localhost", "port": 9200}],
+				http_auth=("admin", "Lolpass@123"),
+				use_ssl=True,
+				verify_certs=False
 			)
-			
+
+
 			# Test the connection
 			client.info()
 			return client
