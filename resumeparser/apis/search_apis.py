@@ -90,7 +90,7 @@ def seach_skills(q:str):
 def seach_candidate_location(q:str):
     data = frappe.get_all("Locations", filters={"name": ["like", f"%{q}%"]}, fields=["name","parent_locations"])
     if data:
-        return [f"{item["name"]}, {item["parent_locations"]}" for item in data]
+        return [f"{item['name']}, {item['parent_locations']}" for item in data]
     else:
         return ["No data found"] 
     
@@ -294,7 +294,7 @@ def candidate_detail():
                 },
                 "workSummary": {
                     "industry": source.get("industry"),
-                    "department": set([f"{i.get("department")} - {i.get("role")}" for i in source.get("department", [])]),
+                    "department": set([f"{i.get('department')} - {i.get('role')}" for i in source.get("department", [])]),
                     "role": source.get("role")
                 },
                 "education": source.get("education", []),
@@ -337,7 +337,7 @@ def candidate_detail():
 def test(q:str):
     data = frappe.get_all("Locations", filters={"name": ["like", f"%{q}%"]}, fields=["name","parent_locations"])
     if data:
-        return [f"{item["name"]},{item["parent_locations"]}" for item in data]
+        return [f"{item['name']},{item['parent_locations']}" for item in data]
         return data
     else:
         return ["No data found"] 
