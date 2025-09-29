@@ -21,8 +21,8 @@ class Resume(Document):
 	def get_opensearch_credentials(self):
 		"""Get OpenSearch credentials from site config or environment variables"""
 		# Try to get from site config first
-		host = frappe.conf.get('opensearch_host') or os.environ.get('OPENSEARCH_HOST') or "localhost"
-		port = frappe.conf.get('opensearch_port') or os.environ.get('OPENSEARCH_PORT') or 9200
+		host = frappe.conf.get('opensearch_host')
+		port = frappe.conf.get('opensearch_port')
 		opensearch_auth = frappe.conf.get('opensearch_port')
 		
 		frappe.logger().debug(f"OpenSearch connection details - Host: {host}, Port: {port}")
@@ -35,8 +35,7 @@ class Resume(Document):
 
 	def get_gemini_api_key(self):
 		"""Get Gemini API key from site config or environment variables"""
-		return frappe.conf.get('gemini_api_key') or os.environ.get('GEMINI_API_KEY')
-
+		return frappe.conf.get('gemini_api_key')
 	def before_insert(self):
 		"""Extract resume data using Gemini API before inserting the document"""
 		# Check if the file is public or private
@@ -456,7 +455,7 @@ class Resume(Document):
 		
 		try:
 			client = OpenSearch(
-				hosts=[{"host": creds.get("host"), "port": creds.get("port")}],
+				hosts=[{"host": creds.get("host"), "port": int(creds.get("port"))}],
 				http_auth=("admin", creds.get("opensearch_auth")),
 				use_ssl=True,
 				verify_certs=False
