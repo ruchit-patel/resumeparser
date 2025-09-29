@@ -21,16 +21,16 @@ class Resume(Document):
 	def get_opensearch_credentials(self):
 		"""Get OpenSearch credentials from site config or environment variables"""
 		# Try to get from site config first
-		host = frappe.conf.get('opensearch_host')
-		port = frappe.conf.get('opensearch_port')
-		opensearch_auth = frappe.conf.get('opensearch_port')
-		
+		host = os.environ.get('OPENSEARCH_HOST') or frappe.conf.get('opensearch_host')
+		port = os.environ.get('OPENSEARCH_PORT') or frappe.conf.get('opensearch_port')
+		password = os.environ.get('OPENSEARCH_PASSWORD') or frappe.conf.get('opensearch_password')
+
 		frappe.logger().debug(f"OpenSearch connection details - Host: {host}, Port: {port}")
-		
+
 		return {
 			'host': host,
 			'port': port,
-			'opensearch_auth':opensearch_auth
+			'password': password
 		}
 
 	def get_gemini_api_key(self):
@@ -452,11 +452,11 @@ class Resume(Document):
 	def get_opensearch_client(self):
 		# Get credentials from config or environment
 		creds = self.get_opensearch_credentials()
-		
+
 		try:
 			client = OpenSearch(
 				hosts=[{"host": creds.get("host"), "port": int(creds.get("port"))}],
-				http_auth=("admin", creds.get("opensearch_auth")),
+				http_auth=("admin", creds.get("password")),
 				use_ssl=True,
 				verify_certs=False
 			)
