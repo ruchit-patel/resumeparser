@@ -23,12 +23,14 @@ class Resume(Document):
 		# Try to get from site config first
 		host = frappe.conf.get('opensearch_host') or os.environ.get('OPENSEARCH_HOST') or "localhost"
 		port = frappe.conf.get('opensearch_port') or os.environ.get('OPENSEARCH_PORT') or 9200
+		opensearch_auth = frappe.conf.get('opensearch_port')
 		
 		frappe.logger().debug(f"OpenSearch connection details - Host: {host}, Port: {port}")
 		
 		return {
 			'host': host,
 			'port': port,
+			'opensearch_auth':opensearch_auth
 		}
 
 	def get_gemini_api_key(self):
@@ -454,8 +456,8 @@ class Resume(Document):
 		
 		try:
 			client = OpenSearch(
-				hosts=[{"host": "localhost", "port": 9200}],
-				http_auth=("admin", "Lolpass@123"),
+				hosts=[{"host": creds.get("host"), "port": creds.get("port")}],
+				http_auth=("admin", creds.get("opensearch_auth")),
 				use_ssl=True,
 				verify_certs=False
 			)
