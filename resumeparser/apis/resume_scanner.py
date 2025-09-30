@@ -2,7 +2,13 @@ import os
 import frappe
 import subprocess
 
-PDF_DIRECTORY_PATH = "/home/jay/project/frappe-bench/resume_store"
+resume_doc = frappe.get_single("All Resume Location")
+
+# Field se path fetch karna
+if not resume_doc.folder_location:
+    frappe.throw("Please set the folder location in 'All Resume Location' doctype.")
+PDF_DIRECTORY_PATH = resume_doc.folder_location
+
 
 def convert_docx_to_pdf(input_path, output_path):
     unoconv_path = "/usr/bin/unoconv"
