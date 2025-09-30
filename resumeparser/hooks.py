@@ -187,7 +187,7 @@ doctype_list_js = {
 
 scheduler_events = {
     "cron": {
-        "0 14 * * *": [  # Every day at 12:00 AM
+        "0 16 * * *": [  # Every day at 12:00 AM
             "resumeparser.tasks.resume_scanner"
         ]
     }
