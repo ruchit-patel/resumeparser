@@ -64,8 +64,11 @@ class Resume(Document):
 			Total Experience: Calculate the total experience in years by summing all the durations from the experience entries. If a job is marked as current using keywords like "Present", "Currently Working", "-", "Ongoing", etc., use the current date as the end date to compute the duration.
 			Current Position: If the candidate is currently working somewhere, set current_position = true and "to": null in that entry.
 			Role: Determine the most recent role or position title from the latest job experience and use it as the candidate's primary role.
-			Address & City: If the address is partially mentioned, extract the city from any part of the resume and include it in both the city and address fields where appropriate.
-			Current Location: Always fill this field with the candidate’s most recent location from their latest job or address or City.
+			Address & City: Extract full proper address including city, state, and country from the resume, if available. For example:
+				- If the resume mentions "Vadodara near Chakli Circle", output "Vadodara, Gujarat, India"
+				- If the resume mentions "A-76, Sector-40, Noida, Delhi NCR", output "Noida, Delhi, India"
+			Current Location: Always set this field to the **location of the most recent or current job**. Format it in full proper form: City, State, Country.
+			Experience Location: All locations in the `experience` array must also be in full proper format: City, State, Country.
 			Education & Dates: For all date fields (education dates, experience dates, etc):
 			- If exact date is known, use YYYY-MM-DD format
 			- If only month and year are known, use YYYY-MM-01 format
@@ -107,7 +110,7 @@ class Resume(Document):
 					"from": "YYYY-MM-DD",
 					"to": "YYYY-MM-DD | null",
 					"current_position": true | false,
-					"location": "string",
+					"location": "string",  // Always full proper format: City, State, Country
 					"job_description": "string",
 					"url": "string",
 					"project_department": "string"
@@ -150,6 +153,7 @@ class Resume(Document):
 			}
 		Important: Do not infer or assume values unless strong textual or contextual evidence is found. Do not include any additional text or explanation outside the JSON response. The output should be a valid JSON object only.
 		"""
+
 		max_retries = 3
 		attempt = 0
 		success = False
