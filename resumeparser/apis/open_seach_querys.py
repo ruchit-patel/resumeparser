@@ -633,6 +633,7 @@ def final_search_query(search_data: dict) -> dict:
     # 3. Experience (must)
     min_exp = search_data.get("minExperience")
     max_exp = search_data.get("maxExperience")
+
     if min_exp != "" and max_exp != "":
         must_conditions.append({
             "range": {
@@ -642,6 +643,23 @@ def final_search_query(search_data: dict) -> dict:
                 }
             }
         })
+    elif min_exp != "":
+        must_conditions.append({
+            "range": {
+                "total_experience": {
+                    "gte": min_exp
+                }
+            }
+        })
+    elif max_exp != "":
+        must_conditions.append({
+            "range": {
+                "total_experience": {
+                    "lte": max_exp
+                }
+            }
+        })
+
 
     # 4. Location (must)
     location = search_data.get("location")
@@ -668,19 +686,31 @@ def final_search_query(search_data: dict) -> dict:
                                 "fuzziness": "AUTO"
                             }
                         }
+                    },
+                    {
+                        "match": {
+                            "current_location": {
+                                "query": location,
+                                "max_expansions": 50,
+                                "operator": "or",
+                                "fuzziness": "AUTO"
+                            }
+                        }
                     }
                 ],
                 "minimum_should_match": 1
             }
         })
 
-
+    
     # 5. Salary (must, with should for salary not provided)
     min_salary = search_data.get("minSalary")
     max_salary = search_data.get("maxSalary")
     salary_not_provided = search_data.get("salaryNotProvided")
 
     salary_shoulds = []
+
+    # Salary range conditions
     if min_salary != "" and max_salary != "":
         salary_shoulds.append({
             "range": {
@@ -690,6 +720,24 @@ def final_search_query(search_data: dict) -> dict:
                 }
             }
         })
+    elif min_salary != "":
+        salary_shoulds.append({
+            "range": {
+                "annual_salary": {
+                    "gte": float(min_salary)
+                }
+            }
+        })
+    elif max_salary != "":
+        salary_shoulds.append({
+            "range": {
+                "annual_salary": {
+                    "lte": float(max_salary)
+                }
+            }
+        })
+
+    # Salary not provided condition
     if salary_not_provided:
         salary_shoulds.append({
             "bool": {
@@ -701,7 +749,7 @@ def final_search_query(search_data: dict) -> dict:
             }
         })
 
-    # If either salary range or not provided is specified, use should with min 1
+    # Add condition if any salary filter is applied
     if salary_shoulds:
         must_conditions.append({
             "bool": {
@@ -709,6 +757,7 @@ def final_search_query(search_data: dict) -> dict:
                 "minimum_should_match": 1
             }
         })
+
 
     # -------------------------------[Section 2]-------------------------------
     departmentes = search_data.get("departmentes", [])
@@ -1009,8 +1058,6 @@ def final_search_query(search_data: dict) -> dict:
         })
 
 
-
-
     # -------------------------------[Section 4]-------------------------------
     gender = search_data.get("gender")
     category = search_data.get("category")
@@ -1029,6 +1076,22 @@ def final_search_query(search_data: dict) -> dict:
             "range": {
                 "age": {
                     "gte": candidateMinAge,
+                    "lte": candidateMaxAge
+                }
+            }
+        })
+    elif candidateMinAge != "":
+        must_conditions.append({
+            "range": {
+                "age": {
+                    "gte": candidateMinAge
+                }
+            }
+        })
+    elif candidateMaxAge != "":
+        must_conditions.append({
+            "range": {
+                "age": {
                     "lte": candidateMaxAge
                 }
             }

@@ -65,6 +65,7 @@ class Resume(Document):
 			Current Position: If the candidate is currently working somewhere, set current_position = true and "to": null in that entry.
 			Role: Determine the most recent role or position title from the latest job experience and use it as the candidate's primary role.
 			Address & City: If the address is partially mentioned, extract the city from any part of the resume and include it in both the city and address fields where appropriate.
+			Current Location: Always fill this field with the candidate’s most recent location from their latest job or address or City.
 			Education & Dates: For all date fields (education dates, experience dates, etc):
 			- If exact date is known, use YYYY-MM-DD format
 			- If only month and year are known, use YYYY-MM-01 format
@@ -82,6 +83,7 @@ class Resume(Document):
 				"mobile_number": "string",
 				"email": "string",
 				"city": "string",
+				"current_location": "string",
 				"age": numeric,
 				"industry": "Information Technology (IT)" | "Finance & Banking" | "Healthcare & Pharmaceuticals" | "Manufacturing & Industrial Production" | "Retail & E-commerce" | "Education & E-Learning" | "Telecommunications & Media" | "Hospitality & Tourism" | "Energy & Utilities" | "Transportation & Logistics" | "Real Estate & Construction" | "Agriculture & Agribusiness" | "Automotive & Aerospace" | "Consumer Goods & Services" | "Entertainment & Leisure" | "Legal & Compliance" | "Insurance & Risk Management" | "Mining & Natural Resources" | "Professional Services" | "Public Sector & Government" | "Technology Hardware & Equipment" | "Semiconductors & Electronics" | "Renewable Energy & Sustainability" | "Cybersecurity & Data Privacy" | "Artificial Intelligence & Machine Learning" | "Blockchain & Fintech" | "Sports & Recreation" | "Art & Culture" | "Nonprofit & Social Impact"
 				"department": "string",
