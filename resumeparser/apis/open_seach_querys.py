@@ -1,3 +1,4 @@
+
 import frappe
 
 
@@ -885,106 +886,17 @@ def final_search_query(search_data: dict) -> dict:
         })
     # -------------------------------[Section 3]-------------------------------
     
-    ugcourse = search_data.get("ugcourse",[])
-    uginstitute = search_data.get("uginstitute","")
-    ugeducationType = search_data.get("ugeducationType","")
-    ugfromYear = search_data.get("ugfromYear","")
-    ugtoYear = search_data.get("ugtoYear","")
+    ugcourse = search_data.get("ugcourse", [])
+    uginstitute = search_data.get("uginstitute", "")
+    ugeducationType = search_data.get("ugeducationType", "")
+    ugfromYear = search_data.get("ugfromYear", "")
+    ugtoYear = search_data.get("ugtoYear", "")
 
     if ugcourse != "" and len(ugcourse) >= 1:
+        search_terms = set()
         for course in ugcourse:
             department = course.get("department")
             role = course.get("role")
-
-            search_terms = set()
-            if department:
-                # search_terms.add(department)
-                pass
-            if role:
-                search_terms.add(role)
-
-        temp_should_clauses = []
-        for term in search_terms:
-            temp_should_clauses.append({
-                "nested": {
-                    "path": "education",
-                    "query": {
-                        "match": {
-                            "education.course_name": {
-                                "query": term,
-                                "operator": "or",
-                                "fuzziness": "AUTO"
-                            }
-                        }
-                    }
-                }
-            })
-            temp_should_clauses.append({
-                "nested": {
-                    "path": "education",
-                    "query": {
-                        "match": {
-                            "education.specialization": {
-                                "query": term,
-                                "operator": "or",
-                                "fuzziness": "AUTO"
-                            }
-                        }
-                    }
-                }
-            })
-
-        if temp_should_clauses:
-            must_conditions.append({
-                "bool": {
-                    "should": temp_should_clauses,
-                    "minimum_should_match": 1
-                }
-            })
-    
-    if uginstitute != "":
-        must_conditions.append({
-            "match": {
-                "education.school_college_name": {"query": uginstitute, "operator": "or", "fuzziness": "AUTO"}
-            }
-        })
-
-    if ugtoYear != "" and ugfromYear != "":
-        must_conditions.append({
-            "bool": {
-                "must": [
-                    {
-                        "range": {
-                            "education.from": {
-                                "gte": ugfromYear
-                            }
-                        }
-                    },
-                    {
-                        "range": {
-                            "education.to": {
-                                "lte": ugtoYear
-                            }
-                        }
-                    }
-                ]
-            }
-        })
-
-    pgcourse = search_data.get("pgcourse",[])
-    pginstitute = search_data.get("pginstitute","")
-    pgeducationType = search_data.get("pgeducationType","")
-    pgfromYear = search_data.get("pgfromYear","")
-    pgtoYear = search_data.get("pgtoYear","")
-    
-
-
-    if pgcourse != "" and len(pgcourse) >= 1:
-        for course in pgcourse:
-            department = course.get("department")
-            role = course.get("role")
-
-            search_terms = set()
             if department:
                 search_terms.add(department)
             if role:
@@ -1028,36 +940,155 @@ def final_search_query(search_data: dict) -> dict:
                     "minimum_should_match": 1
                 }
             })
-    
+
+    if uginstitute != "":
+        must_conditions.append({
+            "nested": {
+                "path": "education",
+                "query": {
+                    "match": {
+                        "education.school_college_name": {
+                            "query": uginstitute,
+                            "operator": "or",
+                            "fuzziness": "AUTO"
+                        }
+                    }
+                }
+            }
+        })
+
+    if ugtoYear != "" and ugfromYear != "":
+        must_conditions.append({
+            "nested": {
+                "path": "education",
+                "query": {
+                    "bool": {
+                        "must": [
+                            {
+                                "range": {
+                                    "education.from": {
+                                        "gte": ugfromYear,
+                                        "format": "yyyy"
+                                    }
+                                }
+                            },
+                            {
+                                "range": {
+                                    "education.to": {
+                                        "lte": ugtoYear,
+                                        "format": "yyyy"
+                                    }
+                                }
+                            }
+                        ]
+                    }
+                }
+            }
+        })
+
+
+    # ---------------- PG Part -----------------
+    pgcourse = search_data.get("pgcourse", [])
+    pginstitute = search_data.get("pginstitute", "")
+    pgeducationType = search_data.get("pgeducationType", "")
+    pgfromYear = search_data.get("pgfromYear", "")
+    pgtoYear = search_data.get("pgtoYear", "")
+
+    if pgcourse != "" and len(pgcourse) >= 1:
+        search_terms = set()
+        for course in pgcourse:
+            department = course.get("department")
+            role = course.get("role")
+            if department:
+                # search_terms.add(department)
+                pass
+
+            if role:
+                search_terms.add(role)
+
+        temp_should_clauses = []
+        for term in search_terms:
+            temp_should_clauses.append({
+                "nested": {
+                    "path": "education",
+                    "query": {
+                        "match": {
+                            "education.course_name": {
+                                "query": term,
+                                "operator": "or",
+                                "fuzziness": "AUTO"
+                            }
+                        }
+                    }
+                }
+            })
+            temp_should_clauses.append({
+                "nested": {
+                    "path": "education",
+                    "query": {
+                        "match": {
+                            "education.specialization": {
+                                "query": term,
+                                "operator": "or",
+                                "fuzziness": "AUTO"
+                            }
+                        }
+                    }
+                }
+            })
+
+        if temp_should_clauses:
+            must_conditions.append({
+                "bool": {
+                    "should": temp_should_clauses,
+                    "minimum_should_match": 1
+                }
+            })
+
     if pginstitute != "":
         must_conditions.append({
-            "match": {
-                "education.school_college_name": {"query": pginstitute, "operator": "or", "fuzziness": "AUTO"}
+            "nested": {
+                "path": "education",
+                "query": {
+                    "match": {
+                        "education.school_college_name": {
+                            "query": pginstitute,
+                            "operator": "or",
+                            "fuzziness": "AUTO"
+                        }
+                    }
+                }
             }
         })
 
     if pgtoYear != "" and pgfromYear != "":
         must_conditions.append({
-            "bool": {
-                "must": [
-                    {
-                        "range": {
-                            "education.from": {
-                                "gte": ugfromYear
+            "nested": {
+                "path": "education",
+                "query": {
+                    "bool": {
+                        "must": [
+                            {
+                                "range": {
+                                    "education.from": {
+                                        "gte": pgfromYear,
+                                        "format": "yyyy"
+                                    }
+                                }
+                            },
+                            {
+                                "range": {
+                                    "education.to": {
+                                        "lte": pgtoYear,
+                                        "format": "yyyy"
+                                    }
+                                }
                             }
-                        }
-                    },
-                    {
-                        "range": {
-                            "education.to": {
-                                "lte": ugtoYear
-                            }
-                        }
+                        ]
                     }
-                ]
+                }
             }
         })
-
 
     # -------------------------------[Section 4]-------------------------------
     gender = search_data.get("gender")
