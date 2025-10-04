@@ -478,7 +478,7 @@ def final_search_query(search_data: dict) -> dict:
                                 "match": {
                                     "skills.skill_name": {
                                         "query": skill_name,
-                                        "operator": "or",
+                                        "operator": "and",
                                         "fuzziness": "AUTO"
                                     }
                                 }
@@ -505,7 +505,7 @@ def final_search_query(search_data: dict) -> dict:
                         "match": {
                             "skills.skill_name": {
                                 "query": keyword_text,
-                                "operator": "or",
+                                "operator": "and",
                                 "fuzziness": "AUTO"
                             }
                         }
@@ -520,7 +520,7 @@ def final_search_query(search_data: dict) -> dict:
                         "match": {
                             "experience.role_position": {
                                 "query": keyword_text,
-                                "operator": "or",
+                                "operator": "and",
                                 "fuzziness": "AUTO"
                             }
                         }
@@ -535,7 +535,7 @@ def final_search_query(search_data: dict) -> dict:
                         "match": {
                             "experience.job_description": {
                                 "query": keyword_text,
-                                "operator": "or",
+                                "operator": "and",
                                 "fuzziness": "AUTO"
                             }
                         }
@@ -550,7 +550,7 @@ def final_search_query(search_data: dict) -> dict:
                         "match": {
                             "experience.company_name": {
                                 "query": keyword_text,
-                                "operator": "or",
+                                "operator": "and",
                                 "fuzziness": "AUTO"
                             }
                         }
@@ -565,7 +565,7 @@ def final_search_query(search_data: dict) -> dict:
                         "match": {
                             "education.course_name": {
                                 "query": keyword_text,
-                                "operator": "or",
+                                "operator": "and",
                                 "fuzziness": "AUTO"
                             }
                         }
@@ -580,7 +580,7 @@ def final_search_query(search_data: dict) -> dict:
                         "match": {
                             "education.specialization": {
                                 "query": keyword_text,
-                                "operator": "or",
+                                "operator": "and",
                                 "fuzziness": "AUTO"
                             }
                         }
@@ -595,7 +595,7 @@ def final_search_query(search_data: dict) -> dict:
                         "match": {
                             "certificates.certificate_name": {
                                 "query": keyword_text,
-                                "operator": "or",
+                                "operator": "and",
                                 "fuzziness": "AUTO"
                             }
                         }
@@ -607,7 +607,7 @@ def final_search_query(search_data: dict) -> dict:
                 "multi_match": {
                     "query": keyword_text,
                     "fields": ["candidate_name", "role", "industry", "department"],
-                    "operator": "or",
+                    "operator": "and",
                     "fuzziness": "AUTO"
                 }
             }
@@ -790,7 +790,7 @@ def final_search_query(search_data: dict) -> dict:
                         "match": {
                             "experience.role_position": {
                                 "query": term,
-                                "operator": "or",
+                                "operator": "and",
                                 "fuzziness": "AUTO"
                             }
                         }
@@ -804,7 +804,7 @@ def final_search_query(search_data: dict) -> dict:
                         "match": {
                             "experience.job_description": {
                                 "query": term,
-                                "operator": "or",
+                                "operator": "and",
                                 "fuzziness": "AUTO"
                             }
                         }
@@ -818,7 +818,7 @@ def final_search_query(search_data: dict) -> dict:
                         "match": {
                             "experience.department": {
                                 "query": term,
-                                "operator": "or",
+                                "operator": "and",
                                 "fuzziness": "AUTO"
                             }
                         }
@@ -837,7 +837,7 @@ def final_search_query(search_data: dict) -> dict:
     if industry != "":
         must_conditions.append({
             "match": {
-                "industry": {"query": industry, "operator": "or", "fuzziness": "AUTO"}
+                "industry": {"query": industry, "operator": "and", "fuzziness": "AUTO"}
             }
         })
     if company != "":
@@ -848,7 +848,7 @@ def final_search_query(search_data: dict) -> dict:
                         "match": {
                             "experience.company_name": {
                                 "query": company,
-                                "operator": "or",
+                                "operator": "and",
                                 "fuzziness": "AUTO"
                             }
                         }
@@ -911,7 +911,7 @@ def final_search_query(search_data: dict) -> dict:
                         "match": {
                             "education.course_name": {
                                 "query": term,
-                                "operator": "or",
+                                "operator": "and",
                                 "fuzziness": "AUTO"
                             }
                         }
@@ -925,7 +925,7 @@ def final_search_query(search_data: dict) -> dict:
                         "match": {
                             "education.specialization": {
                                 "query": term,
-                                "operator": "or",
+                                "operator": "and",
                                 "fuzziness": "AUTO"
                             }
                         }
@@ -944,7 +944,7 @@ def final_search_query(search_data: dict) -> dict:
     if uginstitute != "":
         must_conditions.append({
             "match": {
-                "education.school_college_name": {"query": uginstitute, "operator": "or", "fuzziness": "AUTO"}
+                "education.school_college_name": {"query": uginstitute, "operator": "and", "fuzziness": "AUTO"}
             }
         })
 
@@ -998,7 +998,7 @@ def final_search_query(search_data: dict) -> dict:
                         "match": {
                             "education.course_name": {
                                 "query": term,
-                                "operator": "or",
+                                "operator": "and",
                                 "fuzziness": "AUTO"
                             }
                         }
@@ -1012,7 +1012,7 @@ def final_search_query(search_data: dict) -> dict:
                         "match": {
                             "education.specialization": {
                                 "query": term,
-                                "operator": "or",
+                                "operator": "and",
                                 "fuzziness": "AUTO"
                             }
                         }
@@ -1031,7 +1031,7 @@ def final_search_query(search_data: dict) -> dict:
     if pginstitute != "":
         must_conditions.append({
             "match": {
-                "education.school_college_name": {"query": pginstitute, "operator": "or", "fuzziness": "AUTO"}
+                "education.school_college_name": {"query": pginstitute, "operator": "and", "fuzziness": "AUTO"}
             }
         })
 
@@ -1100,20 +1100,20 @@ def final_search_query(search_data: dict) -> dict:
     if category != "":
         must_conditions.append({
             "match": {
-                "category": {"query": category, "operator": "or", "fuzziness": "AUTO"}
+                "category": {"query": category, "operator": "and", "fuzziness": "AUTO"}
             }
         })
     
     if currentJobType != "":
         must_conditions.append({
             "match": {
-                "current_job_type": {"query": currentJobType, "operator": "or", "fuzziness": "AUTO"}
+                "current_job_type": {"query": currentJobType, "operator": "and", "fuzziness": "AUTO"}
             }
         })
     if seekingJobType != "":
         must_conditions.append({
             "match": {
-                "seeking_job_type": {"query": seekingJobType, "operator": "or", "fuzziness": "AUTO"}
+                "seeking_job_type": {"query": seekingJobType, "operator": "and", "fuzziness": "AUTO"}
             }
         })
         

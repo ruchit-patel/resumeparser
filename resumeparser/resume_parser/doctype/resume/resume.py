@@ -279,14 +279,14 @@ class Resume(Document):
 			data["mobile_number"] = self.normalize_mobile_number(data["mobile_number"])
 
 		# Check for potential duplicates
-		# duplicate = self.check_duplicate_resume(client, data)
-		# if duplicate:
-		# 	# Instead of throwing error, return the duplicate info
-		# 	return {
-		# 		"status": "duplicate_found",
-		# 		"duplicate_id": duplicate,
-		# 		"data": data
-		# 	}
+		duplicate = self.check_duplicate_resume(client, data)
+		if duplicate:
+			# Instead of throwing error, return the duplicate info
+			return {
+				"status": "duplicate_found",
+				"duplicate_id": duplicate,
+				"data": data
+			}
 		
 		# Update Department on vector index
 		if "department" in data and data["department"]:
