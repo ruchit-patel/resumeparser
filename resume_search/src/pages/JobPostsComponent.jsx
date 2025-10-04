@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Building2, MapPin, Briefcase, Users, Search, Filter, X } from "lucide-react";
+import { Building2, MapPin, Briefcase, Users, Search, Filter, X, Plus } from "lucide-react";
 import CustomPagination from "../components/ui/custom-pagination";
 
 const JobPostCard = ({ jobPost, onSearchCandidates }) => {
@@ -118,7 +119,9 @@ const JobPostCard = ({ jobPost, onSearchCandidates }) => {
   );
 };
 
-const JobPostsComponent = ({ onSearchCandidatesWithJobPost }) => {
+const JobPostsComponent = ({ onSearchCandidatesWithJobPost, onCreateJobPost }) => {
+  const navigate = useNavigate();
+  
   // State management
   const [jobPosts, setJobPosts] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -199,6 +202,11 @@ const JobPostsComponent = ({ onSearchCandidatesWithJobPost }) => {
 
   const handlePageChange = (page) => {
     setCurrentPage(page);
+  };
+
+  // Handle create job post button click
+  const handleCreateJobPost = () => {
+    navigate('/resume_search/new-job');
   };
 
   const handleSearchCandidates = (jobPost) => {
@@ -285,6 +293,19 @@ const JobPostsComponent = ({ onSearchCandidatesWithJobPost }) => {
 
   return (
     <div className="container mx-auto px-4 py-8">
+      {/* Header Section with Create Button */}
+      <div className="flex justify-between items-center mb-6">
+        <h1 className="text-2xl font-bold text-gray-900">Job Posts</h1>
+        <Button 
+          onClick={handleCreateJobPost}
+          className="flex items-center gap-2"
+          variant="default"
+        >
+          <Plus className="w-4 h-4" />
+          Create Job Post
+        </Button>
+      </div>
+
       {/* Filter Section */}
       <div className="bg-white rounded-lg shadow-lg p-6 mb-6">       
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
