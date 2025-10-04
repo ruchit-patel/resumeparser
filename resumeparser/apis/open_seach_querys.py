@@ -898,7 +898,8 @@ def final_search_query(search_data: dict) -> dict:
 
             search_terms = set()
             if department:
-                search_terms.add(department)
+                # search_terms.add(department)
+                pass
             if role:
                 search_terms.add(role)
 
@@ -911,7 +912,7 @@ def final_search_query(search_data: dict) -> dict:
                         "match": {
                             "education.course_name": {
                                 "query": term,
-                                "operator": "and",
+                                "operator": "or",
                                 "fuzziness": "AUTO"
                             }
                         }
@@ -925,7 +926,7 @@ def final_search_query(search_data: dict) -> dict:
                         "match": {
                             "education.specialization": {
                                 "query": term,
-                                "operator": "and",
+                                "operator": "or",
                                 "fuzziness": "AUTO"
                             }
                         }
@@ -944,7 +945,7 @@ def final_search_query(search_data: dict) -> dict:
     if uginstitute != "":
         must_conditions.append({
             "match": {
-                "education.school_college_name": {"query": uginstitute, "operator": "and", "fuzziness": "AUTO"}
+                "education.school_college_name": {"query": uginstitute, "operator": "or", "fuzziness": "AUTO"}
             }
         })
 
@@ -998,7 +999,7 @@ def final_search_query(search_data: dict) -> dict:
                         "match": {
                             "education.course_name": {
                                 "query": term,
-                                "operator": "and",
+                                "operator": "or",
                                 "fuzziness": "AUTO"
                             }
                         }
@@ -1012,7 +1013,7 @@ def final_search_query(search_data: dict) -> dict:
                         "match": {
                             "education.specialization": {
                                 "query": term,
-                                "operator": "and",
+                                "operator": "or",
                                 "fuzziness": "AUTO"
                             }
                         }
@@ -1031,7 +1032,7 @@ def final_search_query(search_data: dict) -> dict:
     if pginstitute != "":
         must_conditions.append({
             "match": {
-                "education.school_college_name": {"query": pginstitute, "operator": "and", "fuzziness": "AUTO"}
+                "education.school_college_name": {"query": pginstitute, "operator": "or", "fuzziness": "AUTO"}
             }
         })
 

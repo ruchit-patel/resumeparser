@@ -1,25 +1,5 @@
 [
     {
-      "name": "Any Computers (Degree/Diploma)",
-      "roles": ["Computer Engineering", "Software Engineering", "Information Technology", "Data Science", "Artificial Intelligence", "Machine Learning", "Cybersecurity", "Computer Applications", "Computer Networking", "Cloud Computing", "Database Management", "Web Development", "Mobile Application Development", "DevOps Engineering", "Systems Architecture"]
-    },
-    {
-      "name": "Any Engineering",
-      "roles": ["Mechanical Engineering", "Electrical Engineering", "Civil Engineering", "Chemical Engineering", "Electronics Engineering", "Aerospace Engineering", "Automotive Engineering", "Biomedical Engineering", "Industrial Engineering", "Materials Engineering", "Petroleum Engineering", "Agricultural Engineering", "Mining Engineering", "Nuclear Engineering", "Marine Engineering", "Robotics Engineering"]
-    },
-    {
-      "name": "Any Hotel-Management",
-      "roles": ["Hotel Administration", "Restaurant Management", "Hospitality Operations", "Event Management", "Food & Beverage Management", "Accommodation Management", "Tourism Management", "Culinary Arts", "Catering Management", "Housekeeping Management", "Front Office Operations", "Hospitality Marketing", "Resort Management", "Club Management", "Cruise Ship Management"]
-    },
-    {
-      "name": "Any Management",
-      "roles": ["Business Administration", "Human Resource Management", "Financial Management", "Marketing Management", "Operations Management", "Project Management", "Supply Chain Management", "Strategic Management", "International Business Management", "Retail Management", "Healthcare Management", "Sports Management", "Media Management", "Entrepreneurship", "Logistics Management", "Risk Management"]
-    },
-    {
-      "name": "Any Medical",
-      "roles": ["Medicine (MBBS)", "Dentistry", "Nursing", "Pharmacy", "Physiotherapy", "Occupational Therapy", "Medical Laboratory Technology", "Radiology & Imaging", "Optometry", "Audiology", "Speech Therapy", "Dietetics & Nutrition", "Paramedical Sciences", "Hospital Administration", "Public Health", "Ayurveda", "Homeopathy", "Unani Medicine", "Veterinary Sciences"]
-    },
-    {
       "name": "B.Tech/B.E (From Top Ranked Colleges)",
       "roles": ["Computer Science & Engineering", "Electronics & Communication", "Electrical Engineering", "Mechanical Engineering", "Civil Engineering", "Chemical Engineering", "Information Technology", "Biotechnology", "Aerospace Engineering", "Metallurgical Engineering", "Petroleum Engineering", "Production Engineering", "Industrial Engineering", "Materials Science"]
     },
