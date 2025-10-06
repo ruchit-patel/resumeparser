@@ -198,15 +198,27 @@ class Resume(Document):
 		if response_text.endswith("```"):
 			response_text = response_text[:-4].strip()
 
+		# After parsing Gemini API response
 		try:
 			data = json.loads(response_text)  # Convert to dictionary
 			self.extracted_json = json.dumps(data, indent=4)
 			self.candidate_name = data.get("candidate_name")
 
+			# --- Duplicate check before saving ---
+			client = self.get_opensearch_client()
+			duplicate = self.check_duplicate_resume(client, data)
+			if duplicate:
+				# Instead of inserting, raise a warning and prevent saving
+				frappe.throw(
+					"This candidate already exists in the system. "
+					"Please select another resume.", title="Duplicate Candidate"
+				)
+
 		except Exception as e:
 			frappe.throw(f"Error parsing Gemini API response: {str(e)}")
 		except json.JSONDecodeError:
 			frappe.throw("Invalid JSON response from Gemini API.")
+
 
 	def after_insert(self):
 		"""Update the resume fields in OpenSearch"""
@@ -446,10 +458,10 @@ class Resume(Document):
 			for doc_id, info in potential_duplicates.items():
 				if info["count"] >= 2:
 					matched_fields = ", ".join(info["fields"])
-					# frappe.msgprint(
-					# 	f"Duplicate detected! Matching fields: {matched_fields}",
-					# 	indicator="red"
-					# )
+					frappe.msgprint(
+						f"Duplicate detected! Matching fields: {matched_fields}",
+						indicator="red"
+					)
 					return doc_id
 
 			return None

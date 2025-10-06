@@ -1,58 +1,56 @@
-# OpenSearch Department Embeddings Setup
 
-This guide walks through **Step 1 → Step 6** to configure and use embeddings in OpenSearch for department search.
+--------------------- Step-1 ---------------------
+PUT _cluster/settings
+{
+  "persistent": {
+    "plugins.ml_commons.only_run_on_ml_node": "false",
+    "plugins.ml_commons.native_memory_threshold": "99"
+  }
+}
 
----
-
-## 0) (Optional) Cleanup
-
-```json
-DELETE departments-index
-DELETE _ingest/pipeline/department-embedding-pipeline
-```
-
----
-
-## 1) Register & Deploy Model
-
-### Register model (HuggingFace sentence-transformers)
-```json
-POST _plugins/_ml/models/_register
+--------------------- Step-2 ---------------------
+POST /_plugins/_ml/models/_register?deploy=true
 {
   "name": "huggingface/sentence-transformers/all-distilroberta-v1",
   "version": "1.0.1",
   "model_format": "TORCH_SCRIPT"
 }
-```
 
-### Check registration task status
-```json
-GET _plugins/_ml/tasks/<task_id>
-```
 
-When `state=COMPLETED`, note the `model_id`.
+--------------------- Step-3 ---------------------
+GET /_plugins/_ml/models/_search
+{
+  "query": {
+    "match": {
+      "name": "sentence-transformers/all-distilroberta-v1"
+    }
+  }
+}
 
-### Deploy model
-```json
-POST _plugins/_ml/models/<model_id>/_deploy
-```
+--------------------- Step-3.1 ---------------------
+GET /_plugins/_ml/models/XWbtlJkBrC5Xn29FOi5n
 
-### Check deployment status
-```json
-GET _plugins/_ml/tasks/<task_id>
-```
 
-### Verify deployed models
-```json
-GET _plugins/_ml/models/_all
-```
+GET /_plugins/_ml/tasks/R10elJkByjMWPGFjNNOV
 
----
 
-## 2) Create Index with Vector Field
+--------------------- Step-4 ---------------------
+PUT my-vector-index
+{
+  "settings": {
+    "number_of_shards": 1,
+    "number_of_replicas": 0
+  },
+  "mappings": {
+    "properties": {
+      "field1": { "type": "text" },
+      "vector_field": { "type": "dense_vector", "dims": 1536 }
+    }
+  }
+}
 
-```json
-PUT departments-index
+--------------------- Step-5 ---------------------
+PUT my-vector-index
 {
   "settings": {
     "index": {
@@ -64,164 +62,65 @@ PUT departments-index
   },
   "mappings": {
     "properties": {
-      "department_name": { "type": "text", "analyzer": "standard" },
-      "department_id":   { "type": "keyword" },
-      "keywords":        { "type": "text", "analyzer": "standard" },
-      "description":     { "type": "text", "analyzer": "standard" },
-      "category":        { "type": "keyword" },
+      "department_name": {
+        "type": "text",
+        "analyzer": "standard"
+      },
+      "department_id": {
+        "type": "keyword"
+      },
+      "keywords": {
+        "type": "text",
+        "analyzer": "standard"
+      },
+      "description": {
+        "type": "text",
+        "analyzer": "standard"
+      },
+      "category": {
+        "type": "keyword"
+      },
       "department_vector": {
         "type": "knn_vector",
         "dimension": 768,
         "method": {
           "name": "hnsw",
-          "space_type": "cosine",
+          "space_type": "cosinesimil",
           "engine": "lucene",
-          "parameters": { "ef_construction": 256, "m": 16 }
+          "parameters": {
+            "ef_construction": 256,
+            "m": 16
+          }
         }
       }
     }
   }
 }
-```
 
----
-
-## 3) Create Ingest Pipeline
-
-Replace `<model_id>` with your model ID.
-
-```json
-PUT _ingest/pipeline/department-embedding-pipeline
+--------------------- Step-6 [Replace model id] ---------------------
+PUT _ingest/pipeline/text-embedding-pipeline
 {
-  "description": "Department embedding pipeline",
+  "description": "Title & Content embedding pipeline",
   "processors": [
     {
       "text_embedding": {
-        "model_id": "<model_id>",
+        "model_id": "HqGbrZkBFFxNQDhxa79M",
         "field_map": {
-          "combined_text": "department_vector"
+          "title": "title_vector",
+          "content": "content_vector"
         }
       }
     },
-    { "remove": { "field": "combined_text" } }
-  ]
-}
-```
-
----
-
-## 4) Bulk Insert Departments with Auto-Embeddings
-
-```json
-POST departments-index/_bulk?pipeline=department-embedding-pipeline
-{ "index": { "_id": "dept_1" } }
-{ "department_name": "Talent Acquisition", "department_id": "dept_1", "keywords": "recruiting recruitment hiring talent sourcing headhunting HR human resources", "description": "Responsible for finding, attracting, and hiring top talent for the organization", "category": "Human Resources", "combined_text": "Talent Acquisition recruiting recruitment hiring talent sourcing headhunting HR human resources Responsible for finding, attracting, and hiring top talent for the organization" }
-{ "index": { "_id": "dept_2" } }
-{ "department_name": "Payroll", "department_id": "dept_2", "keywords": "salary wages compensation benefits payroll processing HR human resources", "description": "Manages employee compensation, benefits, and payroll processing", "category": "Human Resources", "combined_text": "Payroll salary wages compensation benefits payroll processing HR human resources Manages employee compensation, benefits, and payroll processing" }
-{ "index": { "_id": "dept_3" } }
-{ "department_name": "Software Engineering", "department_id": "dept_3", "keywords": "software development programming coding backend frontend fullstack developer engineer", "description": "Develops and maintains software applications and systems", "category": "Technology", "combined_text": "Software Engineering software development programming coding backend frontend fullstack developer engineer Develops and maintains software applications and systems" }
-{ "index": { "_id": "dept_4" } }
-{ "department_name": "Software Testing", "department_id": "dept_4", "keywords": "quality assurance QA testing automation manual testing software tester engineer", "description": "Ensures software quality through testing and quality assurance processes", "category": "Technology", "combined_text": "Software Testing quality assurance QA testing automation manual testing software tester engineer Ensures software quality through testing and quality assurance processes" }
-{ "index": { "_id": "dept_5" } }
-{ "department_name": "DevOps Engineering", "department_id": "dept_5", "keywords": "infrastructure deployment automation CI/CD docker kubernetes cloud devops engineer", "description": "Manages infrastructure, deployment, and automation processes", "category": "Technology", "combined_text": "DevOps Engineering infrastructure deployment automation CI/CD docker kubernetes cloud devops engineer Manages infrastructure, deployment, and automation processes" }
-{ "index": { "_id": "dept_6" } }
-{ "department_name": "Data Science", "department_id": "dept_6", "keywords": "machine learning AI artificial intelligence data analysis analytics scientist", "description": "Analyzes data and builds machine learning models for business insights", "category": "Technology", "combined_text": "Data Science machine learning AI artificial intelligence data analysis analytics scientist Analyzes data and builds machine learning models for business insights" }
-{ "index": { "_id": "dept_7" } }
-{ "department_name": "Product Management", "department_id": "dept_7", "keywords": "product strategy roadmap requirements business analysis product manager", "description": "Defines product strategy and manages product development lifecycle", "category": "Product", "combined_text": "Product Management product strategy roadmap requirements business analysis product manager Defines product strategy and manages product development lifecycle" }
-{ "index": { "_id": "dept_8" } }
-{ "department_name": "Marketing", "department_id": "dept_8", "keywords": "digital marketing campaigns advertising promotion brand marketing manager", "description": "Promotes products and services through various marketing channels", "category": "Marketing", "combined_text": "Marketing digital marketing campaigns advertising promotion brand marketing manager Promotes products and services through various marketing channels" }
-{ "index": { "_id": "dept_9" } }
-{ "department_name": "Sales", "department_id": "dept_9", "keywords": "business development sales representative account management revenue", "description": "Drives revenue through direct sales and customer relationship management", "category": "Sales", "combined_text": "Sales business development sales representative account management revenue Drives revenue through direct sales and customer relationship management" }
-{ "index": { "_id": "dept_10" } }
-{ "department_name": "Customer Support", "department_id": "dept_10", "keywords": "customer service support help desk technical support customer success", "description": "Provides assistance and support to customers", "category": "Support", "combined_text": "Customer Support customer service support help desk technical support customer success Provides assistance and support to customers" }
-```
-
-### Refresh & verify
-```json
-POST departments-index/_refresh
-GET _cat/indices/departments-index?v
-GET departments-index/_count
-```
-
----
-
-## 5) Single Neural Search
-
-Replace `<model_id>`.
-
-```json
-POST departments-index/_search
-{
-  "size": 3,
-  "query": {
-    "neural": {
-      "department_vector": {
-        "query_text": "Software Automation Engineer",
-        "model_id": "<model_id>",
-        "k": 6
+    {
+      "remove": {
+        "field": ["title", "content"]
       }
     }
-  },
-  "_source": ["department_name", "department_id", "keywords", "description", "category"]
+  ]
 }
-```
-
----
-
-## 6) Multi-Search (Batch Job Titles)
-
-Each 2 lines = one query.
-
-```json
-POST _msearch
-{"index":"departments-index"}
-{"size":3,"query":{"neural":{"department_vector":{"query_text":"Resource Hiring HR","model_id":"<model_id>","k":6}}},"_source":["department_name","department_id","keywords","description","category"]}
-{"index":"departments-index"}
-{"size":3,"query":{"neural":{"department_vector":{"query_text":"Payroll Manager","model_id":"<model_id>","k":6}}},"_source":["department_name","department_id","keywords","description","category"]}
-{"index":"departments-index"}
-{"size":3,"query":{"neural":{"department_vector":{"query_text":"Fullstack Developer","model_id":"<model_id>","k":6}}},"_source":["department_name","department_id","keywords","description","category"]}
-{"index":"departments-index"}
-{"size":3,"query":{"neural":{"department_vector":{"query_text":"QA Automation Engineer","model_id":"<model_id>","k":6}}},"_source":["department_name","department_id","keywords","description","category"]}
-{"index":"departments-index"}
-{"size":3,"query":{"neural":{"department_vector":{"query_text":"DevOps Specialist","model_id":"<model_id>","k":6}}},"_source":["department_name","department_id","keywords","description","category"]}
-{"index":"departments-index"}
-{"size":3,"query":{"neural":{"department_vector":{"query_text":"Machine Learning Scientist","model_id":"<model_id>","k":6}}},"_source":["department_name","department_id","keywords","description","category"]}
-{"index":"departments-index"}
-{"size":3,"query":{"neural":{"department_vector":{"query_text":"Product Owner","model_id":"<model_id>","k":6}}},"_source":["department_name","department_id","keywords","description","category"]}
-{"index":"departments-index"}
-{"size":3,"query":{"neural":{"department_vector":{"query_text":"Marketing Executive","model_id":"<model_id>","k":6}}},"_source":["department_name","department_id","keywords","description","category"]}
-{"index":"departments-index"}
-{"size":3,"query":{"neural":{"department_vector":{"query_text":"Account Executive","model_id":"<model_id>","k":6}}},"_source":["department_name","department_id","keywords","description","category"]}
-{"index":"departments-index"}
-{"size":3,"query":{"neural":{"department_vector":{"query_text":"Technical Support Specialist","model_id":"<model_id>","k":6}}},"_source":["department_name","department_id","keywords","description","category"]}
-```
-
----
-
-✅ That’s the full pipeline — from registering a HuggingFace model → deploying → creating index + pipeline → inserting sample departments → semantic search & multi-search queries.
-
-
-GET /resumes/_mapping
-
-GET /resumes/_search
-{
-  "query": {
-    "match_all": {}
-  }
-}
-
-
-POST /resumes/_delete_by_query
-{
-  "query": {
-    "match_all": {}
-  }
-}
-
-DELETE /resumes
-
-
+--------------------- Step-7 [Schema] ---------------------
 # Create the resumes index with custom analyzers and mappings
+DELETE /resumes
 PUT /resumes
 {
   "settings": {
@@ -285,62 +184,24 @@ PUT /resumes
   },
   "mappings": {
     "properties": {
-      "candidate_name": {
-        "type": "text",
-        "fields": {
-          "keyword": {
-            "type": "keyword",
-            "ignore_above": 256
-          }
-        }
-      },
-      "address": {
-        "type": "text",
-        "fields": {
-          "keyword": {
-            "type": "keyword",
-            "ignore_above": 256
-          }
-        }
-      },
-      "city": {
-        "type": "text",
-        "fields": {
-          "keyword": {
-            "type": "keyword",
-            "ignore_above": 256
-          }
-        }
-      },
-      "date_of_birth": {
-        "type": "date",
-        "ignore_malformed": true
-      },
-      "email": {
-        "type": "text",
-        "fields": {
-          "keyword": {
-            "type": "keyword",
-            "ignore_above": 256
-          }
-        }
-      },
-      "gender": {
-        "type": "text",
-        "fields": {
-          "keyword": {
-            "type": "keyword",
-            "ignore_above": 256
-          }
-        }
-      },
-      "mobile_number": {
-        "type": "text",
-        "fields": {
-          "keyword": {
-            "type": "keyword",
-            "ignore_above": 256
-          }
+      "candidate_name": { "type": "text", "fields": { "keyword": { "type": "keyword", "ignore_above": 256 } } },
+      "date_of_birth": { "type": "date", "ignore_malformed": true },
+      "address": { "type": "text", "fields": { "keyword": { "type": "keyword", "ignore_above": 256 } } },
+      "city": { "type": "text", "fields": { "keyword": { "type": "keyword", "ignore_above": 256 } } },
+      "current_location": { "type": "text", "fields": { "keyword": { "type": "keyword", "ignore_above": 256 } } },
+      "age": { "type": "integer" },
+      "email": { "type": "text", "fields": { "keyword": { "type": "keyword", "ignore_above": 256 } } },
+      "gender": { "type": "text", "fields": { "keyword": { "type": "keyword", "ignore_above": 256 } } },
+      "mobile_number": { "type": "text", "fields": { "keyword": { "type": "keyword", "ignore_above": 256 } } },
+      "industry": { "type": "text", "fields": { "keyword": { "type": "keyword", "ignore_above": 256 } } },
+      "role": { "type": "text", "fields": { "keyword": { "type": "keyword", "ignore_above": 256 } } },
+      "total_experience": { "type": "float" },
+      "department": {
+        "type": "nested",
+        "properties": {
+          "department": { "type": "text", "fields": { "keyword": { "type": "keyword", "ignore_above": 256 } } },
+          "role": { "type": "text", "fields": { "keyword": { "type": "keyword", "ignore_above": 256 } } },
+          "fullString": { "type": "text" }
         }
       },
       "skills": {
@@ -351,29 +212,14 @@ PUT /resumes
             "analyzer": "resume_analyzer",
             "search_analyzer": "search_analyzer",
             "fields": {
-              "keyword": {
-                "type": "keyword",
-                "ignore_above": 256
-              },
-              "suggest": {
-                "type": "completion",
-                "analyzer": "simple",
-                "preserve_separators": true,
-                "preserve_position_increments": true,
-                "max_input_length": 50
-              },
-              "searchable": {
-                "type": "search_as_you_type",
-                "doc_values": false,
-                "max_shingle_size": 3
-              }
+              "keyword": { "type": "keyword", "ignore_above": 256 },
+              "suggest": { "type": "completion", "analyzer": "simple", "preserve_separators": true, "preserve_position_increments": true, "max_input_length": 50 },
+              "searchable": { "type": "search_as_you_type", "doc_values": false, "max_shingle_size": 3 }
             }
           },
-          "skill_type": {
-            "type": "text"
-          }
+          "skill_type": { "type": "text" }
         }
-      },  
+      },
       "certificates": {
         "type": "nested",
         "properties": {
@@ -382,182 +228,75 @@ PUT /resumes
             "analyzer": "resume_analyzer",
             "search_analyzer": "search_analyzer",
             "fields": {
-              "keyword": {
-                "type": "keyword",
-                "ignore_above": 256
-              },
-              "suggest": {
-                "type": "completion",
-                "analyzer": "simple",
-                "preserve_separators": true,
-                "preserve_position_increments": true,
-                "max_input_length": 50
-              }
+              "keyword": { "type": "keyword", "ignore_above": 256 },
+              "suggest": { "type": "completion", "analyzer": "simple", "preserve_separators": true, "preserve_position_increments": true, "max_input_length": 50 }
             }
           },
-          "issue_date": {
-            "type": "date",
-            "ignore_malformed": true
-          },
+          "issue_date": { "type": "date", "ignore_malformed": true },
           "provider": {
             "type": "text",
             "analyzer": "resume_analyzer",
             "search_analyzer": "search_analyzer",
-            "fields": {
-              "keyword": {
-                "type": "keyword",
-                "ignore_above": 256
-              }
-            }
+            "fields": { "keyword": { "type": "keyword", "ignore_above": 256 } }
           }
         }
       },
       "education": {
         "type": "nested",
         "properties": {
-          "course_name": {
-            "type": "text",
-            "analyzer": "resume_analyzer",
-            "search_analyzer": "search_analyzer",
-            "fields": {
-              "keyword": {
-                "type": "keyword",
-                "ignore_above": 256
-              },
-              "suggest": {
-                "type": "completion",
-                "analyzer": "simple"
-              }
-            }
-          },
-          "from": {
-            "type": "date",
-            "ignore_malformed": true
-          },
-          "to": {
-            "type": "date",
-            "ignore_malformed": true
-          },
-          "school_college_name": {
-            "type": "text",
-            "analyzer": "resume_analyzer",
-            "search_analyzer": "search_analyzer",
-            "fields": {
-              "keyword": {
-                "type": "keyword",
-                "ignore_above": 256
-              },
-              "suggest": {
-                "type": "completion",
-                "analyzer": "simple"
-              }
-            }
-          },
-          "school_college_city": {
-            "type": "text",
-            "fields": {
-              "keyword": {
-                "type": "keyword",
-                "ignore_above": 256
-              }
-            }
-          },
-          "specialization": {
-            "type": "text",
-            "analyzer": "resume_analyzer",
-            "search_analyzer": "search_analyzer",
-            "fields": {
-              "keyword": {
-                "type": "keyword",
-                "ignore_above": 256
-              }
-            }
-          }
+          "course_name": { "type": "text", "analyzer": "resume_analyzer", "search_analyzer": "search_analyzer", "fields": { "keyword": { "type": "keyword", "ignore_above": 256 }, "suggest": { "type": "completion", "analyzer": "simple" } } },
+          "from": { "type": "date", "ignore_malformed": true },
+          "to": { "type": "date", "ignore_malformed": true },
+          "school_college_name": { "type": "text", "analyzer": "resume_analyzer", "search_analyzer": "search_analyzer", "fields": { "keyword": { "type": "keyword", "ignore_above": 256 }, "suggest": { "type": "completion", "analyzer": "simple" } } },
+          "school_college_city": { "type": "text", "fields": { "keyword": { "type": "keyword", "ignore_above": 256 } } },
+          "specialization": { "type": "text", "analyzer": "resume_analyzer", "search_analyzer": "search_analyzer", "fields": { "keyword": { "type": "keyword", "ignore_above": 256 } } },
+          "evaluation_score": { "type": "text" },
+          "education_level": { "type": "text", "fields": { "keyword": { "type": "keyword", "ignore_above": 256 } } }
         }
       },
       "experience": {
         "type": "nested",
         "properties": {
-          "company_name": {
-            "type": "text",
-            "analyzer": "resume_analyzer",
-            "search_analyzer": "search_analyzer",
-            "fields": {
-              "keyword": {
-                "type": "keyword",
-                "ignore_above": 256
-              },
-              "suggest": {
-                "type": "completion",
-                "analyzer": "simple",
-                "preserve_separators": true,
-                "preserve_position_increments": true,
-                "max_input_length": 50
-              }
-            }
-          },
-          "role_position": {
-            "type": "text",
-            "analyzer": "resume_analyzer",
-            "search_analyzer": "search_analyzer",
-            "fields": {
-              "keyword": {
-                "type": "keyword",
-                "ignore_above": 256
-              },
-              "suggest": {
-                "type": "completion",
-                "analyzer": "simple",
-                "preserve_separators": true,
-                "preserve_position_increments": true,
-                "max_input_length": 50
-              }
-            }
-          },
-          "from": {
-            "type": "date",
-            "ignore_malformed": true
-          },
-          "to": {
-            "type": "date",
-            "ignore_malformed": true
-          },
-          "current_position": {
-            "type": "boolean"
-          },
-          "location": {
-            "type": "text",
-            "fields": {
-              "keyword": {
-                "type": "keyword",
-                "ignore_above": 256
-              }
-            }
-          },
-          "project_department": {
-            "type": "text",
-            "analyzer": "resume_analyzer",
-            "search_analyzer": "search_analyzer",
-            "fields": {
-              "keyword": {
-                "type": "keyword",
-                "ignore_above": 256
-              }
-            }
-          },
-          "job_description": {
-            "type": "text",
-            "analyzer": "resume_analyzer",
-            "search_analyzer": "search_analyzer",
-            "fields": {
-              "keyword": {
-                "type": "keyword",
-                "ignore_above": 256
-              }
-            }
-          }
+          "company_name": { "type": "text", "analyzer": "resume_analyzer", "search_analyzer": "search_analyzer", "fields": { "keyword": { "type": "keyword", "ignore_above": 256 }, "suggest": { "type": "completion", "analyzer": "simple", "preserve_separators": true, "preserve_position_increments": true, "max_input_length": 50 } } },
+          "role_position": { "type": "text", "analyzer": "resume_analyzer", "search_analyzer": "search_analyzer", "fields": { "keyword": { "type": "keyword", "ignore_above": 256 }, "suggest": { "type": "completion", "analyzer": "simple", "preserve_separators": true, "preserve_position_increments": true, "max_input_length": 50 } } },
+          "from": { "type": "date", "ignore_malformed": true },
+          "to": { "type": "date", "ignore_malformed": true },
+          "current_position": { "type": "boolean" },
+          "location": { "type": "text", "fields": { "keyword": { "type": "keyword", "ignore_above": 256 } } },
+          "project_department": { "type": "text", "analyzer": "resume_analyzer", "search_analyzer": "search_analyzer", "fields": { "keyword": { "type": "keyword", "ignore_above": 256 } } },
+          "job_description": { "type": "text", "analyzer": "resume_analyzer", "search_analyzer": "search_analyzer", "fields": { "keyword": { "type": "keyword", "ignore_above": 256 } } },
+          "url": { "type": "text" }
+        }
+      },
+      "projects": {
+        "type": "nested",
+        "properties": {
+          "project_name": { "type": "text" },
+          "role_position": { "type": "text" },
+          "from": { "type": "date", "ignore_malformed": true },
+          "to": { "type": "date", "ignore_malformed": true },
+          "description": { "type": "text" },
+          "technologies": { "type": "text" },
+          "url": { "type": "text" }
+        }
+      },
+      "accomplishments": {
+        "type": "nested",
+        "properties": {
+          "accomplishment": { "type": "text" },
+          "when": { "type": "date", "ignore_malformed": true },
+          "url": { "type": "text" },
+          "description": { "type": "text" }
         }
       }
     }
   }
 }
+
+
+
+
+
+
+
+
