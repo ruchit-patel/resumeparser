@@ -69,6 +69,8 @@ class Resume(Document):
 				- If the resume mentions "A-76, Sector-40, Noida, Delhi NCR", output "Noida, Delhi, India"
 			Current Location: Always set this field to the **location of the most recent or current job**. Format it in full proper form: City, State, Country.
 			Experience Location: All locations in the `experience` array must also be in full proper format: City, State, Country.
+			Education Level: For each education entry, add a field `"education_level"` which should be one of `"UG"` | `"PG"` | `"SSC"` | `"HSC"` | `"Diploma"` | `"Other"`. Infer this based on the course name, degree, or contextual clues from the resume.
+
 			Education & Dates: For all date fields (education dates, experience dates, etc):
 			- If exact date is known, use YYYY-MM-DD format
 			- If only month and year are known, use YYYY-MM-01 format
@@ -100,7 +102,8 @@ class Resume(Document):
 					"specialization": "string",
 					"from": "YYYY-MM-DD",
 					"to": "YYYY-MM-DD",
-					"evaluation_score": "string"
+					"evaluation_score": "string",
+					"education_level": "UG | PG | SSC | HSC | Diploma | Other",
 					}
 				],
 				"experience": [
