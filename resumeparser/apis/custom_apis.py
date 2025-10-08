@@ -455,6 +455,190 @@ def generate_assessment_pdf(assessment_name, fields=None):
         }
 
 
+@frappe.whitelist(allow_guest=True)
+def shared_resumes(page=1, per_page=10, search_term=None, shared_by_filter=None):
+    """
+    Get paginated list of resumes shared with current user with simple search functionality
+    """
+    try:
+        from resumeparser.apis.update_profile import get_resume_from_id, open_search_query_executor
+
+        current_user = frappe.session.user
+        page = int(page)
+        per_page = int(per_page)
+        start = (page - 1) * per_page
+
+        # Get all shared resumes for current user with owner info
+        shared_filters = {'user': current_user, 'share_doctype': 'Resume'}
+
+        # Add shared_by filter if provided
+        if shared_by_filter:
+            shared_filters['owner'] = shared_by_filter
+
+        shared_docs = frappe.get_all(
+            'DocShare',
+            filters=shared_filters,
+            fields=['share_name', 'owner', 'creation']
+        )
+
+        if not shared_docs:
+            return {
+                "data": [],
+                "pagination": {
+                    "current_page": page,
+                    "per_page": per_page,
+                    "total_count": 0,
+                    "total_pages": 0,
+                    "has_next": False,
+                    "has_prev": False
+                },
+                "shared_by_users": []
+            }
+
+        # Get resume IDs
+        resume_ids = [doc['share_name'] for doc in shared_docs]
+
+        # Create a map of resume_id to owner info
+        owner_map = {doc['share_name']: {
+            'shared_by': doc['owner'],
+            'shared_on': doc['creation']
+        } for doc in shared_docs}
+
+        # Get unique shared_by users for filter dropdown
+        shared_by_users = []
+        unique_owners = list(set([doc['owner'] for doc in shared_docs]))
+        for owner in unique_owners:
+            try:
+                user_doc = frappe.get_doc('User', owner)
+                shared_by_users.append({
+                    'email': owner,
+                    'name': user_doc.full_name or owner
+                })
+            except:
+                shared_by_users.append({
+                    'email': owner,
+                    'name': owner
+                })
+
+        # Get resume data from OpenSearch
+        row_query = get_resume_from_id(resume_ids)
+        response = open_search_query_executor(row_query)
+        row_data = response.get('hits', {}).get('hits', [])
+
+        # Process resume data
+        all_data = []
+        for source_row in row_data:
+            source = source_row.get("_source")
+            resume_id = str(source_row.get("_id"))
+
+            # Get owner info
+            owner_info = owner_map.get(resume_id, {})
+            shared_by = owner_info.get('shared_by', 'Unknown')
+            shared_on = owner_info.get('shared_on', None)
+
+            # Get user details for shared_by
+            try:
+                user_doc = frappe.get_doc('User', shared_by)
+                shared_by_name = user_doc.full_name or shared_by
+                shared_by_email = user_doc.email
+            except:
+                shared_by_name = shared_by
+                shared_by_email = shared_by
+
+            # Apply search filter if provided
+            if search_term:
+                search_lower = search_term.lower()
+                candidate_name = (source.get('candidate_name') or "").lower()
+                email = (source.get('email') or "").lower()
+                city = (source.get('city') or "").lower()
+                shared_by_lower = (shared_by_name or "").lower()
+
+                # Skip if doesn't match search
+                if not (search_lower in candidate_name or
+                        search_lower in email or
+                        search_lower in city or
+                        search_lower in shared_by_lower):
+                    continue
+
+            skills = source.get("skills", [])
+            technical_skills = [s.get("skill_name", "") for s in skills if s.get("skill_type") == "Technical"]
+            soft_skills = [s.get("skill_name", "") for s in skills if s.get("skill_type") == "Soft"]
+
+            resume_data = {
+                "id": resume_id,
+                "shared_by": shared_by_name,
+                "shared_by_email": shared_by_email,
+                "shared_on": str(shared_on) if shared_on else None,
+                "basicInfo": {
+                    "candidate_name": source.get('candidate_name'),
+                    "date_of_birth": None,
+                    "address": None,
+                    "gender": None,
+                    "mobile_number": source.get('mobile_number'),
+                    "email": source.get('email'),
+                    "city": source.get('city'),
+                    "maritalStatus": "-",
+                    "castCategory": "-",
+                    "physicallyChallenged": "-"
+                },
+                "workSummary": {
+                    "industry": None,
+                    "department": None,
+                    "role": None
+                },
+                "education": source.get('education', []),
+                "experience": source.get('experience', []),
+                "projects": source.get('projects', []),
+                "certificates": source.get('certificates', []),
+                "accomplishments": [],
+                "skills": {
+                    "TechnicalSkill": technical_skills,
+                    "Soft": soft_skills,
+                    "AdditionalSkills": []
+                }
+            }
+            all_data.append(resume_data)
+
+        # Apply pagination
+        total_count = len(all_data)
+        total_pages = (total_count + per_page - 1) // per_page if total_count > 0 else 0
+        paginated_data = all_data[start:start + per_page]
+
+        has_next = page < total_pages
+        has_prev = page > 1
+
+        return {
+            "data": paginated_data,
+            "pagination": {
+                "current_page": page,
+                "per_page": per_page,
+                "total_count": total_count,
+                "total_pages": total_pages,
+                "has_next": has_next,
+                "has_prev": has_prev,
+                "next_page": page + 1 if has_next else None,
+                "prev_page": page - 1 if has_prev else None
+            },
+            "shared_by_users": shared_by_users
+        }
+
+    except Exception as e:
+        frappe.log_error(f"Error in shared_resumes: {str(e)}")
+        return {
+            "data": [],
+            "error": str(e),
+            "pagination": {
+                "current_page": 1,
+                "per_page": per_page,
+                "total_count": 0,
+                "total_pages": 0,
+                "has_next": False,
+                "has_prev": False
+            },
+            "shared_by_users": []
+        }
+
+
 def generate_assessment_html(assessment, selected_fields=None):
     """
     Generate HTML content for assessment PDF with Seachend Search Advisors Private Limited watermark

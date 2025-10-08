@@ -9,6 +9,7 @@ import DiversityDetails from '../components/diversity/DiversityDetails';
 import '../App.css';
 import { useNavigate } from 'react-router-dom';
 import SaveResumesComponent from './SaveResumesComponent';
+import SharedResumesComponent from './SharedResumesComponent';
 import JobPostsComponent from './JobPostsComponent';
 import AssessmentsComponent from './AssessmentsComponent';
 import RecentSearches from '../components/search/RecentSearches';
@@ -143,14 +144,20 @@ const ResumeFindPage = () => {
                 >
                   Job Posts
                 </TabsTrigger>
-                <TabsTrigger 
-                  value="saved" 
+                <TabsTrigger
+                  value="saved"
                   className="rounded-none border-b-2 border-transparent data-[state=active]:border-blue-600 data-[state=active]:bg-white px-4 py-2"
                 >
                   Saved Candidates
                 </TabsTrigger>
-                <TabsTrigger 
-                  value="assessments" 
+                <TabsTrigger
+                  value="shared"
+                  className="rounded-none border-b-2 border-transparent data-[state=active]:border-blue-600 data-[state=active]:bg-white px-4 py-2"
+                >
+                  Shared with me
+                </TabsTrigger>
+                <TabsTrigger
+                  value="assessments"
                   className="rounded-none border-b-2 border-transparent data-[state=active]:border-blue-600 data-[state=active]:bg-white px-4 py-2"
                 >
                   Assessments
@@ -215,6 +222,10 @@ const ResumeFindPage = () => {
 
               <TabsContent value="saved">
                 <SaveResumesComponent />
+              </TabsContent>
+
+              <TabsContent value="shared">
+                <SharedResumesComponent />
               </TabsContent>
 
               <TabsContent value="assessments">
