@@ -31,12 +31,18 @@ const Header = () => {
                 Search Resumes
               </button>
 
+              <button
+                onClick={() => navigate('/resume_search/upload')}
+                className="border-b-2 border-blue-500 text-gray-900 px-1 pt-1 text-sm font-medium">
+                Upload Resume
+              </button>
+
               {/* <button
                 onClick={() => navigate('/resume_search/results')}
                 className="border-b-2 border-blue-500 text-gray-900 px-1 pt-1 text-sm font-medium">
                 ResDesk
               </button> */}
-              
+
             </nav>
           </div>
           

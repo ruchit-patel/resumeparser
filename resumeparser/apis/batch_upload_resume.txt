@@ -1,0 +1,273 @@
+import os
+import requests
+import subprocess
+
+# =====================================
+# CONFIGURATION
+# =====================================
+API_KEY = "756912ffc6042de"
+API_SECRET = "8bfe2ffb6d68f70"
+
+UPLOAD_URL = "http://localhost:8090/api/method/upload_file"
+RESUME_CREATE_URL = "http://localhost:8090/api/resource/Resume"
+RESUME_CHECK_URL = "http://localhost:8090/api/resource/File"
+
+HEADERS = {
+    "Authorization": f"token {API_KEY}:{API_SECRET}",
+    "Content-Type": "application/json"
+}
+
+FOLDER_PATH = "resumes"
+PROCESSED_PREFIX = "processed_"
+ALREADY_PREFIX = "already_"
+
+# =====================================
+# Convert DOC/DOCX to PDF
+# =====================================
+def convert_doc_to_pdf(input_path):
+    base_name = os.path.splitext(os.path.basename(input_path))[0]
+    output_path = os.path.join(os.path.dirname(input_path), f"{base_name}.pdf")
+    
+    command = [
+        "/Applications/LibreOffice.app/Contents/MacOS/soffice",
+        "--headless",
+        "--convert-to",
+        "pdf",
+        input_path,
+        "--outdir",
+        os.path.dirname(output_path)
+    ]
+
+    try:
+        subprocess.run(command, check=True)
+        if os.path.exists(output_path):
+            print(f"✅ Converted {input_path} -> {output_path}")
+            # Delete original DOC/DOCX after conversion
+            os.remove(input_path)
+            print(f"🗑️ Original file removed: {input_path}")
+            return output_path
+        else:
+            print(f"❌ Conversion failed, PDF not found: {output_path}")
+            return None
+    except subprocess.CalledProcessError as e:
+        print(f"❌ Error converting {input_path} -> {e}")
+        return None
+
+# =====================================
+# Check if Resume doc already exists
+# =====================================
+def resume_exists(title):
+    params = {
+        "filters": f'[["file_name","=","{title}"]]',
+        "fields": '["name"]'
+    }
+    try:
+        res = requests.get(RESUME_CHECK_URL, headers=HEADERS, params=params, timeout=30)
+        res.raise_for_status()
+        data = res.json().get("data", [])
+        return len(data) > 0
+    except requests.exceptions.RequestException as e:
+        print(f"⚠️ Error checking existing Resume: {e}")
+        return False
+
+# =====================================
+# Upload file to Frappe
+# =====================================
+def upload_file(file_path):
+    file_name = os.path.basename(file_path)
+    print(f"\n📤 Uploading: {file_name} ...")
+
+    with open(file_path, "rb") as f:
+        files = {"file": (file_name, f, "application/pdf")}
+        data = {"is_private": 1}
+        try:
+            res = requests.post(UPLOAD_URL, headers={"Authorization": f"token {API_KEY}:{API_SECRET}"}, files=files, data=data, timeout=60)
+            res.raise_for_status()
+            file_url = res.json()["message"]["file_url"]
+            print(f"✅ Uploaded: {file_name} -> {file_url}")
+            return file_url
+        except requests.exceptions.RequestException as e:
+            print(f"❌ Upload failed: {file_name} -> {e}")
+            return None
+
+# =====================================
+# Create Resume document in Frappe
+# =====================================
+def create_resume(file_url, file_path, title=None):
+    doc_payload = {
+        "resume_file": file_url,
+        "upload_by": "Manual",
+        "approve_status": 0
+    }
+    if title:
+        doc_payload["title"] = title
+
+    payload = {"data": doc_payload}
+
+    try:
+        res = requests.post(RESUME_CREATE_URL, headers=HEADERS, json=payload, timeout=60)
+        res.raise_for_status()
+        doc_name = res.json()["data"]["name"]
+        print(f"✅ Resume doc created: {doc_name}")
+
+        # rename original file with prefix
+        base_name = os.path.basename(file_path)
+        dir_name = os.path.dirname(file_path)
+        new_name = os.path.join(dir_name, f"{PROCESSED_PREFIX}{base_name}")
+        os.rename(file_path, new_name)
+        print(f"✏️ File renamed -> {os.path.basename(new_name)}")
+
+        return doc_name
+    except requests.exceptions.RequestException as e:
+        print(f"❌ Failed to create Resume doc -> {e}")
+        return None
+
+# =====================================
+# MAIN LOOP
+# =====================================
+def main():
+    all_files = [os.path.join(FOLDER_PATH, f) for f in os.listdir(FOLDER_PATH)
+                 if f.lower().endswith((".pdf", ".docx", ".doc"))]
+
+    if not all_files:
+        print("No files found.")
+        return
+
+    for f in all_files:
+        file_name = os.path.basename(f)
+
+        # 0️⃣ Skip if already has prefix
+        if file_name.startswith(PROCESSED_PREFIX) or file_name.startswith(ALREADY_PREFIX):
+            print(f"⏭️ Skipped already prefixed file: {file_name}")
+            continue
+
+        # 1️⃣ Convert DOC/DOCX to PDF (and delete original)
+        if f.lower().endswith((".doc", ".docx")):
+            converted_pdf = convert_doc_to_pdf(f)
+            if not converted_pdf:
+                continue  # skip if conversion failed
+            f = converted_pdf  # use PDF path for further processing
+            file_name = os.path.basename(f)
+
+        # 2️⃣ Check if Resume already exists
+        if resume_exists(file_name):
+            print(f"⏭️ Resume already exists in Frappe, skipping: {file_name}")
+            dir_name = os.path.dirname(f)
+            new_name = os.path.join(dir_name, f"{ALREADY_PREFIX}{file_name}")
+            os.rename(f, new_name)
+            print(f"✏️ File renamed -> {os.path.basename(new_name)}")
+            continue
+
+        # 3️⃣ Upload file
+        file_url = upload_file(f)
+        if file_url:
+            create_resume(file_url, f, title=file_name)
+
+if __name__ == "__main__":
+    main()
+
+
+
+
+------------------------------------------------------------[Multi Threading]-----------------------------------------------------------
+
+import os
+import requests
+import subprocess
+from concurrent.futures import ThreadPoolExecutor, as_completed
+
+API_KEY = "756912ffc6042de"
+API_SECRET = "8bfe2ffb6d68f70"
+
+UPLOAD_URL = "http://localhost:8090/api/method/upload_file"
+RESUME_CREATE_URL = "http://localhost:8090/api/resource/Resume"
+RESUME_CHECK_URL = "http://localhost:8090/api/resource/File"
+
+HEADERS = {
+    "Authorization": f"token {API_KEY}:{API_SECRET}",
+    "Content-Type": "application/json"
+}
+
+FOLDER_PATH = "resumes"
+PROCESSED_PREFIX = "processed_"
+ALREADY_PREFIX = "already_"
+LIBREOFFICE_PATH = "/Applications/LibreOffice.app/Contents/MacOS/soffice"
+
+# =====================================
+# Process single resume
+# =====================================
+def process_resume(file_path):
+    file_name = os.path.basename(file_path)
+
+    if file_name.startswith(PROCESSED_PREFIX) or file_name.startswith(ALREADY_PREFIX):
+        return f"⏭️ Skipped already prefixed: {file_name}"
+
+    # Convert DOC/DOCX to PDF
+    if file_path.lower().endswith((".doc", ".docx")):
+        base_name = os.path.splitext(file_name)[0]
+        pdf_path = os.path.join(os.path.dirname(file_path), f"{base_name}.pdf")
+        command = [LIBREOFFICE_PATH, "--headless", "--convert-to", "pdf", file_path, "--outdir", os.path.dirname(pdf_path)]
+        try:
+            subprocess.run(command, check=True)
+            if os.path.exists(pdf_path):
+                os.remove(file_path)
+                file_path = pdf_path
+                file_name = os.path.basename(file_path)
+            else:
+                return f"❌ Conversion failed: {file_name}"
+        except subprocess.CalledProcessError as e:
+            return f"❌ Error converting {file_name} -> {e}"
+
+    # Check if resume exists
+    params = {"filters": f'[["file_name","=","{file_name}"]]', "fields": '["name"]'}
+    try:
+        res = requests.get(RESUME_CHECK_URL, headers=HEADERS, params=params, timeout=30)
+        res.raise_for_status()
+        if len(res.json().get("data", [])) > 0:
+            new_name = os.path.join(os.path.dirname(file_path), f"{ALREADY_PREFIX}{file_name}")
+            os.rename(file_path, new_name)
+            return f"⏭️ Already exists, renamed -> {os.path.basename(new_name)}"
+    except requests.exceptions.RequestException as e:
+        return f"⚠️ Error checking resume {file_name} -> {e}"
+
+    # Upload
+    try:
+        with open(file_path, "rb") as f:
+            files = {"file": (file_name, f, "application/pdf")}
+            data = {"is_private": 1}
+            res = requests.post(UPLOAD_URL, headers={"Authorization": f"token {API_KEY}:{API_SECRET}"}, files=files, data=data, timeout=60)
+            res.raise_for_status()
+            file_url = res.json()["message"]["file_url"]
+    except requests.exceptions.RequestException as e:
+        return f"❌ Upload failed {file_name} -> {e}"
+
+    # Create Resume
+    doc_payload = {"resume_file": file_url, "upload_by": "Manual", "approve_status": 0, "title": file_name}
+    try:
+        res = requests.post(RESUME_CREATE_URL, headers=HEADERS, json={"data": doc_payload}, timeout=60)
+        res.raise_for_status()
+        new_name = os.path.join(os.path.dirname(file_path), f"{PROCESSED_PREFIX}{file_name}")
+        os.rename(file_path, new_name)
+        return f"✅ Processed: {file_name}"
+    except requests.exceptions.RequestException as e:
+        return f"❌ Failed to create Resume {file_name} -> {e}"
+
+# =====================================
+# Main
+# =====================================
+def main():
+    all_files = [os.path.join(FOLDER_PATH, f) for f in os.listdir(FOLDER_PATH)
+                 if f.lower().endswith((".pdf", ".docx", ".doc"))]
+
+    if not all_files:
+        print("No files found.")
+        return
+
+    # Use ThreadPoolExecutor to process 5-10 files in parallel
+    with ThreadPoolExecutor(max_workers=5) as executor:
+        futures = [executor.submit(process_resume, f) for f in all_files]
+        for future in as_completed(futures):
+            print(future.result())
+
+if __name__ == "__main__":
+    main()
