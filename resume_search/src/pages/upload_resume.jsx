@@ -39,14 +39,14 @@ const UploadResumePage = () => {
     setSuccess('');
 
     try {
-      // Step 1: Upload file
+      // Step 1: Upload file using custom API (handles DOC to PDF conversion)
       const formData = new FormData();
       formData.append('file', selectedFile);
       formData.append('is_private', 0);
 
       const csrfToken = window.csrf_token;
 
-      const uploadResponse = await fetch('/api/method/upload_file', {
+      const uploadResponse = await fetch('/api/method/resumeparser.apis.custom_apis.upload_and_convert_resume', {
         method: 'POST',
         headers: {
           'X-Frappe-CSRF-Token': csrfToken,
@@ -61,6 +61,7 @@ const UploadResumePage = () => {
       const uploadData = await uploadResponse.json();
       const fileUrl = uploadData.message.file_url;
       const fileName = uploadData.message.file_name;
+      const uploadMessage = uploadData.message.message;
 
       // Step 2: Create Resume record
       const docPayload = {
@@ -105,7 +106,7 @@ const UploadResumePage = () => {
 
       const resumeData = await resumeResponse.json();
 
-      setSuccess('Resume uploaded successfully!');
+      setSuccess(uploadMessage || 'Resume uploaded successfully!');
       setSelectedFile(null);
 
       // Reset file input

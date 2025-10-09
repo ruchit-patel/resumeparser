@@ -1010,3 +1010,151 @@ def generate_assessment_html(assessment, selected_fields=None):
     """
     
     return html_content
+
+
+
+
+import os
+import requests
+import subprocess
+
+def convert_doc_to_pdf(input_path):
+    base_name = os.path.splitext(os.path.basename(input_path))[0]
+    output_path = os.path.join(os.path.dirname(input_path), f"{base_name}.pdf")
+    
+    command = [
+        "/opt/homebrew/bin/soffice",
+        "--headless",
+        "--convert-to",
+        "pdf",
+        input_path,
+        "--outdir",
+        os.path.dirname(output_path)
+    ]
+
+    try:
+        subprocess.run(command, check=True)
+        if os.path.exists(output_path):
+            print(f"✅ Converted {input_path} -> {output_path}")
+            # Delete original DOC/DOCX after conversion
+            os.remove(input_path)
+            print(f"🗑️ Original file removed: {input_path}")
+            return output_path
+        else:
+            print(f"❌ Conversion failed, PDF not found: {output_path}")
+            return None
+    except subprocess.CalledProcessError as e:
+        print(f"❌ Error converting {input_path} -> {e}")
+        return None
+
+
+
+@frappe.whitelist(allow_guest=True)
+def upload_and_convert_resume():
+    """
+    Process resume file: if PDF keep as is, if DOC/DOCX convert to PDF
+    Save to File DocType and return file path (prevents duplicate files)
+    """
+    try:
+        # Get uploaded file from request
+        files = frappe.request.files
+        file = files.get('file')
+
+        if not file:
+            frappe.throw("No file uploaded")
+
+        filename = file.filename
+        file_content = file.stream
+
+        if not file_content or not filename:
+            frappe.throw("Invalid file data")
+
+        # Get file extension
+        file_ext = os.path.splitext(filename)[1].lower()
+
+        # Validate file type
+        allowed_extensions = ['.pdf', '.doc', '.docx']
+        if file_ext not in allowed_extensions:
+            frappe.throw("Only PDF, DOC, and DOCX files are allowed")
+
+        # Get is_private parameter (default to 0)
+        is_private = int(frappe.form_dict.get('is_private', 0))
+
+        from frappe.utils.file_manager import save_file
+        import tempfile
+
+        # Save uploaded file to temporary location
+        temp_dir = tempfile.gettempdir()
+        temp_file_path = os.path.join(temp_dir, filename)
+
+        # Write uploaded content to temp file
+        with open(temp_file_path, 'wb') as f:
+            f.write(file_content.read())
+
+        final_file_path = temp_file_path
+        message = ""
+
+        # Prepare PDF filename
+        pdf_filename = os.path.splitext(filename)[0] + '.pdf'
+
+        # Check if file already exists in File DocType
+        existing_file = frappe.get_all(
+            "File",
+            filters={"file_name": pdf_filename},
+            fields=["name", "file_url", "file_name"]
+        )
+
+        if existing_file:
+            # File already exists, return existing file URL
+            # Clean up uploaded file
+            if os.path.exists(temp_file_path):
+                os.remove(temp_file_path)
+
+            return {
+                "status": "success",
+                "message": "File already exists, using existing file",
+                "file_url": existing_file[0].get("file_url"),
+                "file_name": existing_file[0].get("file_name")
+            }
+
+        # If DOC/DOCX, convert to PDF
+        if file_ext in ['.doc', '.docx']:
+            # Convert to PDF
+            pdf_path = convert_doc_to_pdf(temp_file_path)
+
+            if not pdf_path or not os.path.exists(pdf_path):
+                # Clean up temp file
+                if os.path.exists(temp_file_path):
+                    os.remove(temp_file_path)
+                frappe.throw("Failed to convert DOC/DOCX to PDF. Please ensure LibreOffice is installed.")
+
+            final_file_path = pdf_path
+            message = "File converted to PDF and saved successfully"
+        else:
+            message = "PDF file saved successfully"
+
+        # Read file content
+        with open(final_file_path, 'rb') as f:
+            final_content = f.read()
+
+        # Save to File DocType with PDF filename
+        file_doc = save_file(pdf_filename, final_content, '', '', is_private=is_private)
+
+        # Clean up temporary files
+        if final_file_path != temp_file_path and os.path.exists(final_file_path):
+            os.remove(final_file_path)
+        if os.path.exists(temp_file_path):
+            os.remove(temp_file_path)
+
+        frappe.db.commit()
+
+        return {
+            "status": "success",
+            "message": message,
+            "file_url": file_doc.file_url,
+            "file_name": file_doc.file_name
+        }
+
+    except Exception as e:
+        frappe.log_error(f"Error in upload_and_convert_resume: {str(e)}")
+        frappe.throw(f"Upload failed: {str(e)}")
