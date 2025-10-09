@@ -1023,7 +1023,7 @@ def convert_doc_to_pdf(input_path):
     output_path = os.path.join(os.path.dirname(input_path), f"{base_name}.pdf")
     
     command = [
-        "/opt/homebrew/bin/soffice",
+        "/usr/bin/soffice",
         "--headless",
         "--convert-to",
         "pdf",
